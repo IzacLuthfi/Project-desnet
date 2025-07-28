@@ -3,13 +3,24 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProjectController; // <-- Tambahkan ini
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\AdminController;
 
+
+Route::post('/projects/ajax-store', [ProjectController::class, 'ajaxStore']);
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Halaman utama (welcome)
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Redirect dashboard sesuai role
+// Redirect ke dashboard sesuai role
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
@@ -31,44 +42,28 @@ Route::get('/dashboard', function () {
     }
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Route dashboard berdasarkan role
+// ==================== DASHBOARD PER ROLE ====================
 Route::middleware(['auth'])->group(function () {
-    // Admin
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
-
-    // PM
-    Route::get('/pm/dashboard', function () {
-        return view('pm.dashboard');
-    })->name('pm.dashboard');
-
-    // HOD
-    Route::get('/hod/dashboard', function () {
-        return view('hod.dashboard');
-    })->name('hod.dashboard');
-
-    // Staff
-    Route::get('/staff/dashboard', function () {
-        return view('staff.dashboard');
-    })->name('staff.dashboard');
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
+    Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
+    Route::get('/staff/dashboard', fn () => view('staff.dashboard'))->name('staff.dashboard');
 });
 
-// Route profil user
+// ==================== PROFIL USER ====================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ==================== Tambahan: ROUTE PROJECT ====================
-Route::middleware(['auth'])->prefix('project')->group(function () {
-    Route::get('/', [ProjectController::class, 'index'])->name('project.index');         // Halaman utama
-    Route::post('/', [ProjectController::class, 'store'])->name('project.store');        // Simpan data baru
-    Route::get('/{id}', [ProjectController::class, 'show'])->name('project.show');       // Detail dokumen
-    Route::get('/{id}/edit', [ProjectController::class, 'edit'])->name('project.edit');  // Edit
-    Route::put('/{id}', [ProjectController::class, 'update'])->name('project.update');   // Update
-    Route::delete('/{id}', [ProjectController::class, 'destroy'])->name('project.destroy'); // Hapus
+// ==================== PROJECT ROUTES ====================
+Route::middleware(['auth'])->group(function () {
+    // Resource route utama
+    Route::resource('projects', ProjectController::class);
+
+    // ➕ Tambahan: route AJAX untuk store data dari dashboard
+    Route::post('/projects/ajax-store', [ProjectController::class, 'ajaxStore'])->name('projects.ajax.store');
 });
 
 require __DIR__.'/auth.php';

@@ -1,4 +1,4 @@
-@extends('layouts.app') {{-- Pastikan layout utama ada --}}
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
@@ -22,45 +22,50 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($projects as $project)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $project->judul }}</td>
-                    <td>Rp{{ number_format($project->nilai, 0, ',', '.') }}</td>
-                    <td>{{ ucfirst($project->status) }}</td>
-                    <td>
-                        <!-- Tombol Detail -->
-                        <button 
-                            class="btn btn-success btn-sm btn-detail"
-                            data-id="{{ $project->id }}"
-                            data-judul="{{ $project->judul }}"
-                            data-nilai="{{ $project->nilai }}"
-                            data-status="{{ $project->status }}"
-                            data-personel='@json($project->personel->map(fn($p) => $p->role . ": " . $p->nama))'
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalDetailProyek"
-                        >
-                            Detail
-                        </button>
+                @forelse ($projects as $project)
+    <tr>
+        <td>{{ $loop->iteration }}</td>
+        <td>{{ $project->judul }}</td>
+        <td>Rp{{ number_format($project->nilai, 0, ',', '.') }}</td>
+        <td>{{ ucfirst($project->status) }}</td>
+        <td>
+            <!-- Tombol Detail -->
+            <button 
+                class="btn btn-success btn-sm btn-detail"
+                data-id="{{ $project->id }}"
+                data-judul="{{ $project->judul }}"
+                data-nilai="{{ $project->nilai }}"
+                data-status="{{ $project->status }}"
+                data-personel='@json($project->projectPersonel->map(fn($p) => $p->role . ": " . $p->nama))'
+                data-bs-toggle="modal"
+                data-bs-target="#modalDetailProyek"
+            >
+                Detail
+            </button>
 
-                        <!-- Tombol Edit -->
-                        <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-warning btn-sm">Edit</a>
+            <!-- Tombol Edit -->
+            <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                        <!-- Tombol Hapus -->
-                        <form action="{{ route('projects.destroy', $project->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus proyek ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
+            <!-- Tombol Hapus -->
+            <form action="{{ route('projects.destroy', $project->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus proyek ini?')">
+                @csrf
+                @method('DELETE')
+                <button class="btn btn-danger btn-sm">Hapus</button>
+            </form>
+        </td>
+    </tr>
 
-                @if ($projects->isEmpty())
-                <tr>
-                    <td colspan="5" class="text-center">Belum ada data proyek.</td>
-                </tr>
-                @endif
+    {{-- Optional: Tampilkan nama-nama personel (di luar tabel jika perlu) --}}
+    {{-- @foreach ($project->projectPersonel as $personel)
+        <p>{{ $personel->nama }}</p>
+    @endforeach --}}
+
+@empty
+    <tr>
+        <td colspan="5" class="text-center">Belum ada data proyek.</td>
+    </tr>
+@endforelse
+
             </tbody>
         </table>
     </div>
@@ -84,7 +89,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
