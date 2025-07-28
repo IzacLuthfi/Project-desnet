@@ -5,31 +5,182 @@
   <title>Dashboard Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- Bootstrap, Font & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <form id="formTambahProject">
+
+  <!-- Personel Dynamic JS -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let personelCount = 3;
+
+      document.getElementById('addPersonelBtn').addEventListener('click', function () {
+        const container = document.getElementById('personelContainer');
+        const index = personelCount++;
+        
+        const row = document.createElement('div');
+        row.className = 'row g-2 mb-3 personel-row';
+        row.innerHTML = `
+          <div class="col-md-6">
+            <label class="form-label">Personel ${index + 1}</label>
+            <input type="text" name="personel[${index}][nama]" class="form-control rounded-3">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Sebagai:</label>
+            <select name="personel[${index}][role]" class="form-select rounded-3">
+              <option value="">Pilih peran</option>
+              <option>Analis</option>
+              <option>Programer web</option>
+              <option>Programer mobile</option>
+              <option>Tester</option>
+              <option>Desainer</option>
+              <option>Front-end</option>
+            </select>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    });
+  </script>
 
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     let personelCount = 3;
 
     document.getElementById('addPersonelBtn').addEventListener('click', function () {
-      personelCount++;
+      // Tambah personel secara dinamis
+    });
+  });
+</script>
 
+<script>
+  document.getElementById('addPersonelBtn').addEventListener('click', function () {
+    // Tambah personel (duplikat dari atas)
+  });
+
+  // AJAX simpan project juga di sini
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  let personelCount = 3;
+
+  // HANYA INI SAJA: tombol tambah personel
+  document.getElementById('addPersonelBtn').addEventListener('click', function () {
+    const container = document.getElementById('personelContainer');
+    const index = personelCount++;
+
+    const row = document.createElement('div');
+    row.className = 'row g-2 mb-3 personel-row';
+    row.innerHTML = `
+      <div class="col-md-6">
+        <label class="form-label">Personel ${index + 1}</label>
+        <input type="text" name="personel[${index}][nama]" class="form-control" placeholder="Nama Personel">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Sebagai:</label>
+        <select name="personel[${index}][role]" class="form-select">
+          <option value="">Pilih peran</option>
+          <option>Analis</option>
+          <option>Programer web</option>
+          <option>Programer mobile</option>
+          <option>Tester</option>
+          <option>Desainer</option>
+          <option>Front-end</option>
+        </select>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+
+    // Simpan proyek via AJAX
+  document.getElementById('formTambahProject').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const notif = document.getElementById('notifAjax');
+    const btn = document.getElementById('btnSimpanProject');
+
+    btn.disabled = true;
+    fetch("{{ url('/projects/ajax-store') }}", {
+      method: "POST",
+      headers: {
+        "X-CSRF-TOKEN": '{{ csrf_token() }}'
+      },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      btn.disabled = false;
+      if (data.success) {
+        notif.classList.remove('d-none', 'alert-danger');
+        notif.classList.add('alert-success');
+        notif.innerText = data.message;
+
+        // Tambahkan baris ke tabel
+        const table = document.getElementById('tabelWorkOrder').querySelector('tbody');
+        const index = table.querySelectorAll('tr').length + 1;
+        const personelList = data.project.project_personel.map(p => p.nama).join(', ');
+        const row = `
+  <tr>
+    <td>${index}</td>
+    <td>${data.project.judul}</td>
+    <td><span class="status-dot dot-warning"></span> Belum Diajukan</td>
+    <td><span class="status-dot dot-warning"></span> Belum Disetujui</td>
+    <td>${parseInt(data.project.nilai).toLocaleString('id-ID')}</td>
+    <td>${personelList || '-'}</td>
+    <td>
+      <a href="/projects/${data.project.id}" class="btn btn-sm btn-info text-white">Detail</a>
+      <a href="/projects/${data.project.id}/edit" class="btn btn-sm btn-warning text-white">Edit</a>
+      <form action="/projects/${data.project.id}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus?')">
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+      </form>
+    </td>
+  </tr>`;
+        table.insertAdjacentHTML('beforeend', row);
+
+        // Reset form & tutup modal
+        form.reset();
+        document.getElementById('modalTambahProject').querySelector('.btn-close').click();
+      } else {
+        notif.classList.remove('d-none', 'alert-success');
+        notif.classList.add('alert-danger');
+        notif.innerText = data.message || 'Gagal menyimpan proyek.';
+      }
+    })
+    .catch(err => {
+      notif.classList.remove('d-none', 'alert-success');
+      notif.classList.add('alert-danger');
+      notif.innerText = 'Kesalahan server. Silakan coba lagi.';
+      btn.disabled = false;
+    });
+  });
+});
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let personelCount = 3;
+
+    // Tambah Personel
+    document.getElementById('addPersonelBtn').addEventListener('click', function () {
       const container = document.getElementById('personelContainer');
+      const index = personelCount++;
 
       const row = document.createElement('div');
-      row.className = 'row g-2 mb-3';
-
+      row.className = 'row g-2 mb-3 personel-row';
       row.innerHTML = `
         <div class="col-md-6">
-          <label class="form-label">Personel ${personelCount}</label>
-          <input type="text" name="personel[]" class="form-control rounded-3">
+          <label class="form-label">Personel ${index + 1}</label>
+          <input type="text" name="personel[${index}][nama]" class="form-control" placeholder="Nama Personel">
         </div>
         <div class="col-md-6">
           <label class="form-label">Sebagai:</label>
-          <select name="role[]" class="form-select rounded-3">
+          <select name="personel[${index}][role]" class="form-select">
             <option value="">Pilih peran</option>
             <option>Analis</option>
             <option>Programer web</option>
@@ -40,14 +191,56 @@
           </select>
         </div>
       `;
-
       container.appendChild(row);
+    });
+
+    // RESET form saat klik Batal
+    document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const form = document.getElementById('formTambahProject');
+        form.reset();
+
+        // Hapus semua personel dinamis
+        const container = document.getElementById('personelContainer');
+        container.innerHTML = '';
+
+        // Tambahkan kembali default 3 personel
+        personelCount = 3;
+        for (let i = 0; i < 3; i++) {
+          const row = document.createElement('div');
+          row.className = 'row g-2 mb-3 personel-row';
+          row.innerHTML = `
+            <div class="col-md-6">
+              <label class="form-label">Personel ${i + 1}</label>
+              <input type="text" name="personel[${i}][nama]" class="form-control" placeholder="Nama Personel">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Sebagai:</label>
+              <select name="personel[${i}][role]" class="form-select">
+                <option value="">Pilih peran</option>
+                <option>Analis</option>
+                <option>Programer web</option>
+                <option>Programer mobile</option>
+                <option>Tester</option>
+                <option>Desainer</option>
+                <option>Front-end</option>
+              </select>
+            </div>
+          `;
+          container.appendChild(row);
+        }
+
+        // Sembunyikan notifikasi
+        const notif = document.getElementById('notifAjax');
+        notif.classList.add('d-none');
+        notif.innerText = '';
+      });
     });
   });
 </script>
 
 
-
+  <!-- Style -->
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -97,11 +290,6 @@
       align-items: center;
     }
 
-    .topbar .logo img {
-      height: 32px;
-      margin-right: 10px;
-    }
-
     .main-content {
       margin-left: 240px;
       padding: 30px;
@@ -146,47 +334,24 @@
     .dot-success { background-color: #22c55e; }
     .dot-warning { background-color: #f59e0b; }
 
-    .doc-box {
-      background-color: #f8f9ff;
+    .doc-box, .komisi-box {
+      background-color: #ffffff;
       border: 1px solid #e0e7ff;
       border-radius: 14px;
       padding: 20px;
       text-align: center;
     }
 
-    .doc-box i {
+    .doc-box i, .komisi-box i {
       font-size: 28px;
       margin-bottom: 8px;
       display: block;
     }
 
-    .doc-box .title {
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .doc-box .number {
+    .number {
       font-size: 24px;
       font-weight: bold;
       color: #4f46e5;
-    }
-
-    .komisi-box {
-      background-color: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .komisi-box .title {
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .komisi-box .amount {
-      font-size: 22px;
-      font-weight: bold;
     }
 
     table th, table td {
@@ -196,261 +361,185 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="text-center mb-3">
-      <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-      <div class="role-label"><i class="bi bi-person-fill"></i> Admin</div>
-    </div>
-    <nav class="nav flex-column">
-      <a href="#" class="nav-link active">Beranda</a>
-      <a href="#" class="nav-link">Kelola User</a>
-      <a href="#" class="nav-link">Monitoring</a>
-      <a href="#" class="nav-link">Komisi</a>
-    </nav>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="text-center mb-3">
+    <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
+    <div class="role-label"><i class="bi bi-person-fill"></i> Admin</div>
   </div>
+  <nav class="nav flex-column">
+    <a href="#" class="nav-link active">Beranda</a>
+    <a href="#" class="nav-link">Kelola User</a>
+    <a href="#" class="nav-link">Monitoring</a>
+    <a href="#" class="nav-link">Komisi</a>
+  </nav>
+</div>
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="logo d-flex align-items-center">
-      <h6 class="mb-0 fw-bold">Managemen Arsip Dokumen dan Komisi</h6>
-    </div>
-    <div class="d-flex align-items-center gap-3">
-      <i class="bi bi-calendar-event"></i>
-      <i class="bi bi-question-circle"></i>
-      <i class="bi bi-bell"></i>
-    </div>
+<!-- Topbar -->
+<div class="topbar">
+  <div><h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6></div>
+  <div class="d-flex align-items-center gap-3">
+    <i class="bi bi-calendar-event"></i>
+    <i class="bi bi-question-circle"></i>
+    <i class="bi bi-bell"></i>
   </div>
+</div>
 
-  <!-- Main Content -->
-    <div class="main-content">
-        <button class="add-button mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahProject">
-        <i class="bi bi-plus-circle me-1"></i> Tambah Dokumen
-    </button>
-    <!-- Modal Tambah Project -->
+<!-- Main Content -->
+<div class="main-content">
+
+  <!-- Tombol Tambah -->
+<button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahProject">
+  <i class="bi bi-plus-circle me-1"></i> Tambah Dokumen
+</button>
+
+<!-- Modal Tambah Proyek -->
 <div class="modal fade" id="modalTambahProject" tabindex="-1" aria-labelledby="modalTambahProjectLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content rounded-4 shadow">
-      <div class="modal-header border-bottom-0">
-        <h5 class="modal-title fw-bold" id="modalTambahProjectLabel">Tambah Data Project</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold">Tambah Data Project</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+      <form action="{{ route('projects.store') }}" method="POST" id="formTambahProject">
+        @csrf
+        <div id="notifAjax" class="alert d-none" role="alert"></div>
+        <div class="modal-body">
 
-      <div class="modal-body px-4">
-        <form>
           <!-- Proyek -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Judul Proyek</label>
-            <input type="text" class="form-control rounded-3">
-          </div>
           <div class="mb-4">
-            <label class="form-label fw-semibold">Nilai Proyek</label>
-            <input type="text" class="form-control rounded-3">
+            <h6 class="fw-semibold">Proyek</h6>
+
+            <div class="mb-3">
+              <label class="form-label">Judul Proyek</label>
+              <input type="text" name="judul" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Nilai Proyek</label>
+              <input type="number" name="nilai" class="form-control" required>
+            </div>
           </div>
 
           <!-- Personel -->
-          <h6 class="fw-bold mb-3">Personel</h6>
-
           <div class="mb-3">
-            <label class="form-label fw-semibold">Project Manager</label>
-            <input type="text" class="form-control rounded-3">
-          </div>
+            <h6 class="fw-semibold">Personel</h6>
 
-          <div id="personelContainer">
-  <!-- Personel 1 -->
-  <div class="row g-2 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Personel 1</label>
-      <input type="text" class="form-control rounded-3" name="personel[]">
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Sebagai:</label>
-      <select class="form-select rounded-3" name="role[]">
-        <option value="">Pilih peran</option>
-        <option>Analis</option>
-        <option>Programer web</option>
-        <option>Programer mobile</option>
-        <option>Tester</option>
-        <option>Desainer</option>
-        <option>Front-end</option>
-      </select>
-    </div>
-  </div>
+            <div class="mb-3">
+              <label class="form-label">Project Manager</label>
+              <input type="text" name="pm" class="form-control" required>
+            </div>
 
-  <!-- Personel 2 -->
-  <div class="row g-2 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Personel 2</label>
-      <input type="text" class="form-control rounded-3" name="personel[]">
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Sebagai:</label>
-      <select class="form-select rounded-3" name="role[]">
-        <option value="">Pilih peran</option>
-        <option>Analis</option>
-        <option>Programer web</option>
-        <option>Programer mobile</option>
-        <option>Tester</option>
-        <option>Desainer</option>
-        <option>Front-end</option>
-      </select>
-    </div>
-  </div>
+            <div id="personelContainer">
+              @for ($i = 0; $i < 3; $i++)
+              <div class="row g-2 mb-3 personel-row">
+                <div class="col-md-6">
+                  <label class="form-label">Personel {{ $i + 1 }}</label>
+                  <input type="text" name="personel[{{ $i }}][nama]" class="form-control" placeholder="Nama Personel">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Sebagai:</label>
+                  <select name="personel[{{ $i }}][role]" class="form-select">
+                    <option value="">Pilih peran</option>
+                    <option>Analis</option>
+                    <option>Programer web</option>
+                    <option>Programer mobile</option>
+                    <option>Tester</option>
+                    <option>Desainer</option>
+                    <option>Front-end</option>
+                  </select>
+                </div>
+              </div>
+              @endfor
+            </div>
 
-  <!-- Personel 3 -->
-  <div class="row g-2 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Personel 3</label>
-      <input type="text" class="form-control rounded-3" name="personel[]">
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Sebagai:</label>
-      <select class="form-select rounded-3" name="role[]">
-        <option value="">Pilih peran</option>
-        <option>Analis</option>
-        <option>Programer web</option>
-        <option>Programer mobile</option>
-        <option>Tester</option>
-        <option>Desainer</option>
-        <option>Front-end</option>
-      </select>
-    </div>
-  </div>
-</div>
-
-
-          <!-- Tombol Tambah Personel -->
-          <div class="mb-4">
-            <button type="button" id="addPersonelBtn" class="btn btn-primary rounded-pill px-3">
+            <!-- Tombol Tambah Personel -->
+            <button type="button" class="btn btn-sm btn-primary mt-2 rounded-pill px-3" id="addPersonelBtn">
               <i class="bi bi-plus-circle me-1"></i> Tambah Personel
             </button>
           </div>
-        </form>
-      </div>
+        </div>
 
-      <div class="modal-footer border-top-0">
-        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-primary px-4">Simpan</button>
-      </div>
+        <!-- Footer -->
+        <div class="modal-footer border-top-0">
+          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary px-4" id="btnSimpanProject">Simpan</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-    <!-- Work Order Table -->
-    <div class="card-box mb-4">
-      <h6 class="fw-bold mb-3">Work Order</h6>
-      <div class="table-responsive">
-        <table class="table table-bordered align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>No</th>
-              <th>Judul Proyek</th>
-              <th>Status Dokumen</th>
-              <th>Status Komisi</th>
-              <th>Nilai Proyek</th>
-              <th>Personel</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Trip Karimun Jawa</td>
-              <td><span class="status-dot dot-success"></span>Sudah Diajukan</td>
-              <td><span class="status-dot dot-success"></span>Disetujui</td>
-              <td>10.000.000</td>
-              <td>ahmad, fiki, tiara</td>
-              <td>
-                <button class="btn-detail">Detail</button>
-                <button class="btn-edit">Edit</button>
-                <button class="btn-hapus">Hapus</button>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Background.jpg</td>
-              <td><span class="status-dot dot-warning"></span>Belum Diajukan</td>
-              <td><span class="status-dot dot-warning"></span>Belum Disetujui</td>
-              <td>50.000.000</td>
-              <td>ahmad, fiki, tiara</td>
-              <td>
-                <button class="btn-detail">Detail</button>
-                <button class="btn-edit">Edit</button>
-                <button class="btn-hapus">Hapus</button>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Proposal.docx</td>
-              <td><span class="status-dot dot-warning"></span>Belum Diajukan</td>
-              <td><span class="status-dot dot-warning"></span>Belum Disetujui</td>
-              <td>41.500.000</td>
-              <td>ahmad, fiki, tiara</td>
-              <td>
-                <button class="btn-detail">Detail</button>
-                <button class="btn-edit">Edit</button>
-                <button class="btn-hapus">Hapus</button>
-              </td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>Illustration.ai</td>
-              <td><span class="status-dot dot-success"></span>Sudah Diajukan</td>
-              <td><span class="status-dot dot-success"></span>Disetujui</td>
-              <td>15.000.000</td>
-              <td>ahmad, fiki, tiara</td>
-              <td>
-                <button class="btn-detail">Detail</button>
-                <button class="btn-edit">Edit</button>
-                <button class="btn-hapus">Hapus</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- Tabel Work Order -->
+<div class="card-box mb-4">
+  <h6 class="fw-bold mb-3">Work Order</h6>
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle" id="tabelWorkOrder">
+      <thead class="table-light">
+        <tr>
+          <th>No</th>
+          <th>Judul Proyek</th>
+          <th>Status Dokumen</th>
+          <th>Status Komisi</th>
+          <th>Nilai Proyek</th>
+          <th>Personel</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        @php $projects = $projects ?? collect(); @endphp
+        @forelse ($projects as $project)
+          <tr>
+            <td>{{ $loop->iteration }}</td>
+            <td>{{ $project->judul }}</td>
+            <td>
+              <span class="status-dot {{ $project->status_dokumen === 'Sudah Diajukan' ? 'dot-success' : 'dot-warning' }}"></span>
+              {{ $project->status_dokumen ?? 'Belum Diajukan' }}
+            </td>
+            <td>
+              <span class="status-dot {{ $project->status_komisi === 'Disetujui' ? 'dot-success' : 'dot-warning' }}"></span>
+              {{ $project->status_komisi ?? 'Belum Disetujui' }}
+            </td>
+            <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
+            <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
+            <td>
+              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
+              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Edit</a>
+              <form action="{{ route('projects.destroy', $project->id) }}" method="POST" style="display:inline;">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
+              </form>
+            </td>
+          </tr>
+        @empty
+          <tr>
+            <td colspan="7" class="text-center text-muted">Belum ada dokumen proyek.</td>
+          </tr>
+        @endforelse
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <!-- Dokument Statistik -->
-    <div class="row g-3 mb-4">
-      <div class="col-md-4">
-        <div class="doc-box">
-          <i class="bi bi-folder-fill text-primary"></i>
-          <div class="title">Total Dokumen</div>
-          <div class="number">47</div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="doc-box">
-          <i class="bi bi-folder-symlink-fill text-warning"></i>
-          <div class="title">Dokumen Revisi</div>
-          <div class="number">15</div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="doc-box">
-          <i class="bi bi-folder-check text-success"></i>
-          <div class="title">Dokumen Selesai</div>
-          <div class="number">32</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Komisi Statistik -->
+  <!-- Statistik Dokumen -->
+  <div class="card-box mb-4">
+    <h6 class="fw-bold mb-3">Dokumen</h6>
     <div class="row g-3">
-      <div class="col-md-6">
-        <div class="komisi-box">
-          <div class="title">Komisi Bulan ini</div>
-          <div class="amount">Rp. 76.000.000,00</div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="komisi-box">
-          <div class="title">Komisi Tahun ini</div>
-          <div class="amount">Rp. 1.546.000.000,00</div>
-        </div>
-      </div>
+      <div class="col-md-4"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">47</div></div></div>
+      <div class="col-md-4"><div class="doc-box border-warning"><i class="bi bi-folder-symlink-fill text-warning"></i><div class="title">Dokumen Revisi</div><div class="number">15</div></div></div>
+      <div class="col-md-4"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">32</div></div></div>
     </div>
   </div>
 
+  <!-- Statistik Komisi -->
+  <div class="card-box mb-4">
+    <h6 class="fw-bold mb-3">Komisi</h6>
+    <div class="row g-3">
+      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Bulan ini</div><div class="amount">Rp. 76.000.000,00</div></div></div>
+      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Tahun ini</div><div class="amount">Rp. 1.546.000.000,00</div></div></div>
+    </div>
+  </div>
+
+</div>
 </body>
 </html>
