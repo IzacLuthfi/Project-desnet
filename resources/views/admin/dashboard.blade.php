@@ -372,6 +372,9 @@ document.addEventListener('DOMContentLoaded', function () {
     <a href="#" class="nav-link">Kelola User</a>
     <a href="#" class="nav-link">Monitoring</a>
     <a href="#" class="nav-link">Komisi</a>
+    <a href="#" id="btnLogout" class="btn btn-sm btn-dark mt-auto d-flex align-items-center justify-content-center">
+  <i class="bi bi-box-arrow-right me-1"></i> Logout
+</a>
   </nav>
 </div>
 
@@ -505,10 +508,15 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>
               <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
               <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Edit</a>
-              <form action="{{ route('projects.destroy', $project->id) }}" method="POST" style="display:inline;">
-                @csrf @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
-              </form>
+
+              <!-- Tombol Hapus dengan data-id -->
+              <button 
+                class="btn btn-sm btn-danger btn-hapus" 
+                data-id="{{ $project->id }}" 
+                data-judul="{{ $project->judul }}"
+              >
+                Hapus
+              </button>
             </td>
           </tr>
         @empty
@@ -520,6 +528,100 @@ document.addEventListener('DOMContentLoaded', function () {
     </table>
   </div>
 </div>
+
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="modalKonfirmasiHapus" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      <h5 class="fw-bold mt-3">Apakah Anda yakin ingin menghapus data ini?</h5>
+      <p class="text-muted">Tindakan ini akan menghapus data secara permanen.</p>
+
+      <!-- Tidak gunakan <form>, pakai tombol biasa -->
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-dark" id="btnKonfirmasiHapus">Hapus</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const hapusButtons = document.querySelectorAll('.btn-hapus');
+    const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
+    let projectIdToDelete = null;
+    let rowToDelete = null;
+
+    // Tangkap klik tombol hapus
+    hapusButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        projectIdToDelete = this.dataset.id;
+        rowToDelete = this.closest('tr');
+        modalHapus.show();
+      });
+    });
+
+    // Ketika tombol "Hapus" dalam modal diklik
+    document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
+      if (!projectIdToDelete) return;
+
+      fetch(`/projects/${projectIdToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          // Hapus baris dari tabel tanpa reload
+          rowToDelete.remove();
+          modalHapus.hide();
+        } else {
+          alert('Gagal menghapus data. Coba lagi.');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Terjadi kesalahan!');
+      });
+    });
+  });
+</script>
+
+  <!-- Modal Logout -->
+<div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+      <h5 class="fw-bold mt-3">Apakah Anda yakin ingin keluar?</h5>
+      <p class="text-muted">Tindakan ini akan mengeluarkan anda dari aplikasi</p>
+
+      <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <div class="d-flex justify-content-center gap-2 mt-3">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-dark">Yakin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const logoutButton = document.getElementById('btnLogout');
+    const logoutModal = new bootstrap.Modal(document.getElementById('modalLogout'));
+
+    logoutButton.addEventListener('click', function (e) {
+      e.preventDefault();
+      logoutModal.show();
+    });
+  });
+</script>
+ 
 
   <!-- Statistik Dokumen -->
   <div class="card-box mb-4">

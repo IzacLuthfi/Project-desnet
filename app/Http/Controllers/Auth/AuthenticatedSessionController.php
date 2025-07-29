@@ -54,13 +54,13 @@ class AuthenticatedSessionController extends Controller
      * Logout user.
      */
     public function destroy(Request $request): RedirectResponse
-    {
-        Auth::guard('web')->logout();
+{
+    Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
+    $request->session()->invalidate();        // Hapus session
+    $request->session()->regenerateToken();   // Regenerasi CSRF token
 
-        $request->session()->regenerateToken();
+    return redirect('/');
+}
 
-        return redirect('/');
-    }
 }
