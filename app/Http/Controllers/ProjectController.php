@@ -13,6 +13,21 @@ class ProjectController extends Controller
         $projects = Project::with('projectPersonel')->get();
         return view('project.index', compact('projects'));
     }
+
+    public function destroy($id)
+{
+    $project = Project::findOrFail($id);
+    $project->delete();
+
+    // Return response JSON untuk AJAX
+    if (request()->expectsJson()) {
+        return response()->json(['success' => true]);
+    }
+
+    // Fallback jika bukan AJAX
+    return redirect()->route('dashboard')->with('success', 'Data berhasil dihapus.');
+}
+
    public function ajaxStore(Request $request)
 {
     $project = Project::create([
@@ -27,7 +42,7 @@ class ProjectController extends Controller
             'role' => $p['role'],
         ]);
     }
-
+    
     $project->load('projectPersonel');
 
     return response()->json([
@@ -128,12 +143,4 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil diperbarui.');
     }
 
-    public function destroy($id)
-    {
-        $project = Project::findOrFail($id);
-        $project->projectPersonel()->delete();
-        $project->delete();
-
-        return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus.');
-    }
 }
