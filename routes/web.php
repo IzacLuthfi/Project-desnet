@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
+use App\Http\Controllers\HodController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,9 +50,9 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
-    Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
-    Route::get('/staff/dashboard', fn () => view('staff.dashboard'))->name('staff.dashboard');
+    Route::get('/pm/dashboard', fn() => view('pm.dashboard'))->name('pm.dashboard');
+    Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
+    Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -65,4 +66,4 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
 });
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
