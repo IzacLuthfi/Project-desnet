@@ -8,8 +8,8 @@ class RouteServiceProvider extends ServiceProvider
 {
     public const HOME = '/dashboard';
 
-    public function boot(): void
-    {
-        //
-    }
+    public function boot()
+{
+    ini_set('memory_limit', '1024M'); // Tambahkan baris ini
+}
 }

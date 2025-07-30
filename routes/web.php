@@ -7,7 +7,9 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
-
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\KomisiController;
+use App\Http\Controllers\Admin\KelolaUserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,6 +26,14 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
+
+Route::resource('kelola-user', KelolaUserController::class);
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/komisi', [KomisiController::class, 'index'])->name('komisi.index');
+});
+
+
 
 // ============ REDIRECT DASHBOARD PER ROLE ============
 Route::get('/dashboard', function () {
@@ -66,3 +76,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
 require __DIR__.'/auth.php';
+
+Route::get('/cek', function () {
+    dd(config('app.debug'));
+});
