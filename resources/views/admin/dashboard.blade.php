@@ -362,21 +362,26 @@ document.addEventListener('DOMContentLoaded', function () {
 <body>
 
 <!-- Sidebar -->
-<div class="sidebar">
+<div class="sidebar d-flex flex-column" style="height: 100vh;">
   <div class="text-center mb-3">
     <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
     <div class="role-label"><i class="bi bi-person-fill"></i> Admin</div>
   </div>
-  <nav class="nav flex-column">
-    <a href="#" class="nav-link active">Beranda</a>
-    <a href="#" class="nav-link">Kelola User</a>
-    <a href="#" class="nav-link">Monitoring</a>
-    <a href="#" class="nav-link">Komisi</a>
-    <a href="#" id="btnLogout" class="btn btn-sm btn-dark mt-auto d-flex align-items-center justify-content-center">
-  <i class="bi bi-box-arrow-right me-1"></i> Logout
-</a>
+
+  <nav class="nav flex-column mb-auto">
+    <a href="{{ route('dashboard') }}" class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">Beranda</a>
+    <a href="{{ route('kelola-user.index') }}" class="nav-link {{ Request::is('kelola-user*') ? 'active' : '' }}">Kelola User</a>
+    <a href="{{ route('komisi.index') }}" class="nav-link {{ Request::is('komisi*') ? 'active' : '' }}">Komisi</a>
   </nav>
+
+  <!-- Logout di paling bawah -->
+  <div class="mt-auto p-3">
+    <a href="#" id="btnLogout" class="btn btn-sm btn-dark w-100 d-flex align-items-center justify-content-center">
+      <i class="bi bi-box-arrow-right me-1"></i> Logout
+    </a>
+  </div>
 </div>
+
 
 <!-- Topbar -->
 <div class="topbar">
