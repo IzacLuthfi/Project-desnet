@@ -9,14 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->boolean('is_active')->default(true);
+        $table->boolean('is_active')->default(true)->after('password');
     });
 }
 
-public function down()
+public function down(): void
 {
     Schema::table('users', function (Blueprint $table) {
         $table->dropColumn('is_active');
