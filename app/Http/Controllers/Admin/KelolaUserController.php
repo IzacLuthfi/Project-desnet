@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class KelolaUserController extends Controller
 {
@@ -28,24 +28,28 @@ public function index()
 
     // Simpan user baru
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users',
-            'role'     => 'required|string',
-            'password' => 'required|string|min:6',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:6',
+        'role' => 'required|in:admin,hod,pm,staff',
+    ]);
 
-        User::create([
-            'name'      => $validated['name'],
-            'email'     => $validated['email'],
-            'role'      => $validated['role'],
-            'password'  => Hash::make($validated['password']),
-            'is_active' => true,
-        ]);
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => bcrypt($validated['password']),
+        'role' => $validated['role'],
+    ]);
 
-        return redirect()->route('kelola-user.index')->with('success', 'User berhasil ditambahkan.');
-    }
+    return response()->json([
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'role' => $user->role,
+    ]);
+}
 
     // Tampilkan form edit user
     public function edit($id)
@@ -57,9 +61,51 @@ public function index()
     // Hapus user
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
+        $user = User::find($id);
 
-        return redirect()->route('kelola-user.index')->with('success', 'User berhasil dihapus.');
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        $user->delete();
+        return response()->json(['message' => 'User berhasil dihapus'], 200);
     }
+
+    // Proses update user
+public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    $rules = [
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'role' => 'required',
+    ];
+
+    // Kalau user mau ubah password
+    if ($request->filled('password')) {
+        $rules['old_password'] = 'required';
+        $rules['password'] = 'required|min:6|confirmed'; // pakai password_confirmation
+    }
+
+    $request->validate($rules);
+
+    // Cek old password kalau mau ganti password
+    if ($request->filled('password')) {
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'errors' => ['old_password' => ['Password lama salah']]
+            ], 422);
+        }
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->role = $request->role;
+    $user->save();
+
+    return response()->json($user);
+}
+
 }

@@ -8,9 +8,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
-use App\Http\Controllers\Staff\DashboardController;
-
-
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\KelolaUserController;
+use App\Http\Controllers\Admin\KomisiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,11 +24,18 @@ use App\Http\Controllers\Staff\DashboardController;
 // Logout secara resmi → memastikan session & token dihapus
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
+Route::delete('/admin/kelola-user/{id}', [KelolaUserController::class, 'destroy'])->name('kelola-user.destroy');
+Route::put('/admin/kelola-user/{id}', [KelolaUserController::class, 'update'])->name('kelola-user.update');
+
+
 // ============ HALAMAN UTAMA (WELCOME) ============
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
+    Route::resource('kelola-user', App\Http\Controllers\Admin\KelolaUserController::class);
+});
 Route::resource('kelola-user', KelolaUserController::class);
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
