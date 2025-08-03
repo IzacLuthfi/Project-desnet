@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
   <nav class="nav flex-column">
     <a href="#" class="nav-link active">Beranda</a>
-    <a href="#" class="nav-link">Project</a>
+    <a href="{{ route('hod.project') }}" class="nav-link {{ Request::is('hod/project') ? 'active' : '' }}">Project</a>
     <a href="#" class="nav-link">Komisi</a>
     <a href="#" id="btnLogout" class="btn btn-sm btn-dark mt-auto d-flex align-items-center justify-content-center">
   <i class="bi bi-box-arrow-right me-1"></i> Logout
