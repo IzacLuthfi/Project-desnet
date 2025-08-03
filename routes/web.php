@@ -26,6 +26,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 Route::delete('/admin/kelola-user/{id}', [KelolaUserController::class, 'destroy'])->name('kelola-user.destroy');
 Route::put('/admin/kelola-user/{id}', [KelolaUserController::class, 'update'])->name('kelola-user.update');
+Route::get('/admin/kelola-user/search', [KelolaUserController::class, 'search'])->name('kelola-user.search');
 
 
 // ============ HALAMAN UTAMA (WELCOME) ============
