@@ -79,11 +79,11 @@
     <nav class="nav flex-column mb-auto">
       <a href="{{ route('hod.dashboard') }}" class="nav-link {{ Request::is('hod/dashboard') ? 'active' : '' }}">Beranda</a>
       <a href="{{ route('hod.project') }}" class="nav-link {{ Request::is('hod/project') ? 'active' : '' }}">Project</a>
-      <a href="#" class="nav-link">Komisi</a>
+      <a href="{{ route('hod.komisi') }}" class="nav-link {{ Request::is('hod/komisi') ? 'active' : '' }}">Komisi</a>
     </nav>
 
     <div class="mt-auto p-3">
-      <a href="#" id="btnLogout" class="btn btn-sm btn-light w-100 d-flex align-items-center justify-content-center">
+      <a href="#" id="btnLogout" class="btn btn-sm btn-dark w-100 d-flex align-items-center justify-content-center">
         <i class="bi bi-box-arrow-right me-1"></i> Logout
       </a>
     </div>
