@@ -70,6 +70,14 @@ public function index()
         $user->delete();
         return response()->json(['message' => 'User berhasil dihapus'], 200);
     }
+    
+    public function search(Request $request)
+{
+    $query = $request->get('q');
+    $users = User::where('name', 'like', "%{$query}%")->get();
+    return response()->json($users);
+}
+
 
     // Proses update user
 public function update(Request $request, $id)
