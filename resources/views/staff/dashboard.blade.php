@@ -319,8 +319,8 @@ document.addEventListener('DOMContentLoaded', function () {
       font-size: 14px;
     }
 
-    .btn-detail { background-color: #22c55e; }
-    .btn-edit { background-color: #f59e0b; }
+    .btn-info { background-color: #11df11; }
+    .btn-warning { background-color: #5051f9; }
     .btn-hapus { background-color: #ef4444; }
 
     .status-dot {
@@ -369,8 +369,8 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 
   <nav class="nav flex-column mb-auto">
-    <a href="{{ route('dashboard') }}" class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">Beranda</a>
-    <a href="{{ route('komisi.index') }}" class="nav-link {{ Request::is('komisi*') ? 'active' : '' }}">Komisi</a>
+    <a href="{{ route('staff.dashboard') }}" class="nav-link {{ Request::is('staff/dashboard') ? 'active' : '' }}">Beranda</a>
+    <a href="{{ route('staff.komisi') }}" class="nav-link {{ Request::is('staff/komisi') ? 'active' : '' }}">Komisi</a>
   </nav>
 
   <!-- Logout di paling bawah -->
@@ -428,8 +428,8 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
             <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
             <td>
-              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
-              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Tambah</a>
+              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info text-white">Detail</a>
+              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning text-white">Tambah</a>
             </td>
           </tr>
         @empty

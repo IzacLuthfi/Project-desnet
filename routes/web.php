@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
 use App\Http\Controllers\Staff\StaffController;
+use App\Http\Controllers\Staff\KomisiStaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
@@ -89,6 +90,8 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::post('/projects/ajax-store', [ProjectController::class, 'ajaxStore'])->name('projects.ajax.store');
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 });
+
+    Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
