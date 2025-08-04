@@ -12,6 +12,7 @@ use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
+use App\Http\Controllers\Hod\ProjectController as HodProjectController;
 
 
 /*
@@ -28,6 +29,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 Route::delete('/admin/kelola-user/{id}', [KelolaUserController::class, 'destroy'])->name('kelola-user.destroy');
 Route::put('/admin/kelola-user/{id}', [KelolaUserController::class, 'update'])->name('kelola-user.update');
+Route::get('/admin/kelola-user/search', [KelolaUserController::class, 'search'])->name('kelola-user.search');
 
 
 // ============ HALAMAN UTAMA (WELCOME) ============
@@ -74,10 +76,10 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/pm/dashboard', fn() => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
     Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
+
     Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
     Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
-
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -92,7 +94,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::get('/cek', function () {
     dd(config('app.debug'));
@@ -100,3 +102,6 @@ Route::get('/cek', function () {
 
 require __DIR__ . '/auth.php';
 
+Route::middleware(['auth'])->prefix('hod')->group(function () {
+    Route::get('/project', [HodProjectController::class, 'index'])->name('hod.project');
+});
