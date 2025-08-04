@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
+use App\Http\Controllers\PM\PMController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Staff\KomisiStaffController;
 use App\Http\Controllers\Staff\ProjectStaffController;
@@ -83,6 +84,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
     Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
+    Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
