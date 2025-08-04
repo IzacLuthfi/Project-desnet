@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Admin</title>
+  <title>Dashboard Staff</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap, Font & Icons -->
@@ -365,12 +365,11 @@ document.addEventListener('DOMContentLoaded', function () {
 <div class="sidebar d-flex flex-column" style="height: 100vh;">
   <div class="text-center mb-3">
     <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-    <div class="role-label"><i class="bi bi-person-fill"></i> Admin</div>
+    <div class="role-label"><i class="bi bi-person-fill"></i> Personel</div>
   </div>
 
   <nav class="nav flex-column mb-auto">
     <a href="{{ route('dashboard') }}" class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">Beranda</a>
-    <a href="{{ route('kelola-user.index') }}" class="nav-link {{ Request::is('kelola-user*') ? 'active' : '' }}">Kelola User</a>
     <a href="{{ route('komisi.index') }}" class="nav-link {{ Request::is('komisi*') ? 'active' : '' }}">Komisi</a>
   </nav>
 
@@ -395,88 +394,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Main Content -->
 <div class="main-content">
-
-  <!-- Tombol Tambah -->
-<button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahProject">
-  <i class="bi bi-plus-circle me-1"></i> Tambah Dokumen
-</button>
-
-<!-- Modal Tambah Proyek -->
-<div class="modal fade" id="modalTambahProject" tabindex="-1" aria-labelledby="modalTambahProjectLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content rounded-4 shadow">
-      <div class="modal-header border-bottom">
-        <h5 class="modal-title fw-bold">Tambah Data Project</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form action="{{ route('projects.store') }}" method="POST" id="formTambahProject">
-        @csrf
-        <div id="notifAjax" class="alert d-none" role="alert"></div>
-        <div class="modal-body">
-
-          <!-- Proyek -->
-          <div class="mb-4">
-            <h6 class="fw-semibold">Proyek</h6>
-
-            <div class="mb-3">
-              <label class="form-label">Judul Proyek</label>
-              <input type="text" name="judul" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Nilai Proyek</label>
-              <input type="number" name="nilai" class="form-control" required>
-            </div>
-          </div>
-
-          <!-- Personel -->
-          <div class="mb-3">
-            <h6 class="fw-semibold">Personel</h6>
-
-            <div class="mb-3">
-              <label class="form-label">Project Manager</label>
-              <input type="text" name="pm" class="form-control" required>
-            </div>
-
-            <div id="personelContainer">
-              @for ($i = 0; $i < 3; $i++)
-              <div class="row g-2 mb-3 personel-row">
-                <div class="col-md-6">
-                  <label class="form-label">Personel {{ $i + 1 }}</label>
-                  <input type="text" name="personel[{{ $i }}][nama]" class="form-control" placeholder="Nama Personel">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Sebagai:</label>
-                  <select name="personel[{{ $i }}][role]" class="form-select">
-                    <option value="">Pilih peran</option>
-                    <option>Analis</option>
-                    <option>Programer web</option>
-                    <option>Programer mobile</option>
-                    <option>Tester</option>
-                    <option>Desainer</option>
-                    <option>Front-end</option>
-                  </select>
-                </div>
-              </div>
-              @endfor
-            </div>
-
-            <!-- Tombol Tambah Personel -->
-            <button type="button" class="btn btn-sm btn-primary mt-2 rounded-pill px-3" id="addPersonelBtn">
-              <i class="bi bi-plus-circle me-1"></i> Tambah Personel
-            </button>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="modal-footer border-top-0">
-          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary px-4" id="btnSimpanProject">Simpan</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
 <!-- Tabel Work Order -->
 <div class="card-box mb-4">
@@ -512,16 +429,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
             <td>
               <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
-              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Edit</a>
-
-              <!-- Tombol Hapus dengan data-id -->
-              <button 
-                class="btn btn-sm btn-danger btn-hapus" 
-                data-id="{{ $project->id }}" 
-                data-judul="{{ $project->judul }}"
-              >
-                Hapus
-              </button>
+              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Tambah</a>
             </td>
           </tr>
         @empty
@@ -531,23 +439,6 @@ document.addEventListener('DOMContentLoaded', function () {
         @endforelse
       </tbody>
     </table>
-  </div>
-</div>
-
-<!-- Modal Konfirmasi Hapus -->
-<div class="modal fade" id="modalKonfirmasiHapus" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4">
-      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Tutup"></button>
-      <h5 class="fw-bold mt-3">Apakah Anda yakin ingin menghapus data ini?</h5>
-      <p class="text-muted">Tindakan ini akan menghapus data secara permanen.</p>
-
-      <!-- Tidak gunakan <form>, pakai tombol biasa -->
-      <div class="d-flex justify-content-center gap-2 mt-3">
-        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
-        <button type="button" class="btn btn-dark" id="btnKonfirmasiHapus">Hapus</button>
-      </div>
-    </div>
   </div>
 </div>
 

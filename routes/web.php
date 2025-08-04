@@ -8,9 +8,11 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
+use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -74,7 +76,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
     Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
-    Route::get('/staff/dashboard', [DashboardController::class, 'index'])->name('staff.dashboard');
+    Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
 
 
     // Profil

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
 
-class DashboardController extends Controller
+class StaffController extends Controller
 {
     public function index()
     {
