@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
 use App\Http\Controllers\Hod\ProjectController as HodProjectController;
+use App\Http\Controllers\Hod\KomisiController as HodKomisiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,4 +102,5 @@ require __DIR__ . '/auth.php';
 
 Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::get('/project', [HodProjectController::class, 'index'])->name('hod.project');
+    Route::get('/komisi', [HodKomisiController::class, 'index'])->name('hod.komisi');
 });
