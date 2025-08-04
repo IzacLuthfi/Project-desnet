@@ -319,8 +319,8 @@ document.addEventListener('DOMContentLoaded', function () {
       font-size: 14px;
     }
 
-    .btn-detail { background-color: #22c55e; }
-    .btn-edit { background-color: #f59e0b; }
+    .btn-info { background-color: #11df11; }
+    .btn-warning { background-color: #5051f9; }
     .btn-hapus { background-color: #ef4444; }
 
     .status-dot {
@@ -361,25 +361,18 @@ document.addEventListener('DOMContentLoaded', function () {
 </head>
 <body>
 
- <!-- Sidebar -->
-  <div class="sidebar d-flex flex-column">
-    <div class="text-center mb-3">
-      <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-      <div class="role-label"><i class="bi bi-person-fill"></i> PM</div>
-    </div>
-
-    <nav class="nav flex-column mb-auto">
-      <a href="{{ route('pm.dashboard') }}" class="nav-link {{ Request::is('pm/dashboard') ? 'active' : '' }}">Beranda</a>
-      <a href="{{ route('pm.project') }}" class="nav-link {{ Request::is('pm/project') ? 'active' : '' }}">Project</a>
-      <a href="{{ route('pm.komisi') }}" class="nav-link {{ Request::is('pm/komisi') ? 'active' : '' }}">Komisi</a>
-    </nav>
-
-    <div class="mt-auto p-3">
-      <a href="#" id="btnLogout" class="btn btn-sm btn-dark w-100 d-flex align-items-center justify-content-center">
-        <i class="bi bi-box-arrow-right me-1"></i> Logout
-      </a>
-    </div>
+<!-- Sidebar -->
+<div class="sidebar d-flex flex-column" style="height: 100vh;">
+  <div class="text-center mb-3">
+    <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
+    <div class="role-label"><i class="bi bi-person-fill"></i> PM</div>
   </div>
+
+  <nav class="nav flex-column mb-auto">
+    <a href="{{ route('pm.dashboard') }}" class="nav-link {{ Request::is('pm/dashboard') ? 'active' : '' }}">Beranda</a>
+    <a href="{{ route('pm.project') }}" class="nav-link {{ Request::is('pm/project') ? 'active' : '' }}">Project</a>
+    <a href="{{ route('pm.komisi') }}" class="nav-link {{ Request::is('pm/komisi') ? 'active' : '' }}">Komisi</a>
+  </nav>
 
   <!-- Logout di paling bawah -->
   <div class="mt-auto p-3">
@@ -436,8 +429,8 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
             <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
             <td>
-              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
-              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Tambah</a>
+              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info text-white">Detail</a>
+              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning text-white">Tambah</a>
             </td>
           </tr>
         @empty
