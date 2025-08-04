@@ -370,6 +370,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   <nav class="nav flex-column mb-auto">
     <a href="{{ route('staff.dashboard') }}" class="nav-link {{ Request::is('staff/dashboard') ? 'active' : '' }}">Beranda</a>
+    <a href="{{ route('staff.project') }}" class="nav-link {{ Request::is('staff/project') ? 'active' : '' }}">Project</a>
     <a href="{{ route('staff.komisi') }}" class="nav-link {{ Request::is('staff/komisi') ? 'active' : '' }}">Komisi</a>
   </nav>
 

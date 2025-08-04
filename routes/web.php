@@ -10,6 +10,7 @@ use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Staff\KomisiStaffController;
+use App\Http\Controllers\Staff\ProjectStaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
@@ -95,6 +96,8 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
 });
 
     Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
+    Route::get('/staff/project', [ProjectStaffController::class, 'index'])->name('staff.project');
+
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
