@@ -31,7 +31,11 @@
               {{ $project->projectPersonel->count() > 3 ? ',...' : '' }}
             </td>
             <td>
-              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
+              <a href="{{ route('projects.show', $project->id) }}" 
+                class="btn btn-sm" 
+                style="background-color: #22c55e; color: white;">
+                Detail
+              </a>
             </td>
           </tr>
         @empty
