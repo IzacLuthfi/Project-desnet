@@ -98,6 +98,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
     Route::get('/staff/project', [ProjectStaffController::class, 'index'])->name('staff.project');
 
+
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
 require __DIR__ . '/auth.php';
