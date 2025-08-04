@@ -11,6 +11,7 @@ use App\Http\Controllers\HodController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
+use App\Http\Controllers\Hod\ProjectController as HodProjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,8 +74,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/pm/dashboard', fn() => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
     Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
-    Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
-    Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
+    Route::get('/pm/dashboard', fn() => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/staff/dashboard', [DashboardController::class, 'index'])->name('staff.dashboard');
 
 
@@ -91,7 +91,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::get('/cek', function () {
     dd(config('app.debug'));
@@ -99,3 +99,6 @@ Route::get('/cek', function () {
 
 require __DIR__ . '/auth.php';
 
+Route::middleware(['auth'])->prefix('hod')->group(function () {
+    Route::get('/project', [HodProjectController::class, 'index'])->name('hod.project');
+});
