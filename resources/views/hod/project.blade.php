@@ -33,9 +33,10 @@
             <td>
               <a href="{{ route('projects.show', $project->id) }}" 
                 class="btn btn-sm" 
-                style="background-color: #22c55e; color: white;">
+                style="background-color: #11df11: white;">
                 Detail
               </a>
+
             </td>
           </tr>
         @empty
