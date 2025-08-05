@@ -319,6 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
       font-size: 14px;
     }
 
+
     .btn-info { background-color: #11df11; }
     .btn-warning { background-color: #5051f9; }
     .btn-hapus { background-color: #ef4444; }
@@ -373,6 +374,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <a href="{{ route('pm.project') }}" class="nav-link {{ Request::is('pm/project') ? 'active' : '' }}">Project</a>
     <a href="{{ route('pm.komisi') }}" class="nav-link {{ Request::is('pm/komisi') ? 'active' : '' }}">Komisi</a>
   </nav>
+
 
   <!-- Logout di paling bawah -->
   <div class="mt-auto p-3">
