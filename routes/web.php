@@ -9,6 +9,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
 use App\Http\Controllers\PM\PMController;
+use App\Http\Controllers\PM\KomisiPMController;
+use App\Http\Controllers\PM\ProjectPMController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Staff\KomisiStaffController;
 use App\Http\Controllers\Staff\ProjectStaffController;
@@ -100,7 +102,8 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
     Route::get('/staff/project', [ProjectStaffController::class, 'index'])->name('staff.project');
 
-
+    Route::get('/pm/komisi', [KomisiPMController::class, 'index'])->name('pm.komisi');
+    Route::get('/pm/project', [ProjectPMController::class, 'index'])->name('pm.project');
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
 require __DIR__ . '/auth.php';
