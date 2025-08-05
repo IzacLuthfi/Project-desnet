@@ -11,6 +11,7 @@ use App\Http\Controllers\HodController;
 use App\Http\Controllers\PM\PMController;
 use App\Http\Controllers\PM\KomisiPMController;
 use App\Http\Controllers\PM\ProjectPMController;
+use App\Http\Controllers\PM\ProjectDocumentController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Staff\KomisiStaffController;
 use App\Http\Controllers\Staff\ProjectStaffController;
@@ -78,15 +79,10 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
-    Route::get('/pm/dashboard', fn() => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
-    Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
-
-    Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
-    Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
     Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
     Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
+    Route::post('/pm/projects/{project}/documents', [ProjectDocumentController::class, 'store'])->name('project.documents.store');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -99,11 +95,15 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 });
 
-    Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
-    Route::get('/staff/project', [ProjectStaffController::class, 'index'])->name('staff.project');
+Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
+Route::get('/staff/project', [ProjectStaffController::class, 'index'])->name('staff.project');
 
-    Route::get('/pm/komisi', [KomisiPMController::class, 'index'])->name('pm.komisi');
-    Route::get('/pm/project', [ProjectPMController::class, 'index'])->name('pm.project');
+Route::get('/pm/komisi', [KomisiPMController::class, 'index'])->name('pm.komisi');
+Route::get('/pm/project', [ProjectPMController::class, 'index'])->name('pm.project');
+
+
+// web.php
+
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
 require __DIR__ . '/auth.php';

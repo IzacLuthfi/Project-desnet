@@ -15,42 +15,42 @@ class ProjectController extends Controller
     }
 
     public function destroy($id)
-{
-    $project = Project::findOrFail($id);
-    $project->delete();
+    {
+        $project = Project::findOrFail($id);
+        $project->delete();
 
-    // Return response JSON untuk AJAX
-    if (request()->expectsJson()) {
-        return response()->json(['success' => true]);
+        // Return response JSON untuk AJAX
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        // Fallback jika bukan AJAX
+        return redirect()->route('dashboard')->with('success', 'Data berhasil dihapus.');
     }
 
-    // Fallback jika bukan AJAX
-    return redirect()->route('dashboard')->with('success', 'Data berhasil dihapus.');
-}
+    public function ajaxStore(Request $request)
+    {
+        $project = Project::create([
+            'judul' => $request->judul,
+            'nilai' => $request->nilai,
+            'pm' => $request->pm,
+        ]);
 
-   public function ajaxStore(Request $request)
-{
-    $project = Project::create([
-        'judul' => $request->judul,
-        'nilai' => $request->nilai,
-        'pm' => $request->pm,
-    ]);
+        foreach ($request->personel as $p) {
+            $project->projectPersonel()->create([
+                'nama' => $p['nama'],
+                'role' => $p['role'],
+            ]);
+        }
 
-    foreach ($request->personel as $p) {
-        $project->projectPersonel()->create([
-            'nama' => $p['nama'],
-            'role' => $p['role'],
+        $project->load('projectPersonel');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Proyek berhasil disimpan.',
+            'project' => $project,
         ]);
     }
-    
-    $project->load('projectPersonel');
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Proyek berhasil disimpan.',
-        'project' => $project,
-    ]);
-}
 
 
 
@@ -66,36 +66,36 @@ class ProjectController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'judul' => 'required|string|max:255',
-        'nilai' => 'required|numeric',
-        'pm' => 'required|string',
-        'personel.*.nama' => 'required|string',
-        'personel.*.role' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'nilai' => 'required|numeric',
+            'pm' => 'required|string',
+            'personel.*.nama' => 'required|string',
+            'personel.*.role' => 'required|string',
+        ]);
 
-    $project = Project::create([
-        'judul' => $request->judul,
-        'nilai' => $request->nilai,
-        'pm' => $request->pm,
-        'status' => $request->status ?? 'Belum dimulai',
-        'status_dokumen' => 'Belum Diajukan', // ✅ Tambahkan default
-        'status_komisi' => 'Belum Disetujui',  // ✅ Tambahkan default
-    ]);
+        $project = Project::create([
+            'judul' => $request->judul,
+            'nilai' => $request->nilai,
+            'pm' => $request->pm,
+            'status' => $request->status ?? 'Belum dimulai',
+            'status_dokumen' => 'Belum Diajukan', // ✅ Tambahkan default
+            'status_komisi' => 'Belum Disetujui',  // ✅ Tambahkan default
+        ]);
 
-    if ($request->has('personel')) {
-        foreach ($request->personel as $person) {
-            ProjectPersonel::create([
-                'project_id' => $project->id,
-                'nama' => $person['nama'],
-                'role' => $person['role'],
-            ]);
+        if ($request->has('personel')) {
+            foreach ($request->personel as $person) {
+                ProjectPersonel::create([
+                    'project_id' => $project->id,
+                    'nama' => $person['nama'],
+                    'role' => $person['role'],
+                ]);
+            }
         }
-    }
 
-    return redirect()->route('projects.index')->with('success', 'Proyek berhasil disimpan.');
-}
+        return redirect()->route('projects.index')->with('success', 'Proyek berhasil disimpan.');
+    }
 
 
     public function edit($id)
@@ -142,5 +142,10 @@ class ProjectController extends Controller
 
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil diperbarui.');
     }
+    public function show($id)
+    {
+        $project = Project::with('projectDocuments')->findOrFail($id);
 
+        return view('pm.project.show', compact('project'));
+    }
 }
