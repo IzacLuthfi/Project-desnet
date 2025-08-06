@@ -14,4 +14,11 @@ class ProjectController extends Controller
 
         return view('hod.project', compact('projects'));
     }
+    // app/Http/Controllers/Hod/ProjectController.php
+
+    public function show($id)
+    {
+        $project = Project::with('projectDocuments')->findOrFail($id);
+        return view('hod.projects.show', compact('project'));
+    }
 }
