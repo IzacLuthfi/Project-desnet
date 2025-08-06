@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
             <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
             <td>
-              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
+              <a href="{{ route('admin.project.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
               <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Edit</a>
 
               <!-- Tombol Hapus dengan data-id -->

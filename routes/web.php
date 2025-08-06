@@ -18,6 +18,7 @@ use App\Http\Controllers\Staff\ProjectStaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
+use App\Http\Controllers\Admin\AdminProjectController;
 use App\Http\Controllers\Hod\ProjectController as HodProjectController;
 use App\Http\Controllers\Hod\KomisiController as HodKomisiController;
 
@@ -51,6 +52,7 @@ Route::resource('kelola-user', KelolaUserController::class);
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/komisi', [KomisiController::class, 'index'])->name('komisi.index');
+    Route::get('/project/{id}', [AdminProjectController::class, 'show'])->name('admin.project.show');
 });
 
 
@@ -117,4 +119,5 @@ require __DIR__ . '/auth.php';
 Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::get('/project', [HodProjectController::class, 'index'])->name('hod.project');
     Route::get('/komisi', [HodKomisiController::class, 'index'])->name('hod.komisi');
+    Route::get('/project/{id}', [HodProjectController::class, 'show'])->name('hod.project.show');
 });
