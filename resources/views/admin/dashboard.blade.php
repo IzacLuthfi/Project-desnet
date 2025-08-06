@@ -2,8 +2,19 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Admin</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    rel="stylesheet">
+  <!-- Font (opsional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Bootstrap, Font & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,165 +23,72 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <form id="formTambahProject">
 
-  <!-- Personel Dynamic JS -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      let personelCount = 3;
 
-      document.getElementById('addPersonelBtn').addEventListener('click', function () {
-        const container = document.getElementById('personelContainer');
-        const index = personelCount++;
-        
-        const row = document.createElement('div');
-        row.className = 'row g-2 mb-3 personel-row';
-        row.innerHTML = `
-          <div class="col-md-6">
-            <label class="form-label">Personel ${index + 1}</label>
-            <input type="text" name="personel[${index}][nama]" class="form-control rounded-3">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Sebagai:</label>
-            <select name="personel[${index}][role]" class="form-select rounded-3">
-              <option value="">Pilih peran</option>
-              <option>Analis</option>
-              <option>Programer web</option>
-              <option>Programer mobile</option>
-              <option>Tester</option>
-              <option>Desainer</option>
-              <option>Front-end</option>
-            </select>
-          </div>
-        `;
-        container.appendChild(row);
+  <!-- Bootstrap 5 JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+</script>
+
+   <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const hapusButtons = document.querySelectorAll('.btn-hapus');
+    const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
+    let projectIdToDelete = null;
+    let rowToDelete = null;
+
+    hapusButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        projectIdToDelete = this.dataset.id;
+        rowToDelete = this.closest('tr');
+        modalHapus.show();
       });
     });
-  </script>
 
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    let personelCount = 3;
+    document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
+      if (!projectIdToDelete) return;
 
-    document.getElementById('addPersonelBtn').addEventListener('click', function () {
-      // Tambah personel secara dinamis
+      fetch(`/projects/${projectIdToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          rowToDelete.remove();
+          modalHapus.hide();
+        } else {
+          alert('Gagal menghapus data. Coba lagi.');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Terjadi kesalahan!');
+      });
     });
   });
 </script>
 
 <script>
-  document.getElementById('addPersonelBtn').addEventListener('click', function () {
-    // Tambah personel (duplikat dari atas)
-  });
+  document.addEventListener('DOMContentLoaded', function () {
+    const logoutButton = document.getElementById('btnLogout');
+    const logoutModal = new bootstrap.Modal(document.getElementById('modalLogout'));
 
-  // AJAX simpan project juga di sini
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  let personelCount = 3;
-
-  // HANYA INI SAJA: tombol tambah personel
-  document.getElementById('addPersonelBtn').addEventListener('click', function () {
-    const container = document.getElementById('personelContainer');
-    const index = personelCount++;
-
-    const row = document.createElement('div');
-    row.className = 'row g-2 mb-3 personel-row';
-    row.innerHTML = `
-      <div class="col-md-6">
-        <label class="form-label">Personel ${index + 1}</label>
-        <input type="text" name="personel[${index}][nama]" class="form-control" placeholder="Nama Personel">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Sebagai:</label>
-        <select name="personel[${index}][role]" class="form-select">
-          <option value="">Pilih peran</option>
-          <option>Analis</option>
-          <option>Programer web</option>
-          <option>Programer mobile</option>
-          <option>Tester</option>
-          <option>Desainer</option>
-          <option>Front-end</option>
-        </select>
-      </div>
-    `;
-    container.appendChild(row);
-  });
-
-    // Simpan proyek via AJAX
-  document.getElementById('formTambahProject').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const notif = document.getElementById('notifAjax');
-    const btn = document.getElementById('btnSimpanProject');
-
-    btn.disabled = true;
-    fetch("{{ url('/projects/ajax-store') }}", {
-      method: "POST",
-      headers: {
-        "X-CSRF-TOKEN": '{{ csrf_token() }}'
-      },
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      btn.disabled = false;
-      if (data.success) {
-        notif.classList.remove('d-none', 'alert-danger');
-        notif.classList.add('alert-success');
-        notif.innerText = data.message;
-
-        // Tambahkan baris ke tabel
-        const table = document.getElementById('tabelWorkOrder').querySelector('tbody');
-        const index = table.querySelectorAll('tr').length + 1;
-        const personelList = data.project.project_personel.map(p => p.nama).join(', ');
-        const row = `
-  <tr>
-    <td>${index}</td>
-    <td>${data.project.judul}</td>
-    <td><span class="status-dot dot-warning"></span> Belum Diajukan</td>
-    <td><span class="status-dot dot-warning"></span> Belum Disetujui</td>
-    <td>${parseInt(data.project.nilai).toLocaleString('id-ID')}</td>
-    <td>${personelList || '-'}</td>
-    <td>
-      <a href="/projects/${data.project.id}" class="btn btn-sm btn-info text-white">Detail</a>
-      <a href="/projects/${data.project.id}/edit" class="btn btn-sm btn-warning text-white">Edit</a>
-      <form action="/projects/${data.project.id}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus?')">
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="_method" value="DELETE">
-        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-      </form>
-    </td>
-  </tr>`;
-        table.insertAdjacentHTML('beforeend', row);
-
-        // Reset form & tutup modal
-        form.reset();
-        document.getElementById('modalTambahProject').querySelector('.btn-close').click();
-      } else {
-        notif.classList.remove('d-none', 'alert-success');
-        notif.classList.add('alert-danger');
-        notif.innerText = data.message || 'Gagal menyimpan proyek.';
-      }
-    })
-    .catch(err => {
-      notif.classList.remove('d-none', 'alert-success');
-      notif.classList.add('alert-danger');
-      notif.innerText = 'Kesalahan server. Silakan coba lagi.';
-      btn.disabled = false;
+    logoutButton.addEventListener('click', function (e) {
+      e.preventDefault();
+      logoutModal.show();
     });
   });
-});
 </script>
+
+
+<!-- Personel Dynamic + AJAX Simpan + Reset -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     let personelCount = 3;
 
-    // Tambah Personel
-    document.getElementById('addPersonelBtn').addEventListener('click', function () {
-      const container = document.getElementById('personelContainer');
-      const index = personelCount++;
-
+    function createPersonelRow(index) {
       const row = document.createElement('div');
       row.className = 'row g-2 mb-3 personel-row';
       row.innerHTML = `
@@ -191,54 +109,124 @@ document.addEventListener('DOMContentLoaded', function () {
           </select>
         </div>
       `;
-      container.appendChild(row);
+      return row;
+    }
+
+    // Tambah personel dinamis
+    document.getElementById('addPersonelBtn').addEventListener('click', function () {
+      const container = document.getElementById('personelContainer');
+      const newRow = createPersonelRow(personelCount);
+      container.appendChild(newRow);
+      personelCount++;
     });
 
-    // RESET form saat klik Batal
+    // Simpan proyek via AJAX
+document.getElementById('formTambahProject').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+  const notif = document.getElementById('notifAjax');
+  const btn = document.getElementById('btnSimpanProject');
+
+  btn.disabled = true;
+
+  fetch("{{ url('/projects/ajax-store') }}", {
+    method: "POST",
+    headers: {
+      "X-CSRF-TOKEN": '{{ csrf_token() }}'
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    btn.disabled = false;
+
+    if (data.success) {
+      notif.classList.remove('d-none', 'alert-danger');
+      notif.classList.add('alert-success');
+      notif.innerText = data.message;
+
+      // Tambahkan baris ke tabel
+      const tableBody = document.querySelector('#tabelWorkOrder tbody');
+      const index = tableBody.querySelectorAll('tr').length + 1;
+      const personelList = Array.isArray(data.project.project_personel)
+        ? data.project.project_personel.map(p => p.nama).join(', ')
+        : '-';
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index}</td>
+        <td>${data.project.judul}</td>
+        <td><span class="status-dot dot-warning"></span> Belum Diajukan</td>
+        <td><span class="status-dot dot-warning"></span> Belum Disetujui</td>
+        <td>${parseInt(data.project.nilai).toLocaleString('id-ID')}</td>
+        <td>${personelList || '-'}</td>
+        <td>
+          <a href="/projects/${data.project.id}" class="btn btn-sm btn-info text-white">Detail</a>
+          <a href="/projects/${data.project.id}/edit" class="btn btn-sm btn-warning text-white">Edit</a>
+          <button class="btn btn-sm btn-danger btn-hapus" data-id="${data.project.id}" data-judul="${data.project.judul}">Hapus</button>
+        </td>
+      `;
+
+      tableBody.appendChild(row);
+
+      // Re-attach event listener untuk tombol hapus yang baru
+      row.querySelector('.btn-hapus').addEventListener('click', function () {
+        const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
+        projectIdToDelete = this.dataset.id;
+        rowToDelete = this.closest('tr');
+        modalHapus.show();
+      });
+
+      // Reset form dan modal
+      form.reset();
+      document.getElementById('modalTambahProject').querySelector('.btn-close').click();
+
+      // Reset personel dinamis di form
+      const container = document.getElementById('personelContainer');
+      container.querySelectorAll('.personel-row').forEach((row, index) => {
+        if (index >= 3) row.remove(); // Hapus tambahan
+      });
+      personelCount = 3;
+
+    } else {
+      notif.classList.remove('d-none', 'alert-success');
+      notif.classList.add('alert-danger');
+      notif.innerText = data.message || 'Gagal menyimpan proyek.';
+    }
+  })
+  .catch(err => {
+    notif.classList.remove('d-none', 'alert-success');
+    notif.classList.add('alert-danger');
+    notif.innerText = 'Kesalahan server. Silakan coba lagi.';
+    btn.disabled = false;
+  });
+});
+
+
+    // Reset saat klik batal/modal ditutup
     document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
       btn.addEventListener('click', function () {
         const form = document.getElementById('formTambahProject');
         form.reset();
 
-        // Hapus semua personel dinamis
         const container = document.getElementById('personelContainer');
-        container.innerHTML = '';
+        container.querySelectorAll('.personel-row').forEach((row, index) => {
+          if (index >= 3) {
+            row.remove();
+          }
+        });
 
-        // Tambahkan kembali default 3 personel
         personelCount = 3;
-        for (let i = 0; i < 3; i++) {
-          const row = document.createElement('div');
-          row.className = 'row g-2 mb-3 personel-row';
-          row.innerHTML = `
-            <div class="col-md-6">
-              <label class="form-label">Personel ${i + 1}</label>
-              <input type="text" name="personel[${i}][nama]" class="form-control" placeholder="Nama Personel">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Sebagai:</label>
-              <select name="personel[${i}][role]" class="form-select">
-                <option value="">Pilih peran</option>
-                <option>Analis</option>
-                <option>Programer web</option>
-                <option>Programer mobile</option>
-                <option>Tester</option>
-                <option>Desainer</option>
-                <option>Front-end</option>
-              </select>
-            </div>
-          `;
-          container.appendChild(row);
-        }
-
-        // Sembunyikan notifikasi
         const notif = document.getElementById('notifAjax');
         notif.classList.add('d-none');
         notif.innerText = '';
       });
     });
+
   });
 </script>
-
 
   <!-- Style -->
   <style>
@@ -365,7 +353,9 @@ document.addEventListener('DOMContentLoaded', function () {
 <div class="sidebar d-flex flex-column" style="height: 100vh;">
   <div class="text-center mb-3">
     <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-    <div class="role-label"><i class="bi bi-person-fill"></i> Admin</div>
+    <div class="role-label" id="openAccountModal" style="cursor:pointer;">
+  <i class="bi bi-person-fill"></i> {{ Auth::user()->role }}
+</div>
   </div>
 
   <nav class="nav flex-column mb-auto">
@@ -395,6 +385,153 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Main Content -->
 <div class="main-content">
+
+<!-- Modal Akun -->
+<div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4" style="border-radius:40px;">
+      <div class="modal-header justify-content-center border-0">
+        <h5 class="modal-title px-4 py-2 rounded" style="background-color: #044280; color: white;">
+          <i class="bi bi-person-fill"></i> Akun Saya
+        </h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between py-2">
+          <strong>Name</strong>
+          <span id="accountName">{{ Auth::user()->name }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Email account</strong>
+          <span id="accountEmail">{{ Auth::user()->email }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Role</strong>
+          <span id="accountRole">{{ Auth::user()->role }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Password</strong>
+          <span id="accountPassword">*******</span>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button class="btn btn-warning" id="btnEditAkun">Edit Akun</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Edit User -->
+<div class="modal fade" id="modalEditUser" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:40px;">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditUser">
+          <input type="hidden" id="editUserId">
+          <div class="mb-3">
+            <label>Nama</label>
+            <input type="text" id="editName" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="editEmail" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Role</label>
+            <select id="editRole" class="form-control">
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label>Password Lama</label>
+            <input type="password" id="editOldPassword" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Password Baru</label>
+            <input type="password" id="editPassword" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Konfirmasi Password Baru</label>
+            <input type="password" id="editPasswordConfirmation" class="form-control">
+          </div>
+          <div id="errorEditUser" class="text-danger"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script Utama -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modalEditUser = new bootstrap.Modal(document.getElementById('modalEditUser'));
+    const modalAccount = new bootstrap.Modal(document.getElementById('accountModal'));
+    const formEditUser = document.getElementById('formEditUser');
+    const errorEditBox = document.getElementById('errorEditUser');
+
+    // Klik "Admin" atau role user untuk membuka modal akun
+    document.getElementById("openAccountModal").addEventListener("click", function () {
+        // Isi ulang data akun
+        document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
+        document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
+        document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
+        document.getElementById("accountPassword").innerText = "********";
+
+        modalAccount.show();
+    });
+
+    // Klik tombol edit akun
+    document.getElementById('btnEditAkun').addEventListener('click', function() {
+        document.getElementById('editUserId').value = "{{ Auth::user()->id }}";
+        document.getElementById('editName').value = "{{ Auth::user()->name }}";
+        document.getElementById('editEmail').value = "{{ Auth::user()->email }}";
+        document.getElementById('editRole').value = "{{ Auth::user()->role }}";
+
+        document.getElementById('editOldPassword').value = '';
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editPasswordConfirmation').value = '';
+
+        document.querySelector('#modalEditUser .modal-title').innerText = 'Edit Akun Saya';
+        modalEditUser.show();
+    });
+
+    // Edit user dari tabel
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-edit')) {
+            const row = e.target.closest('tr');
+            const id = row.dataset.id;
+            const name = row.children[1].textContent.trim();
+            const email = row.children[2].textContent.trim();
+            const role = row.querySelector('span.badge').textContent.trim().toLowerCase();
+
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editRole').value = role;
+
+            document.getElementById('editOldPassword').value = '';
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editPasswordConfirmation').value = '';
+
+            document.querySelector('#modalEditUser .modal-title').innerText = 'Edit User';
+            modalEditUser.show();
+        }
+    });
+});
+</script>
 
   <!-- Tombol Tambah -->
 <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahProject">
@@ -534,68 +671,6 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 </div>
 
-<!-- Modal Konfirmasi Hapus -->
-<div class="modal fade" id="modalKonfirmasiHapus" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4">
-      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Tutup"></button>
-      <h5 class="fw-bold mt-3">Apakah Anda yakin ingin menghapus data ini?</h5>
-      <p class="text-muted">Tindakan ini akan menghapus data secara permanen.</p>
-
-      <!-- Tidak gunakan <form>, pakai tombol biasa -->
-      <div class="d-flex justify-content-center gap-2 mt-3">
-        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
-        <button type="button" class="btn btn-dark" id="btnKonfirmasiHapus">Hapus</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const hapusButtons = document.querySelectorAll('.btn-hapus');
-    const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
-    let projectIdToDelete = null;
-    let rowToDelete = null;
-
-    // Tangkap klik tombol hapus
-    hapusButtons.forEach(button => {
-      button.addEventListener('click', function () {
-        projectIdToDelete = this.dataset.id;
-        rowToDelete = this.closest('tr');
-        modalHapus.show();
-      });
-    });
-
-    // Ketika tombol "Hapus" dalam modal diklik
-    document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
-      if (!projectIdToDelete) return;
-
-      fetch(`/projects/${projectIdToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}',
-          'Accept': 'application/json'
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          // Hapus baris dari tabel tanpa reload
-          rowToDelete.remove();
-          modalHapus.hide();
-        } else {
-          alert('Gagal menghapus data. Coba lagi.');
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        alert('Terjadi kesalahan!');
-      });
-    });
-  });
-</script>
-
   <!-- Modal Logout -->
 <div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -615,18 +690,22 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 </div>
 
- <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const logoutButton = document.getElementById('btnLogout');
-    const logoutModal = new bootstrap.Modal(document.getElementById('modalLogout'));
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="modalKonfirmasiHapus" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      <h5 class="fw-bold mt-3">Apakah Anda yakin ingin menghapus data ini?</h5>
+      <p class="text-muted">Tindakan ini akan menghapus data secara permanen.</p>
 
-    logoutButton.addEventListener('click', function (e) {
-      e.preventDefault();
-      logoutModal.show();
-    });
-  });
-</script>
- 
+      <!-- Tidak gunakan <form>, pakai tombol biasa -->
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-dark" id="btnKonfirmasiHapus">Hapus</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Statistik Dokumen -->
   <div class="card-box mb-4">
