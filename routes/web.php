@@ -8,12 +8,17 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
+use App\Http\Controllers\PM\PMController;
+use App\Http\Controllers\PM\KomisiPMController;
+use App\Http\Controllers\PM\ProjectPMController;
+use App\Http\Controllers\PM\ProjectDocumentController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Staff\KomisiStaffController;
 use App\Http\Controllers\Staff\ProjectStaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
+use App\Http\Controllers\Admin\AdminProjectController;
 use App\Http\Controllers\Hod\ProjectController as HodProjectController;
 use App\Http\Controllers\Hod\KomisiController as HodKomisiController;
 
@@ -47,6 +52,7 @@ Route::resource('kelola-user', KelolaUserController::class);
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/komisi', [KomisiController::class, 'index'])->name('komisi.index');
+    Route::get('/project/{id}', [AdminProjectController::class, 'show'])->name('admin.project.show');
 });
 
 
@@ -75,14 +81,10 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
-    Route::get('/pm/dashboard', fn() => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
-    Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
-
-    Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
-    Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
     Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
+    Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
+    Route::post('/pm/projects/{project}/documents', [ProjectDocumentController::class, 'store'])->name('project.documents.store');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -95,9 +97,14 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 });
 
-    Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
-    Route::get('/staff/project', [ProjectStaffController::class, 'index'])->name('staff.project');
+Route::get('/staff/komisi', [KomisiStaffController::class, 'index'])->name('staff.komisi');
+Route::get('/staff/project', [ProjectStaffController::class, 'index'])->name('staff.project');
 
+Route::get('/pm/komisi', [KomisiPMController::class, 'index'])->name('pm.komisi');
+Route::get('/pm/project', [ProjectPMController::class, 'index'])->name('pm.project');
+
+
+// web.php
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
@@ -112,4 +119,5 @@ require __DIR__ . '/auth.php';
 Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::get('/project', [HodProjectController::class, 'index'])->name('hod.project');
     Route::get('/komisi', [HodKomisiController::class, 'index'])->name('hod.komisi');
+    Route::get('/project/{id}', [HodProjectController::class, 'show'])->name('hod.project.show');
 });
