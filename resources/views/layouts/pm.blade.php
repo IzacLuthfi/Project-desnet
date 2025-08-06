@@ -1,15 +1,17 @@
+<!-- resources/views/layouts/app.blade.php -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>@yield('title', 'Manajemen')</title>
+  <title>@yield('title', 'Dashboard Staff')</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap CSS dan Icons (1x saja) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+  <!-- Global Style -->
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -35,7 +37,6 @@
       justify-content: center;
       gap: 8px;
       margin-bottom: 30px;
-      cursor: pointer;
     }
 
     .sidebar .nav-link {
@@ -74,15 +75,13 @@
   <div class="sidebar d-flex flex-column">
     <div class="text-center mb-3">
       <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-      <div class="role-label" id="openAccountModal">
-        <i class="bi bi-person-fill"></i> {{ Auth::user()->role }}
-      </div>
+      <div class="role-label"><i class="bi bi-person-fill"></i> PM</div>
     </div>
 
     <nav class="nav flex-column mb-auto">
-      <a href="{{ route('dashboard') }}" class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">Beranda</a>
-      <a href="{{ route('kelola-user.index') }}" class="nav-link {{ Request::is('kelola-user*') ? 'active' : '' }}">Kelola User</a>
-      <a href="{{ route('komisi.index') }}" class="nav-link {{ Request::is('komisi*') ? 'active' : '' }}">Komisi</a>
+      <a href="{{ route('pm.dashboard') }}" class="nav-link {{ Request::is('pm/dashboard') ? 'active' : '' }}">Beranda</a>
+      <a href="{{ route('pm.project') }}" class="nav-link {{ Request::is('pm/project') ? 'active' : '' }}">Project</a>
+      <a href="{{ route('pm.komisi') }}" class="nav-link {{ Request::is('pm/komisi') ? 'active' : '' }}">Komisi</a>
     </nav>
 
     <div class="mt-auto p-3">
@@ -102,43 +101,41 @@
     </div>
   </div>
 
-  <!-- Main Content -->
+  <!-- Content -->
   <div class="main-content">
     @yield('content')
   </div>
 
   <!-- Modal Logout -->
-<div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4">
-      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
-      <h5 class="fw-bold mt-3">Apakah Anda yakin ingin keluar?</h5>
-      <p class="text-muted">Tindakan ini akan mengeluarkan anda dari aplikasi</p>
-
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <div class="d-flex justify-content-center gap-2 mt-3">
-          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-dark">Yakin</button>
-        </div>
-      </form>
+  <div class="modal fade" id="modalLogout" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-4">
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
+        <h5 class="fw-bold mt-3">Apakah Anda yakin ingin keluar?</h5>
+        <p class="text-muted">Tindakan ini akan mengeluarkan anda dari aplikasi</p>
+        <form method="POST" action="{{ route('logout') }}">
+          @csrf
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-dark">Yakin</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  // Logout modal
-  const logoutButton = document.getElementById('btnLogout');
-  const logoutModal  = new bootstrap.Modal(document.getElementById('modalLogout'));
-  logoutButton.addEventListener('click', function (e) {
-    e.preventDefault();
-    logoutModal.show();
-  });
-</script>
-
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const logoutButton = document.getElementById('btnLogout');
+      const logoutModal = new bootstrap.Modal(document.getElementById('modalLogout'));
+      logoutButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        logoutModal.show();
+      });
+    });
+  </script>
 
   @stack('scripts')
 </body>

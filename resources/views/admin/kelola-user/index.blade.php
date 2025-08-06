@@ -13,8 +13,8 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-hover align-middle table-bordered">
-            <thead class="table-primary text-center">
+        <table class="table table-hover align-middle table-bordered bg-white">
+            <thead class="table-light text-center">
                 <tr>
                     <th>No</th>
                     <th>Full Name</th>
@@ -43,9 +43,10 @@
                         <span class="badge {{ $badgeColor }}">{{ ucfirst($user->role) }}</span>
                     </td>
                     <td class="text-center">
-                        <a href="#" class="btn btn-warning btn-sm rounded-2 me-1 btn-edit">
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </a>
+                        <a href="#" class="btn btn-warning btn-sm rounded-2 me-1 btn-edit" data-id="{{ $user->id }}">
+    <i class="bi bi-pencil-square"></i> Edit
+</a>
+
                         <button class="btn btn-danger btn-sm rounded-2 btn-hapus" data-id="{{ $user->id }}">
                             <i class="bi bi-trash"></i> Hapus
                         </button>
@@ -169,7 +170,8 @@
                         <label>Konfirmasi Password Baru</label>
                         <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation">
                     </div>
-                    <button type="submit" class="btn btn-warning w-100">Update</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
                 </form>
             </div>
         </div>
@@ -287,20 +289,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const errorEditBox = document.getElementById('errorEditUser');
 
     document.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-edit')) {
-            const row = e.target.closest('tr');
-            const id = row.dataset.id;
-            const name = row.children[1].textContent.trim();
-            const email = row.children[2].textContent.trim();
-            const role = row.querySelector('span.badge').textContent.trim();
+            if (e.target.closest('.btn-edit')) {
+        const id = e.target.closest('.btn-edit').dataset.id;
+        const row = e.target.closest('tr');
+        const name = row.children[1].textContent.trim();
+        const email = row.children[2].textContent.trim();
+        const role = row.querySelector('span.badge').textContent.trim();
 
-            document.getElementById('editUserId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editRole').value = role.toLowerCase();
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editRole').value = role.toLowerCase();
 
-            modalEditUser.show();
-        }
+        modalEditUser.show();
+    }
     });
 
     // Submit edit
