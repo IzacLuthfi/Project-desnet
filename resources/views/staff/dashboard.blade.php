@@ -362,39 +362,113 @@ document.addEventListener('DOMContentLoaded', function () {
 <body>
 
 <!-- Sidebar -->
-<div class="sidebar d-flex flex-column" style="height: 100vh;">
-  <div class="text-center mb-3">
-    <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-    <div class="role-label"><i class="bi bi-person-fill"></i> Personel</div>
+  <div class="sidebar d-flex flex-column">
+    <div class="text-center mb-3">
+      <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
+      <div class="role-label"><i class="bi bi-person-fill"></i> Personel</div>
+    </div>
+
+    <nav class="nav flex-column mb-auto">
+      <a href="{{ route('staff.dashboard') }}" class="nav-link {{ Request::is('staff/dashboard') ? 'active' : '' }}">Beranda</a>
+      <a href="{{ route('staff.project') }}" class="nav-link {{ Request::is('staff/project') ? 'active' : '' }}">Project</a>
+      <a href="{{ route('staff.komisi') }}" class="nav-link {{ Request::is('staff/komisi') ? 'active' : '' }}">Komisi</a>
+    </nav>
+
+    <div class="mt-auto p-3">
+      <a href="#" id="btnLogout" class="btn btn-sm btn-dark w-100 d-flex align-items-center justify-content-center">
+        <i class="bi bi-box-arrow-right me-1"></i> Logout
+      </a>
+    </div>
   </div>
 
-  <nav class="nav flex-column mb-auto">
-    <a href="{{ route('staff.dashboard') }}" class="nav-link {{ Request::is('staff/dashboard') ? 'active' : '' }}">Beranda</a>
-    <a href="{{ route('staff.project') }}" class="nav-link {{ Request::is('staff/project') ? 'active' : '' }}">Project</a>
-    <a href="{{ route('staff.komisi') }}" class="nav-link {{ Request::is('staff/komisi') ? 'active' : '' }}">Komisi</a>
-  </nav>
-
-  <!-- Logout di paling bawah -->
-  <div class="mt-auto p-3">
-    <a href="#" id="btnLogout" class="btn btn-sm btn-dark w-100 d-flex align-items-center justify-content-center">
-      <i class="bi bi-box-arrow-right me-1"></i> Logout
-    </a>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div><h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6></div>
+    <div class="d-flex align-items-center gap-3">
+      <i class="bi bi-calendar-event"></i>
+      <i class="bi bi-question-circle"></i>
+      <i class="bi bi-bell"></i>
+    </div>
   </div>
-</div>
-
-
-<!-- Topbar -->
-<div class="topbar">
-  <div><h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6></div>
-  <div class="d-flex align-items-center gap-3">
-    <i class="bi bi-calendar-event"></i>
-    <i class="bi bi-question-circle"></i>
-    <i class="bi bi-bell"></i>
-  </div>
-</div>
 
 <!-- Main Content -->
 <div class="main-content">
+<!-- Modal Tambah Proyek -->
+<div class="modal fade" id="modalTambahProject" tabindex="-1" aria-labelledby="modalTambahProjectLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold">Tambah Data Project</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{{ route('projects.store') }}" method="POST" id="formTambahProject">
+        @csrf
+        <div id="notifAjax" class="alert d-none" role="alert"></div>
+        <div class="modal-body">
+
+          <!-- Proyek -->
+          <div class="mb-4">
+            <h6 class="fw-semibold">Proyek</h6>
+
+            <div class="mb-3">
+              <label class="form-label">Judul Proyek</label>
+              <input type="text" name="judul" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Nilai Proyek</label>
+              <input type="number" name="nilai" class="form-control" required>
+            </div>
+          </div>
+
+          <!-- Personel -->
+          <div class="mb-3">
+            <h6 class="fw-semibold">Personel</h6>
+
+            <div class="mb-3">
+              <label class="form-label">Project Manager</label>
+              <input type="text" name="pm" class="form-control" required>
+            </div>
+
+            <div id="personelContainer">
+              @for ($i = 0; $i < 3; $i++)
+              <div class="row g-2 mb-3 personel-row">
+                <div class="col-md-6">
+                  <label class="form-label">Personel {{ $i + 1 }}</label>
+                  <input type="text" name="personel[{{ $i }}][nama]" class="form-control" placeholder="Nama Personel">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Sebagai:</label>
+                  <select name="personel[{{ $i }}][role]" class="form-select">
+                    <option value="">Pilih peran</option>
+                    <option>Analis</option>
+                    <option>Programer web</option>
+                    <option>Programer mobile</option>
+                    <option>Tester</option>
+                    <option>Desainer</option>
+                    <option>Front-end</option>
+                  </select>
+                </div>
+              </div>
+              @endfor
+            </div>
+
+            <!-- Tombol Tambah Personel -->
+            <button type="button" class="btn btn-sm btn-primary mt-2 rounded-pill px-3" id="addPersonelBtn">
+              <i class="bi bi-plus-circle me-1"></i> Tambah Personel
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer border-top-0">
+          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary px-4" id="btnSimpanProject">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- Tabel Work Order -->
 <div class="card-box mb-4">
@@ -442,51 +516,6 @@ document.addEventListener('DOMContentLoaded', function () {
     </table>
   </div>
 </div>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const hapusButtons = document.querySelectorAll('.btn-hapus');
-    const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
-    let projectIdToDelete = null;
-    let rowToDelete = null;
-
-    // Tangkap klik tombol hapus
-    hapusButtons.forEach(button => {
-      button.addEventListener('click', function () {
-        projectIdToDelete = this.dataset.id;
-        rowToDelete = this.closest('tr');
-        modalHapus.show();
-      });
-    });
-
-    // Ketika tombol "Hapus" dalam modal diklik
-    document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
-      if (!projectIdToDelete) return;
-
-      fetch(`/projects/${projectIdToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}',
-          'Accept': 'application/json'
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          // Hapus baris dari tabel tanpa reload
-          rowToDelete.remove();
-          modalHapus.hide();
-        } else {
-          alert('Gagal menghapus data. Coba lagi.');
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        alert('Terjadi kesalahan!');
-      });
-    });
-  });
-</script>
 
   <!-- Modal Logout -->
 <div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">

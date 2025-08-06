@@ -8,28 +8,12 @@ use App\Models\Project;
 
 class StaffController extends Controller
 {
-    public function index()
+    public function dashboard()
     {
-        // Ambil semua data project (bisa disesuaikan dengan user login jika perlu)
-        $projects = Project::all();
+        // Ambil semua project beserta personelnya
+        $projects = Project::with('projectPersonel')->get();
 
-        // Hitung statistik dokumen
-        $totalDokumen = $projects->count();
-        $dokumenRevisi = $projects->where('status_dokumen', 'Revisi')->count();
-        $dokumenSelesai = $projects->where('status_dokumen', 'Sudah Diajukan')->count();
-
-        $stats = [
-            'total' => $totalDokumen,
-            'revisi' => $dokumenRevisi,
-            'selesai' => $dokumenSelesai,
-        ];
-
-        // Komisi dummy (kamu bisa ganti sesuai logika komisi aslinya)
-        $komisi = [
-            'bulan' => 76000000,
-            'tahun' => 1546000000,
-        ];
-
-        return view('staff.dashboard', compact('projects', 'stats', 'komisi'));
+        // Kirim ke view
+        return view('staff.dashboard', compact('projects'));
     }
 }

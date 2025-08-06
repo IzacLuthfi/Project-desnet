@@ -82,6 +82,12 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
+
+    Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
+    Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
+    Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
+    Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
+
     Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
     Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
     Route::post('/pm/projects/{project}/documents', [ProjectDocumentController::class, 'store'])->name('project.documents.store');
