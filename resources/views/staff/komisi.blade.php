@@ -1,5 +1,6 @@
-@extends('layouts.staff') 
-@section('title', 'Komisi Staff')
+@extends('layouts.staff')
+
+@section('title', 'Komisi staff')
 
 @section('content')
   <!-- Tombol Filter -->
@@ -39,7 +40,4 @@
       </tbody>
     </table>
   </div>
-=======
-@section('content')
-    <h1>Kelola Komisi</h1>
 @endsection

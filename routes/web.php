@@ -82,7 +82,7 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
 
     Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
     Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
-    Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
+    Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
