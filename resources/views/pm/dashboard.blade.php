@@ -397,7 +397,82 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Main Content -->
 <div class="main-content">
+<!-- Modal Tambah Proyek -->
+<div class="modal fade" id="modalTambahProject" tabindex="-1" aria-labelledby="modalTambahProjectLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold">Tambah Data Project</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{{ route('projects.store') }}" method="POST" id="formTambahProject">
+        @csrf
+        <div id="notifAjax" class="alert d-none" role="alert"></div>
+        <div class="modal-body">
 
+          <!-- Proyek -->
+          <div class="mb-4">
+            <h6 class="fw-semibold">Proyek</h6>
+
+            <div class="mb-3">
+              <label class="form-label">Judul Proyek</label>
+              <input type="text" name="judul" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Nilai Proyek</label>
+              <input type="number" name="nilai" class="form-control" required>
+            </div>
+          </div>
+
+          <!-- Personel -->
+          <div class="mb-3">
+            <h6 class="fw-semibold">Personel</h6>
+
+            <div class="mb-3">
+              <label class="form-label">Project Manager</label>
+              <input type="text" name="pm" class="form-control" required>
+            </div>
+
+            <div id="personelContainer">
+              @for ($i = 0; $i < 3; $i++)
+              <div class="row g-2 mb-3 personel-row">
+                <div class="col-md-6">
+                  <label class="form-label">Personel {{ $i + 1 }}</label>
+                  <input type="text" name="personel[{{ $i }}][nama]" class="form-control" placeholder="Nama Personel">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Sebagai:</label>
+                  <select name="personel[{{ $i }}][role]" class="form-select">
+                    <option value="">Pilih peran</option>
+                    <option>Analis</option>
+                    <option>Programer web</option>
+                    <option>Programer mobile</option>
+                    <option>Tester</option>
+                    <option>Desainer</option>
+                    <option>Front-end</option>
+                  </select>
+                </div>
+              </div>
+              @endfor
+            </div>
+
+            <!-- Tombol Tambah Personel -->
+            <button type="button" class="btn btn-sm btn-primary mt-2 rounded-pill px-3" id="addPersonelBtn">
+              <i class="bi bi-plus-circle me-1"></i> Tambah Personel
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer border-top-0">
+          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary px-4" id="btnSimpanProject">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <!-- Tabel Work Order -->
 <div class="card-box mb-4">
   <h6 class="fw-bold mb-3">Work Order</h6>

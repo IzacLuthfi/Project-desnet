@@ -30,7 +30,7 @@
           <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
           <td>
             <a href="#" class="btn btn-sm btn-success">Detail</a>
-            <a href="#" class="btn btn-sm btn-warning">Verifikasi</a>
+            <a href="#" class="btn btn-sm btn-warning">Edit</a>
           </td>
         </tr>
         @empty
