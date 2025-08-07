@@ -15,6 +15,7 @@ use App\Http\Controllers\PM\ProjectDocumentController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Staff\KomisiStaffController;
 use App\Http\Controllers\Staff\ProjectStaffController;
+use App\Http\Controllers\Staff\DocumentStaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
@@ -85,6 +86,8 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
     Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
     Route::post('/pm/projects/{project}/documents', [ProjectDocumentController::class, 'store'])->name('project.documents.store');
+    Route::post('/staff/projects/{project}/documents', [DocumentStaffController::class, 'store'])->name('project.documents.store');
+    Route::get('/project/{id}', [ProjectStaffController::class, 'show'])->name('staff.project.show');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
