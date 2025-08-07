@@ -21,7 +21,7 @@ use App\Http\Controllers\Admin\KomisiController;
 use App\Http\Controllers\Admin\AdminProjectController;
 use App\Http\Controllers\Hod\ProjectController as HodProjectController;
 use App\Http\Controllers\Hod\KomisiController as HodKomisiController;
-
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +55,13 @@ Route::prefix('admin')->group(function () {
     Route::get('/project/{id}', [AdminProjectController::class, 'show'])->name('admin.project.show');
 });
 
+// user
+Route::put('/users/{id}', [UserController::class, 'update']);
+//profil
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
 
 
 // ============ REDIRECT DASHBOARD PER ROLE ============
