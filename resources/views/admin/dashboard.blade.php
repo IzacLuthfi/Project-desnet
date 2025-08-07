@@ -29,6 +29,7 @@
   src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
 </script>
 
+<!-- hapus data -->
    <script>
   document.addEventListener('DOMContentLoaded', function () {
     const hapusButtons = document.querySelectorAll('.btn-hapus');
@@ -70,6 +71,7 @@
   });
 </script>
 
+<!-- log out -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const logoutButton = document.getElementById('btnLogout');

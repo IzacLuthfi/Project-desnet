@@ -2,59 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    public function edit()
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => Auth::user()
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $user = Auth::user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'old_password' => 'nullable|string',
+            'password' => 'nullable|string|min:6|confirmed', // validasi konfirmasi password
+        ]);
+
+        // Jika password lama diisi, validasi kebenarannya
+        if ($request->filled('old_password')) {
+            if (!Hash::check($request->old_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Password lama salah.'
+                ]);
+            }
+
+            // Jika password baru juga diisi
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
         }
 
-        $request->user()->save();
+        $user->name = $request->name;
+        $user->email = $request->email;
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
+        /** @var \App\Models\User $user */
+        $user->save();
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil berhasil diperbarui.',
+            'badge' => $user->role === 'Admin' ? 'bg-primary' : 'bg-secondary'
         ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
     }
 }
