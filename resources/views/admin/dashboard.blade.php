@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard Admin</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
   <!-- Bootstrap CSS -->
   <link
@@ -22,6 +24,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <form id="formTambahProject">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
   <!-- Bootstrap 5 JS -->
@@ -400,11 +404,11 @@ document.getElementById('formTambahProject').addEventListener('submit', function
       </div>
       <div class="modal-body">
         <div class="d-flex justify-content-between py-2">
-          <strong>Name</strong>
+          <strong>Nama</strong>
           <span id="accountName">{{ Auth::user()->name }}</span>
         </div>
         <div class="d-flex justify-content-between py-2">
-          <strong>Email account</strong>
+          <strong>Email</strong>
           <span id="accountEmail">{{ Auth::user()->email }}</span>
         </div>
         <div class="d-flex justify-content-between py-2">
@@ -423,47 +427,40 @@ document.getElementById('formTambahProject').addEventListener('submit', function
   </div>
 </div>
 
-
-<!-- Modal Edit User -->
-<div class="modal fade" id="modalEditUser" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:40px;">
+<!-- Modal Edit Akun -->
+<div class="modal fade" id="modalEditUser" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit User</h5>
+        <h5 class="modal-title">Edit Akun Saya</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form id="formEditUser">
-          <input type="hidden" id="editUserId">
-          <div class="mb-3">
-            <label>Nama</label>
-            <input type="text" id="editName" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Email</label>
-            <input type="email" id="editEmail" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Role</label>
-            <select id="editRole" class="form-control">
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label>Password Lama</label>
-            <input type="password" id="editOldPassword" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Password Baru</label>
-            <input type="password" id="editPassword" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Konfirmasi Password Baru</label>
-            <input type="password" id="editPasswordConfirmation" class="form-control">
-          </div>
-          <div id="errorEditUser" class="text-danger"></div>
-        </form>
+        <div id="errorEditUser" class="text-danger mb-2"></div>
+        <div class="mb-3">
+          <label>Nama</label>
+          <input type="text" class="form-control" id="editName">
+        </div>
+        <div class="mb-3">
+          <label>Email</label>
+          <input type="email" class="form-control" id="editEmail">
+        </div>
+        <div class="mb-3">
+  <label>Role</label>
+  <input type="text" class="form-control" id="editRole" readonly>
+</div>
+        <div class="mb-3">
+          <label>Password Lama</label>
+          <input type="password" class="form-control" id="editOldPassword">
+        </div>
+        <div class="mb-3">
+          <label>Password Baru</label>
+          <input type="password" class="form-control" id="editPassword">
+        </div>
+        <div class="mb-3">
+          <label>Konfirmasi Password</label>
+          <input type="password" class="form-control" id="editPasswordConfirmation">
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -473,67 +470,122 @@ document.getElementById('formTambahProject').addEventListener('submit', function
   </div>
 </div>
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Script Utama -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const modalEditUser = new bootstrap.Modal(document.getElementById('modalEditUser'));
-    const modalAccount = new bootstrap.Modal(document.getElementById('accountModal'));
-    const formEditUser = document.getElementById('formEditUser');
-    const errorEditBox = document.getElementById('errorEditUser');
+document.addEventListener('DOMContentLoaded', function () {
+    // Ambil elemen modal dan tombol
+    const modalAccountEl = document.getElementById('accountModal');
+    const modalEditUserEl = document.getElementById('modalEditUser');
+    const modalAccount = new bootstrap.Modal(modalAccountEl);
+    const modalEditUser = new bootstrap.Modal(modalEditUserEl);
 
-    // Klik "Admin" atau role user untuk membuka modal akun
-    document.getElementById("openAccountModal").addEventListener("click", function () {
-        // Isi ulang data akun
-        document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
-        document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
-        document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
-        document.getElementById("accountPassword").innerText = "********";
+    const btnOpenAccount = document.getElementById("openAccountModal");
+    const btnEditAkun = document.getElementById("btnEditAkun");
 
-        modalAccount.show();
-    });
+    // Buka modal akun
+    if (btnOpenAccount) {
+        btnOpenAccount.addEventListener("click", function () {
+            document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
+            document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
+            document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
+            document.getElementById("accountPassword").innerText = "********";
+            modalAccount.show();
+        });
+    }
 
-    // Klik tombol edit akun
-    document.getElementById('btnEditAkun').addEventListener('click', function() {
-        document.getElementById('editUserId').value = "{{ Auth::user()->id }}";
-        document.getElementById('editName').value = "{{ Auth::user()->name }}";
-        document.getElementById('editEmail').value = "{{ Auth::user()->email }}";
-        document.getElementById('editRole').value = "{{ Auth::user()->role }}";
+    // Klik edit akun dari modal akun
+    if (btnEditAkun) {
+        btnEditAkun.addEventListener("click", function (e) {
+            e.preventDefault();
 
-        document.getElementById('editOldPassword').value = '';
-        document.getElementById('editPassword').value = '';
-        document.getElementById('editPasswordConfirmation').value = '';
-
-        document.querySelector('#modalEditUser .modal-title').innerText = 'Edit Akun Saya';
-        modalEditUser.show();
-    });
-
-    // Edit user dari tabel
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-edit')) {
-            const row = e.target.closest('tr');
-            const id = row.dataset.id;
-            const name = row.children[1].textContent.trim();
-            const email = row.children[2].textContent.trim();
-            const role = row.querySelector('span.badge').textContent.trim().toLowerCase();
-
-            document.getElementById('editUserId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editRole').value = role;
+            // Isi form edit dengan data user
+            document.getElementById('editName').value = "{{ Auth::user()->name }}";
+            document.getElementById('editEmail').value = "{{ Auth::user()->email }}";
+            document.getElementById('editRole').value = "{{ Auth::user()->role }}"; // ← ini penting!
 
             document.getElementById('editOldPassword').value = '';
             document.getElementById('editPassword').value = '';
             document.getElementById('editPasswordConfirmation').value = '';
 
-            document.querySelector('#modalEditUser .modal-title').innerText = 'Edit User';
-            modalEditUser.show();
-        }
+            document.querySelector('#modalEditUser .modal-title').innerText = 'Edit Akun Saya';
+
+            // Tutup modal akun, baru buka modal edit
+            modalAccount.hide();
+            modalAccountEl.addEventListener('hidden.bs.modal', function openEdit() {
+                modalEditUser.show();
+                modalAccountEl.removeEventListener('hidden.bs.modal', openEdit);
+            });
+        });
+    }
+
+    // Tombol simpan di modal edit
+    const btnSaveEdit = document.getElementById('btnSaveEdit');
+
+    if (!btnSaveEdit) return;
+
+    btnSaveEdit.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('editName').value;
+        const email = document.getElementById('editEmail').value;
+        const role = document.getElementById('editRole').value;
+        const oldPassword = document.getElementById('editOldPassword').value;
+        const newPassword = document.getElementById('editPassword').value;
+        const passwordConfirm = document.getElementById('editPasswordConfirmation').value;
+        const errorBox = document.getElementById('errorEditUser');
+
+        fetch('/profile', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                role: role,
+                old_password: oldPassword,
+                password: newPassword,
+                password_confirmation: passwordConfirm
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                errorBox.textContent = '';
+
+                // Tutup modal edit
+                bootstrap.Modal.getInstance(document.getElementById('modalEditUser')).hide();
+
+                // Tampilkan notifikasi berhasil
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    location.reload(); // reload setelah user klik OK
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: data.message || 'Terjadi kesalahan.',
+                });
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan sistem.',
+            });
+        });
     });
 });
 </script>
+
 
   <!-- Tombol Tambah -->
 <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahProject">
