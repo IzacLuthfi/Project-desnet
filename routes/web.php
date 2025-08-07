@@ -20,7 +20,7 @@ use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
 use App\Http\Controllers\Hod\ProjectController as HodProjectController;
 use App\Http\Controllers\Hod\KomisiController as HodKomisiController;
-
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +53,13 @@ Route::prefix('admin')->group(function () {
     Route::get('/komisi', [KomisiController::class, 'index'])->name('komisi.index');
 });
 
+// user
+Route::put('/users/{id}', [UserController::class, 'update']);
+//profil
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
 
 
 // ============ REDIRECT DASHBOARD PER ROLE ============
