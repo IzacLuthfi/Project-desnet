@@ -15,6 +15,7 @@ use App\Http\Controllers\PM\ProjectDocumentController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Staff\KomisiStaffController;
 use App\Http\Controllers\Staff\ProjectStaffController;
+use App\Http\Controllers\Staff\DocumentStaffController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KelolaUserController;
 use App\Http\Controllers\Admin\KomisiController;
@@ -89,15 +90,11 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
-
-    Route::get('/staff/dashboard', fn() => view('staff.dashboard'))->name('staff.dashboard');
-    Route::get('/pm/dashboard', fn () => view('pm.dashboard'))->name('pm.dashboard');
-    Route::get('/hod/dashboard', fn () => view('hod.dashboard'))->name('hod.dashboard');
     Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
-
-    Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
     Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
     Route::post('/pm/projects/{project}/documents', [ProjectDocumentController::class, 'store'])->name('project.documents.store');
+    Route::post('/staff/projects/{project}/documents', [DocumentStaffController::class, 'store'])->name('project.documents.store');
+    Route::get('/project/{id}', [ProjectStaffController::class, 'show'])->name('staff.project.show');
 
     // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

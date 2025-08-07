@@ -14,4 +14,10 @@ class ProjectStaffController extends Controller
 
         return view('staff.project', compact('projects'));
     }
+
+    public function show($id)
+    {
+        $project = Project::with('projectDocuments')->findOrFail($id);
+        return view('staff.project.show', compact('project'));
+    }
 }

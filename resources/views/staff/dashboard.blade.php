@@ -362,10 +362,12 @@ document.addEventListener('DOMContentLoaded', function () {
 <body>
 
 <!-- Sidebar -->
-  <div class="sidebar d-flex flex-column">
+  <div class="sidebar d-flex flex-column" style="height: 100vh;">
     <div class="text-center mb-3">
       <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-      <div class="role-label"><i class="bi bi-person-fill"></i> Personel</div>
+      <div class="role-label" id="openAccountModal" style="cursor:pointer;">
+    <i class="bi bi-person-fill"></i> {{ Auth::user()->role }}
+  </div>
     </div>
 
     <nav class="nav flex-column mb-auto">
@@ -393,6 +395,154 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Main Content -->
 <div class="main-content">
+
+<!-- Modal Akun -->
+<div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4" style="border-radius:40px;">
+      <div class="modal-header justify-content-center border-0">
+        <h5 class="modal-title px-4 py-2 rounded" style="background-color: #044280; color: white;">
+          <i class="bi bi-person-fill"></i> Akun Saya
+        </h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between py-2">
+          <strong>Name</strong>
+          <span id="accountName">{{ Auth::user()->name }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Email account</strong>
+          <span id="accountEmail">{{ Auth::user()->email }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Role</strong>
+          <span id="accountRole">{{ Auth::user()->role }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Password</strong>
+          <span id="accountPassword">*******</span>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button class="btn btn-warning" id="btnEditAkun">Edit Akun</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Edit User -->
+<div class="modal fade" id="modalEditUser" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:40px;">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditUser">
+          <input type="hidden" id="editUserId">
+          <div class="mb-3">
+            <label>Nama</label>
+            <input type="text" id="editName" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="editEmail" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Role</label>
+            <select id="editRole" class="form-control">
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label>Password Lama</label>
+            <input type="password" id="editOldPassword" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Password Baru</label>
+            <input type="password" id="editPassword" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Konfirmasi Password Baru</label>
+            <input type="password" id="editPasswordConfirmation" class="form-control">
+          </div>
+          <div id="errorEditUser" class="text-danger"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script Utama -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modalEditUser = new bootstrap.Modal(document.getElementById('modalEditUser'));
+    const modalAccount = new bootstrap.Modal(document.getElementById('accountModal'));
+    const formEditUser = document.getElementById('formEditUser');
+    const errorEditBox = document.getElementById('errorEditUser');
+
+    // Klik "Admin" atau role user untuk membuka modal akun
+    document.getElementById("openAccountModal").addEventListener("click", function () {
+        // Isi ulang data akun
+        document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
+        document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
+        document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
+        document.getElementById("accountPassword").innerText = "********";
+
+        modalAccount.show();
+    });
+
+    // Klik tombol edit akun
+    document.getElementById('btnEditAkun').addEventListener('click', function() {
+        document.getElementById('editUserId').value = "{{ Auth::user()->id }}";
+        document.getElementById('editName').value = "{{ Auth::user()->name }}";
+        document.getElementById('editEmail').value = "{{ Auth::user()->email }}";
+        document.getElementById('editRole').value = "{{ Auth::user()->role }}";
+
+        document.getElementById('editOldPassword').value = '';
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editPasswordConfirmation').value = '';
+
+        document.querySelector('#modalEditUser .modal-title').innerText = 'Edit Akun Saya';
+        modalEditUser.show();
+    });
+
+    // Edit user dari tabel
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-edit')) {
+            const row = e.target.closest('tr');
+            const id = row.dataset.id;
+            const name = row.children[1].textContent.trim();
+            const email = row.children[2].textContent.trim();
+            const role = row.querySelector('span.badge').textContent.trim().toLowerCase();
+
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editRole').value = role;
+
+            document.getElementById('editOldPassword').value = '';
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editPasswordConfirmation').value = '';
+
+            document.querySelector('#modalEditUser .modal-title').innerText = 'Edit User';
+            modalEditUser.show();
+        }
+    });
+});
+</script>
+
 <!-- Modal Tambah Proyek -->
 <div class="modal fade" id="modalTambahProject" tabindex="-1" aria-labelledby="modalTambahProjectLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -503,8 +653,54 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
             <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
             <td>
-              <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info text-white">Detail</a>
-              <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning text-white">Tambah</a>
+              <!-- Tombol Detail -->
+              <a href="{{ route('staff.project.show', $project->id) }}" 
+                class="btn btn-sm btn-success text-white" 
+                style="background-color: #11df11;">
+                Detail
+              </a>
+
+              <!-- Tombol Tambah dengan modal -->
+              <button class="btn btn-sm btn-primary text-white" 
+                style="background-color: #5051f9;" 
+                data-bs-toggle="modal" 
+                data-bs-target="#modalTambah{{ $project->id }}">
+                Tambah
+              </button>
+              <!-- Modal Tambah Dokumen -->
+              <div class="modal fade" id="modalTambah{{ $project->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $project->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="modalLabel{{ $project->id }}">
+                        Input Dokumen Proyek: {{ $project->judul }}
+                      </h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('project.documents.store', $project->id) }}" method="POST" enctype="multipart/form-data">
+                      @csrf
+                      <div class="modal-body">
+                        <div class="mb-3">
+                        <label for="jenis_dokumen" class="form-label">Jenis Dokumen</label>
+                        <input type="text" name="jenis_dokumen" class="form-control" placeholder="Masukkan Jenis Dokumen" required>
+                      </div>
+                        <div class="mb-3">
+                          <label for="dokumen" class="form-label">Upload Dokumen</label>
+                          <input type="file" name="dokumen" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="keterangan" class="form-label">Keterangan (opsional)</label>
+                          <textarea name="keterangan" class="form-control" rows="3"></textarea>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </td>
           </tr>
         @empty
