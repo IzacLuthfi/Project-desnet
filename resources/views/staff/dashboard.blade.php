@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Dashboard Staff</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <!-- Bootstrap, Font & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,6 +12,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <form id="formTambahProject">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
   <!-- Personel Dynamic JS -->
   <script>
@@ -396,153 +400,6 @@ document.addEventListener('DOMContentLoaded', function () {
 <!-- Main Content -->
 <div class="main-content">
 
-<!-- Modal Akun -->
-<div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4" style="border-radius:40px;">
-      <div class="modal-header justify-content-center border-0">
-        <h5 class="modal-title px-4 py-2 rounded" style="background-color: #044280; color: white;">
-          <i class="bi bi-person-fill"></i> Akun Saya
-        </h5>
-        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex justify-content-between py-2">
-          <strong>Name</strong>
-          <span id="accountName">{{ Auth::user()->name }}</span>
-        </div>
-        <div class="d-flex justify-content-between py-2">
-          <strong>Email account</strong>
-          <span id="accountEmail">{{ Auth::user()->email }}</span>
-        </div>
-        <div class="d-flex justify-content-between py-2">
-          <strong>Role</strong>
-          <span id="accountRole">{{ Auth::user()->role }}</span>
-        </div>
-        <div class="d-flex justify-content-between py-2">
-          <strong>Password</strong>
-          <span id="accountPassword">*******</span>
-        </div>
-      </div>
-      <div class="modal-footer justify-content-center border-0">
-        <button class="btn btn-warning" id="btnEditAkun">Edit Akun</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Modal Edit User -->
-<div class="modal fade" id="modalEditUser" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:40px;">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit User</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form id="formEditUser">
-          <input type="hidden" id="editUserId">
-          <div class="mb-3">
-            <label>Nama</label>
-            <input type="text" id="editName" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Email</label>
-            <input type="email" id="editEmail" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Role</label>
-            <select id="editRole" class="form-control">
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label>Password Lama</label>
-            <input type="password" id="editOldPassword" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Password Baru</label>
-            <input type="password" id="editPassword" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Konfirmasi Password Baru</label>
-            <input type="password" id="editPasswordConfirmation" class="form-control">
-          </div>
-          <div id="errorEditUser" class="text-danger"></div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Script Utama -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const modalEditUser = new bootstrap.Modal(document.getElementById('modalEditUser'));
-    const modalAccount = new bootstrap.Modal(document.getElementById('accountModal'));
-    const formEditUser = document.getElementById('formEditUser');
-    const errorEditBox = document.getElementById('errorEditUser');
-
-    // Klik "Admin" atau role user untuk membuka modal akun
-    document.getElementById("openAccountModal").addEventListener("click", function () {
-        // Isi ulang data akun
-        document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
-        document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
-        document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
-        document.getElementById("accountPassword").innerText = "********";
-
-        modalAccount.show();
-    });
-
-    // Klik tombol edit akun
-    document.getElementById('btnEditAkun').addEventListener('click', function() {
-        document.getElementById('editUserId').value = "{{ Auth::user()->id }}";
-        document.getElementById('editName').value = "{{ Auth::user()->name }}";
-        document.getElementById('editEmail').value = "{{ Auth::user()->email }}";
-        document.getElementById('editRole').value = "{{ Auth::user()->role }}";
-
-        document.getElementById('editOldPassword').value = '';
-        document.getElementById('editPassword').value = '';
-        document.getElementById('editPasswordConfirmation').value = '';
-
-        document.querySelector('#modalEditUser .modal-title').innerText = 'Edit Akun Saya';
-        modalEditUser.show();
-    });
-
-    // Edit user dari tabel
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-edit')) {
-            const row = e.target.closest('tr');
-            const id = row.dataset.id;
-            const name = row.children[1].textContent.trim();
-            const email = row.children[2].textContent.trim();
-            const role = row.querySelector('span.badge').textContent.trim().toLowerCase();
-
-            document.getElementById('editUserId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editRole').value = role;
-
-            document.getElementById('editOldPassword').value = '';
-            document.getElementById('editPassword').value = '';
-            document.getElementById('editPasswordConfirmation').value = '';
-
-            document.querySelector('#modalEditUser .modal-title').innerText = 'Edit User';
-            modalEditUser.show();
-        }
-    });
-});
-</script>
-
 <!-- Modal Tambah Proyek -->
 <div class="modal fade" id="modalTambahProject" tabindex="-1" aria-labelledby="modalTambahProjectLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -713,6 +570,245 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+  <!-- Modal Akun -->
+<div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4" style="border-radius:40px;">
+      <div class="modal-header justify-content-center border-0">
+        <h5 class="modal-title px-4 py-2 rounded" style="background-color: #044280; color: white;">
+          <i class="bi bi-person-fill"></i> Akun Saya
+        </h5>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between py-2">
+          <strong>Nama</strong>
+          <span id="accountName">{{ Auth::user()->name }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Email</strong>
+          <span id="accountEmail">{{ Auth::user()->email }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Role</strong>
+          <span id="accountRole">{{ Auth::user()->role }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <strong>Password</strong>
+          <span id="accountPassword">*******</span>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button class="btn btn-warning" id="btnEditAkun">Edit Akun</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Akun -->
+<div class="modal fade" id="modalEditUser" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Akun Saya</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="errorEditUser" class="text-danger mb-2"></div>
+        <div class="mb-3">
+          <label>Nama</label>
+          <input type="text" class="form-control" id="editName">
+        </div>
+        <div class="mb-3">
+          <label>Email</label>
+          <input type="email" class="form-control" id="editEmail">
+        </div>
+        <div class="mb-3">
+  <label>Role</label>
+  <input type="text" class="form-control" id="editRole" readonly>
+</div>
+        <div class="mb-3">
+          <label>Password Lama</label>
+          <input type="password" class="form-control" id="editOldPassword">
+        </div>
+        <div class="mb-3">
+          <label>Password Baru</label>
+          <input type="password" class="form-control" id="editPassword">
+        </div>
+        <div class="mb-3">
+          <label>Konfirmasi Password</label>
+          <input type="password" class="form-control" id="editPasswordConfirmation">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Ambil elemen modal dan tombol
+    const modalAccountEl = document.getElementById('accountModal');
+    const modalEditUserEl = document.getElementById('modalEditUser');
+    const modalAccount = new bootstrap.Modal(modalAccountEl);
+    const modalEditUser = new bootstrap.Modal(modalEditUserEl);
+
+    const btnOpenAccount = document.getElementById("openAccountModal");
+    const btnEditAkun = document.getElementById("btnEditAkun");
+
+    // Buka modal akun
+    if (btnOpenAccount) {
+        btnOpenAccount.addEventListener("click", function () {
+            document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
+            document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
+            document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
+            document.getElementById("accountPassword").innerText = "********";
+            modalAccount.show();
+        });
+    }
+
+    // Klik edit akun dari modal akun
+    if (btnEditAkun) {
+        btnEditAkun.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            // Isi form edit dengan data user
+            document.getElementById('editName').value = "{{ Auth::user()->name }}";
+            document.getElementById('editEmail').value = "{{ Auth::user()->email }}";
+            document.getElementById('editRole').value = "{{ Auth::user()->role }}"; // ← ini penting!
+
+            document.getElementById('editOldPassword').value = '';
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editPasswordConfirmation').value = '';
+
+            document.querySelector('#modalEditUser .modal-title').innerText = 'Edit Akun Saya';
+
+            // Tutup modal akun, baru buka modal edit
+            modalAccount.hide();
+            modalAccountEl.addEventListener('hidden.bs.modal', function openEdit() {
+                modalEditUser.show();
+                modalAccountEl.removeEventListener('hidden.bs.modal', openEdit);
+            });
+        });
+    }
+
+    // Tombol simpan di modal edit
+    const btnSaveEdit = document.getElementById('btnSaveEdit');
+
+    if (!btnSaveEdit) return;
+
+    btnSaveEdit.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('editName').value;
+        const email = document.getElementById('editEmail').value;
+        const role = document.getElementById('editRole').value;
+        const oldPassword = document.getElementById('editOldPassword').value;
+        const newPassword = document.getElementById('editPassword').value;
+        const passwordConfirm = document.getElementById('editPasswordConfirmation').value;
+        const errorBox = document.getElementById('errorEditUser');
+
+        fetch('/profile', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                role: role,
+                old_password: oldPassword,
+                password: newPassword,
+                password_confirmation: passwordConfirm
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                errorBox.textContent = '';
+
+                // Tutup modal edit
+                bootstrap.Modal.getInstance(document.getElementById('modalEditUser')).hide();
+
+                // Tampilkan notifikasi berhasil
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    location.reload(); // reload setelah user klik OK
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: data.message || 'Terjadi kesalahan.',
+                });
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan sistem.',
+            });
+        });
+    });
+});
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const hapusButtons = document.querySelectorAll('.btn-hapus');
+    const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
+    let projectIdToDelete = null;
+    let rowToDelete = null;
+
+    // Tangkap klik tombol hapus
+    hapusButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        projectIdToDelete = this.dataset.id;
+        rowToDelete = this.closest('tr');
+        modalHapus.show();
+      });
+    });
+
+    // Ketika tombol "Hapus" dalam modal diklik
+    document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
+      if (!projectIdToDelete) return;
+
+      fetch(`/projects/${projectIdToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          // Hapus baris dari tabel tanpa reload
+          rowToDelete.remove();
+          modalHapus.hide();
+        } else {
+          alert('Gagal menghapus data. Coba lagi.');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Terjadi kesalahan!');
+      });
+    });
+  });
+</script>
+
   <!-- Modal Logout -->
 <div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -725,12 +821,48 @@ document.addEventListener('DOMContentLoaded', function() {
         @csrf
         <div class="d-flex justify-content-center gap-2 mt-3">
           <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-dark">Yakin</button>
+          <button type="button" class="btn btn-dark" id="btnConfirmLogout">Yakin</button>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const logoutButton = document.getElementById('btnLogout');
+  const logoutModal = new bootstrap.Modal(document.getElementById('modalLogout'));
+  const confirmLogoutBtn = document.getElementById('btnConfirmLogout');
+
+  // Buka modal saat klik tombol logout di sidebar
+  logoutButton.addEventListener('click', function (e) {
+    e.preventDefault();
+    logoutModal.show();
+  });
+
+  // Logout saat klik tombol "Yakin"
+  confirmLogoutBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    fetch('{{ route('logout') }}', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Accept': 'application/json'
+      }
+    }).then(res => {
+      if (res.ok) {
+        window.location.href = '/login';
+      } else {
+        alert('Gagal logout!');
+      }
+    }).catch(err => {
+      console.error(err);
+      alert('Kesalahan sistem saat logout.');
+    });
+  });
+});
+</script>
 
  <script>
   document.addEventListener('DOMContentLoaded', function () {
