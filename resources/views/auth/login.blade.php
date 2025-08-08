@@ -123,12 +123,39 @@
                     <i class="fa fa-user"></i>
                     <input type="email" name="email" id="email" placeholder="Email" required autofocus autocomplete="email">
                 </div>
+                <div class="form-group" style="position: relative;">
+                    <i class="fa fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #1e40af;"></i>     
+                    <input type="password" 
+                        name="password" 
+                        id="password" 
+                        placeholder="Kata Sandi" 
+                        required 
+                        autocomplete="current-password" 
+                        style="padding-left: 40px; padding-right: 40px; width: 100%; height: 45px; border: 1px solid #ccc; border-radius: 6px;">
 
-                <div class="form-group">
-                    <i class="fa fa-lock"></i>
-                    <input type="password" name="password" id="password" placeholder="Kata Sandi" required autocomplete="current-password">
+                    <!-- Icon mata di dalam kotak -->
+                    <span class="toggle-password" 
+                        onclick="togglePassword()" 
+                        style="position: absolute; right: 50px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #1e40af;">
+                        <i class="fa fa-eye" id="eye-icon"></i>
+                    </span>
                 </div>
+                <script>
+                function togglePassword() {
+                    const passwordInput = document.getElementById('password');
+                    const eyeIcon = document.getElementById('eye-icon');
 
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        eyeIcon.classList.remove('fa-eye');
+                        eyeIcon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        eyeIcon.classList.remove('fa-eye-slash');
+                        eyeIcon.classList.add('fa-eye');
+                    }
+                }
+                </script>
                 <button type="submit" class="btn-login">Masuk</button>
             </form>
         </div>
