@@ -9,7 +9,7 @@ class Project extends Model
 {
   use HasFactory;
 
-  protected $fillable = ['judul', 'nilai', 'pm', 'status'];
+  protected $fillable = ['judul', 'nilai', 'pm_id', 'status', 'status_dokumen', 'status_komisi'];
 
   public function projectPersonel()
   {
@@ -22,5 +22,9 @@ class Project extends Model
   public function projectDocuments()
   {
     return $this->hasMany(\App\Models\ProjectDocument::class, 'project_id');
+  }
+  public function projectManager()
+  {
+    return $this->belongsTo(User::class, 'pm_id');
   }
 }
