@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\ProjectPersonel;
+use App\Models\User;
 
 class ProjectController extends Controller
 {
@@ -33,12 +34,15 @@ class ProjectController extends Controller
         $project = Project::create([
             'judul' => $request->judul,
             'nilai' => $request->nilai,
-            'pm' => $request->pm,
+            'pm_id' => $request->pm_id,
+            'status' => 'Belum dimulai',
+            'status_dokumen' => 'Belum Diajukan',
+            'status_komisi' => 'Belum Disetujui',
         ]);
 
         foreach ($request->personel as $p) {
             $project->projectPersonel()->create([
-                'nama' => $p['nama'],
+                'user_id' => $p['user_id'],
                 'role' => $p['role'],
             ]);
         }
@@ -57,12 +61,18 @@ class ProjectController extends Controller
     public function dashboard()
     {
         $projects = Project::with('projectPersonel')->get();
-        return view('admin.dashboard', compact('projects'));
+        $projectManagers = User::where('role', 'pm')->get();
+        $staffs = User::where('role', 'staff')->get();
+
+        return view('admin.dashboard', compact('projects', 'projectManagers', 'staffs'));
     }
 
     public function create()
     {
-        return view('project.create');
+        $projectManagers = User::where('role', 'pm')->get();
+        $staffs = User::where('role', 'staff')->get();
+
+        return view('project.create', compact('projectManagers', 'staffs'));
     }
 
     public function store(Request $request)
@@ -70,25 +80,25 @@ class ProjectController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'nilai' => 'required|numeric',
-            'pm' => 'required|string',
-            'personel.*.nama' => 'required|string',
+            'pm_id' => 'required|exists:users,id',
+            'personel.*.user_id' => 'required|exists:users,id',
             'personel.*.role' => 'required|string',
         ]);
 
         $project = Project::create([
             'judul' => $request->judul,
             'nilai' => $request->nilai,
-            'pm' => $request->pm,
+            'pm_id' => $request->pm_id,
             'status' => $request->status ?? 'Belum dimulai',
-            'status_dokumen' => 'Belum Diajukan', // ✅ Tambahkan default
-            'status_komisi' => 'Belum Disetujui',  // ✅ Tambahkan default
+            'status_dokumen' => 'Belum Diajukan',
+            'status_komisi' => 'Belum Disetujui',
         ]);
 
         if ($request->has('personel')) {
             foreach ($request->personel as $person) {
                 ProjectPersonel::create([
                     'project_id' => $project->id,
-                    'nama' => $person['nama'],
+                    'user_id' => $person['user_id'],
                     'role' => $person['role'],
                 ]);
             }
@@ -109,11 +119,10 @@ class ProjectController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'nilai' => 'required|numeric',
-            'pm' => 'required|string',
+            'pm_id' => 'required|exists:users,id',
             'status' => 'required|string',
-            'personel' => 'array',
-            'personel.*' => 'nullable|string',
-            'role.*' => 'nullable|string',
+            'personel.*.user_id' => 'nullable|exists:users,id',
+            'personel.*.role' => 'nullable|string',
         ]);
 
         $project = Project::findOrFail($id);
@@ -121,31 +130,25 @@ class ProjectController extends Controller
         $project->update([
             'judul' => $request->judul,
             'nilai' => $request->nilai,
-            'project_manager' => $request->pm,
+            'pm_id' => $request->pm_id,
             'status_dokumen' => $request->status,
         ]);
 
-        // Update personel
+        // Hapus personel lama
         ProjectPersonel::where('project_id', $project->id)->delete();
 
-        if ($request->has('personel') && $request->has('role')) {
-            foreach ($request->personel as $i => $nama) {
-                if (!empty($nama)) {
+        if ($request->has('personel')) {
+            foreach ($request->personel as $person) {
+                if (!empty($person['user_id'])) {
                     ProjectPersonel::create([
                         'project_id' => $project->id,
-                        'nama' => $nama,
-                        'peran' => $request->role[$i] ?? null,
+                        'user_id' => $person['user_id'],
+                        'role' => $person['role'] ?? null,
                     ]);
                 }
             }
         }
 
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil diperbarui.');
-    }
-    public function show($id)
-    {
-        $project = Project::with('projectDocuments')->findOrFail($id);
-
-        return view('pm.project.show', compact('project'));
     }
 }
