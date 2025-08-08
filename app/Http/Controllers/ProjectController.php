@@ -107,6 +107,11 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil disimpan.');
     }
 
+    public function show($id)
+    {
+        $project = Project::with('projectDocuments')->findOrFail($id);
+        return view('pm.project.show', compact('project'));
+    }
 
     public function edit($id)
     {

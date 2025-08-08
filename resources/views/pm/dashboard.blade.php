@@ -360,9 +360,24 @@ document.addEventListener('DOMContentLoaded', function () {
       color: #4f46e5;
     }
 
-    table th, table td {
+    .table-fixed {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .table-fixed th,
+    .table-fixed td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       vertical-align: middle;
     }
+
+    .col-no { width: 40px; }
+    .col-judul { width: 180px; }
+    .col-status { width: 140px; }
+    .col-nilai { width: 120px; }
+    .col-personel { width: 200px; }
+    .col-aksi { width: 170px; }
   </style>
 </head>
 <body>
@@ -480,6 +495,7 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
   </div>
 </div>
+
 <!-- Tabel Work Order -->
 <div class="card-box mb-4">
   <h6 class="fw-bold mb-3">Work Order</h6>
@@ -487,13 +503,13 @@ document.addEventListener('DOMContentLoaded', function () {
     <table class="table table-bordered align-middle" id="tabelWorkOrder">
       <thead class="table-light">
         <tr>
-          <th>No</th>
-          <th>Judul Proyek</th>
-          <th>Status Dokumen</th>
-          <th>Status Komisi</th>
-          <th>Nilai Proyek</th>
-          <th>Personel</th>
-          <th>Aksi</th>
+          <th class="col-no">No</th>
+          <th class="col-judul">Judul Proyek</th>
+          <th class="col-status">Status Dokumen</th>
+          <th class="col-status">Status Komisi</th>
+          <th class="col-nilai">Nilai Proyek</th>
+          <th class="col-personel">Personel</th>
+          <th class="col-aksi">Aksi</th>
         </tr>
       </thead>
       <tbody>
@@ -511,7 +527,11 @@ document.addEventListener('DOMContentLoaded', function () {
               {{ $project->status_komisi ?? 'Belum Disetujui' }}
             </td>
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
-            <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
+            <td>
+              {{ $project->projectPersonel->map(function($p) {
+                  return $p->user ? $p->user->name : '(User tidak ditemukan)';
+              })->join(', ') ?: '-' }}
+            </td>
             <td>
               <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-info text-white">Detail</a>
               <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning text-white">Tambah</a>
@@ -552,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div class="d-flex justify-content-between py-2">
           <strong>Password</strong>
-          <span id="accountPassword">*******</span>
+          <span id="accountPassword">*</span>
         </div>
       </div>
       <div class="modal-footer justify-content-center border-0">
@@ -622,7 +642,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
             document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
             document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
-            document.getElementById("accountPassword").innerText = "********";
+            document.getElementById("accountPassword").innerText = "";
             modalAccount.show();
         });
     }
@@ -742,7 +762,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
       if (!projectIdToDelete) return;
 
-      fetch(`/projects/${projectIdToDelete}`, {
+      fetch(/projects/${projectIdToDelete}, {
         method: 'DELETE',
         headers: {
           'X-CSRF-TOKEN': '{{ csrf_token() }}',
