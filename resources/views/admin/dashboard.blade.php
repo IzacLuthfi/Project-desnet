@@ -348,9 +348,24 @@ document.getElementById('formTambahProject').addEventListener('submit', function
       color: #4f46e5;
     }
 
-    table th, table td {
+    .table-fixed {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .table-fixed th,
+    .table-fixed td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       vertical-align: middle;
     }
+
+    .col-no { width: 40px; }
+    .col-judul { width: 180px; }
+    .col-status { width: 140px; }
+    .col-nilai { width: 120px; }
+    .col-personel { width: 200px; }
+    .col-aksi { width: 170px; }
   </style>
 </head>
 <body>
@@ -600,6 +615,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <h5 class="modal-title fw-bold">Tambah Data Project</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <form action="{{ route('projects.store') }}" method="POST" id="formTambahProject">
         @csrf
         <div id="notifAjax" class="alert d-none" role="alert"></div>
@@ -626,7 +642,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <div class="mb-3">
               <label class="form-label">Project Manager</label>
-              <input type="text" name="pm" class="form-control" required>
+              <select name="pm_id" class="form-select" required>
+                <option value="">-- Pilih Project Manager --</option>
+                @foreach ($projectManagers as $pm)
+                  <option value="{{ $pm->id }}">{{ $pm->name }}</option>
+                @endforeach
+              </select>
             </div>
 
             <div id="personelContainer">
@@ -634,12 +655,17 @@ document.addEventListener('DOMContentLoaded', function () {
               <div class="row g-2 mb-3 personel-row">
                 <div class="col-md-6">
                   <label class="form-label">Personel {{ $i + 1 }}</label>
-                  <input type="text" name="personel[{{ $i }}][nama]" class="form-control" placeholder="Nama Personel">
+                  <select name="personel[{{ $i }}][user_id]" class="form-select">
+                    <option value="">-- Pilih Personel --</option>
+                    @foreach ($staffs as $staff)
+                      <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                    @endforeach
+                  </select>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Sebagai:</label>
                   <select name="personel[{{ $i }}][role]" class="form-select">
-                    <option value="">Pilih peran</option>
+                    <option value="" disabled selected>-- Pilih Peran --</option>  
                     <option>Analis</option>
                     <option>Programer web</option>
                     <option>Programer mobile</option>
@@ -669,20 +695,21 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 </div>
 
+
 <!-- Tabel Work Order -->
 <div class="card-box mb-4">
   <h6 class="fw-bold mb-3">Work Order</h6>
   <div class="table-responsive">
-    <table class="table table-bordered align-middle" id="tabelWorkOrder">
+    <table class="table table-bordered align-middle table-fixed" id="tabelWorkOrder">
       <thead class="table-light">
         <tr>
-          <th>No</th>
-          <th>Judul Proyek</th>
-          <th>Status Dokumen</th>
-          <th>Status Komisi</th>
-          <th>Nilai Proyek</th>
-          <th>Personel</th>
-          <th>Aksi</th>
+          <th class="col-no">No</th>
+          <th class="col-judul">Judul Proyek</th>
+          <th class="col-status">Status Dokumen</th>
+          <th class="col-status">Status Komisi</th>
+          <th class="col-nilai">Nilai Proyek</th>
+          <th class="col-personel">Personel</th>
+          <th class="col-aksi">Aksi</th>
         </tr>
       </thead>
       <tbody>
@@ -700,7 +727,11 @@ document.addEventListener('DOMContentLoaded', function () {
               {{ $project->status_komisi ?? 'Belum Disetujui' }}
             </td>
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
-            <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
+            <td>
+              {{ $project->projectPersonel->map(function($p) {
+                  return $p->user ? $p->user->name : '(User tidak ditemukan)';
+              })->join(', ') ?: '-' }}
+            </td>
             <td>
               <a href="{{ route('admin.project.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
               <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Edit</a>
