@@ -3,6 +3,12 @@
 @section('title', 'Detail Proyek')
 
 @section('content')
+
+  {{-- Tombol Kembali --}}
+  <a href="{{ url()->previous() }}" class="btn btn-outline-primary mb-3">
+      ← Kembali
+  </a>
+
   <h4 class="mb-4 fw-bold">Project: {{ $project->judul }}</h4>
 
   <div class="table-responsive">
