@@ -27,4 +27,9 @@ class Project extends Model
   {
     return $this->belongsTo(User::class, 'pm_id');
   }
+  public function komisi()
+  {
+    return $this->hasMany(\App\Models\ProjectCommission::class, 'project_id');
+  }
+
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
+use App\Http\Controllers\KomisiiController;
 use App\Http\Controllers\PM\PMController;
 use App\Http\Controllers\PM\KomisiPMController;
 use App\Http\Controllers\PM\ProjectPMController;
@@ -131,3 +132,10 @@ Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::get('/komisi', [HodKomisiController::class, 'index'])->name('hod.komisi');
     Route::get('/project/{id}', [HodProjectController::class, 'show'])->name('hod.project.show');
 });
+// routes/web.php
+Route::get('/projects/{id}/commission', [ProjectCommissionController::class, 'edit'])->name('pm.komisi.edit');
+Route::put('/projects/{id}/commission', [ProjectCommissionController::class, 'update'])->name('pm.komisi.update');
+Route::post('/komisi/store', [KomisiiController::class, 'store'])->name('komisi.store');
+Route::get('/komisi', [KomisiiController::class, 'index'])->name('komisi.index');
+Route::get('/komisi/{project_id}', [KomisiiController::class, 'show'])->name('komisi.show');
+
