@@ -26,7 +26,11 @@
         <tr>
           <td>{{ $loop->iteration }}</td>
           <td>{{ $project->judul }}</td>
-          <td>{{ $project->projectPersonel->pluck('nama')->join(', ') }}</td>
+          <td>
+              {{ $project->projectPersonel->map(function($p) {
+                  return $p->user ? $p->user->name : '(User tidak ditemukan)';
+              })->join(', ') ?: '-' }}
+          </td>
           <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
           <td>
             <a href="#" class="btn btn-sm btn-success">Detail</a>
