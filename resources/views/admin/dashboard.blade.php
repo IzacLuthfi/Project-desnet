@@ -100,12 +100,17 @@
       row.innerHTML = `
         <div class="col-md-6">
           <label class="form-label">Personel ${index + 1}</label>
-          <input type="text" name="personel[${index}][nama]" class="form-control" placeholder="Nama Personel">
+          <select name="personel[${index}][user_id]" class="form-select" required>
+            <option value="">-- Pilih Personel --</option>
+            @foreach ($staffs as $staff)
+              <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+            @endforeach
+          </select>
         </div>
         <div class="col-md-6">
           <label class="form-label">Sebagai:</label>
-          <select name="personel[${index}][role]" class="form-select">
-            <option value="">Pilih peran</option>
+          <select name="personel[${index}][role]" class="form-select" required>
+            <option value="">-- Pilih Peran --</option>
             <option>Analis</option>
             <option>Programer web</option>
             <option>Programer mobile</option>
@@ -117,6 +122,7 @@
       `;
       return row;
     }
+
 
     // Tambah personel dinamis
     document.getElementById('addPersonelBtn').addEventListener('click', function () {
@@ -695,7 +701,6 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 </div>
 
-
 <!-- Tabel Work Order -->
 <div class="card-box mb-4">
   <h6 class="fw-bold mb-3">Work Order</h6>
@@ -812,5 +817,6 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 
 </div>
+
 </body>
 </html>

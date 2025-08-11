@@ -371,6 +371,7 @@ document.addEventListener('DOMContentLoaded', function () {
       white-space: nowrap;
       vertical-align: middle;
     }
+
     .col-no { width: 40px; }
     .col-judul { width: 180px; }
     .col-status { width: 140px; }
@@ -526,6 +527,7 @@ document.addEventListener('DOMContentLoaded', function () {
               {{ $project->status_komisi ?? 'Belum Disetujui' }}
             </td>
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
+
             <td>
               {{ $project->projectPersonel->map(function($p) {
                   return $p->user ? $p->user->name : '(User tidak ditemukan)';
@@ -622,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div class="d-flex justify-content-between py-2">
           <strong>Password</strong>
-          <span id="accountPassword">*******</span>
+          <span id="accountPassword">*</span>
         </div>
       </div>
       <div class="modal-footer justify-content-center border-0">
@@ -692,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
             document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
             document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
-            document.getElementById("accountPassword").innerText = "********";
+            document.getElementById("accountPassword").innerText = "";
             modalAccount.show();
         });
     }
@@ -812,7 +814,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
       if (!projectIdToDelete) return;
 
-      fetch(`/projects/${projectIdToDelete}`, {
+      fetch(/projects/${projectIdToDelete}, {
         method: 'DELETE',
         headers: {
           'X-CSRF-TOKEN': '{{ csrf_token() }}',
