@@ -75,7 +75,7 @@
   <div class="sidebar d-flex flex-column">
     <div class="text-center mb-3">
       <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-      <div class="role-label"><i class="bi bi-person-fill"></i> PM</div>
+      <div class="role-label"><i class="bi bi-person-fill"></i> pm</div>
     </div>
 
     <nav class="nav flex-column mb-auto">

@@ -5,30 +5,65 @@
 @section('content')
   <h4 class="mb-4 fw-bold">Work Order</h4>
 
+    <style>
+    .status-dot {
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .dot-success { background-color: #22c55e; }
+    .dot-warning { background-color: #f59e0b; }
+    
+    .table-fixed {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .table-fixed th,
+    .table-fixed td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .col-no { width: 40px; }
+    .col-judul { width: 180px; }
+    .col-status { width: 140px; }
+    .col-nilai { width: 120px; }
+    .col-personel { width: 200px; }
+    .col-aksi { width: 170px; }
+    </style>
+
   <div class="table-responsive">
     <table class="table table-bordered bg-white">
       <thead class="table-light">
         <tr>
-          <th>No</th>
-          <th>Judul Proyek</th>
-          <th>Status Dokumen</th>
-          <th>Nilai Proyek</th>
-          <th>Personel</th>
-          <th>Aksi</th>
+          <th class="col-no">No</th>
+          <th class="col-judul">Judul Proyek</th>
+          <th class="col-status">Status Dokumen</th>
+          <th class="col-nilai">Nilai Proyek</th>
+          <th class="col-personel">Personel</th>
+          <th class="col-aksi">Aksi</th>
         </tr>
       </thead>
       <tbody>
+        @php $projects = $projects ?? collect(); @endphp
         @forelse ($projects as $project)
           <tr>
             <td>{{ $loop->iteration }}</td>
             <td>{{ $project->judul }}</td>
             <td>
-              <span class="text-success fw-semibold">● {{ $project->status_dokumen ?? 'Selesai' }}</span>
+              <span class="status-dot {{ $project->status_dokumen === 'Sudah Diajukan' ? 'dot-success' : 'dot-warning' }}"></span>
+              {{ $project->status_dokumen ?? 'Belum Diajukan' }}
             </td>
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
             <td>
-              {{ $project->projectPersonel->pluck('nama')->take(3)->join(', ') }}
-              {{ $project->projectPersonel->count() > 3 ? ',...' : '' }}
+              {{ $project->projectPersonel->map(function($p) {
+                  return $p->user ? $p->user->name : '(User tidak ditemukan)';
+              })->join(', ') ?: '-' }}
             </td>
             <td>
               <!-- Tombol Detail -->
@@ -45,7 +80,6 @@
                 data-bs-target="#modalTambah{{ $project->id }}">
                 Tambah
               </button>
-
               <!-- Modal Tambah Dokumen -->
               <div class="modal fade" id="modalTambah{{ $project->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $project->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -60,13 +94,9 @@
                       @csrf
                       <div class="modal-body">
                         <div class="mb-3">
-                          <label for="jenis_dokumen" class="form-label">Jenis Dokumen</label>
-                          <select name="jenis_dokumen" class="form-select" required>
-                            <option value="" disabled selected>-- Pilih Jenis Dokumen --</option>
-                            <option value="User Acceptance Testing (UAT)">User Acceptance Testing (UAT)</option>
-                            <option value="Berita Acara Serah Terima (BAST)">Berita Acara Serah Terima (BAST)</option>
-                          </select>
-                        </div>
+                        <label for="jenis_dokumen" class="form-label">Jenis Dokumen</label>
+                        <input type="text" name="jenis_dokumen" class="form-control" placeholder="Masukkan Jenis Dokumen" required>
+                      </div>
                         <div class="mb-3">
                           <label for="dokumen" class="form-label">Upload Dokumen</label>
                           <input type="file" name="dokumen" class="form-control" required>
