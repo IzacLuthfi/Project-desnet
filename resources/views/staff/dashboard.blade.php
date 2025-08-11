@@ -358,9 +358,24 @@ document.addEventListener('DOMContentLoaded', function () {
       color: #4f46e5;
     }
 
-    table th, table td {
+    .table-fixed {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .table-fixed th,
+    .table-fixed td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       vertical-align: middle;
     }
+
+    .col-no { width: 40px; }
+    .col-judul { width: 180px; }
+    .col-status { width: 140px; }
+    .col-nilai { width: 120px; }
+    .col-personel { width: 200px; }
+    .col-aksi { width: 170px; }
   </style>
 </head>
 <body>
@@ -484,13 +499,13 @@ document.addEventListener('DOMContentLoaded', function () {
     <table class="table table-bordered align-middle" id="tabelWorkOrder">
       <thead class="table-light">
         <tr>
-          <th>No</th>
-          <th>Judul Proyek</th>
-          <th>Status Dokumen</th>
-          <th>Status Komisi</th>
-          <th>Nilai Proyek</th>
-          <th>Personel</th>
-          <th>Aksi</th>
+          <th class="col-no">No</th>
+          <th class="col-judul">Judul Proyek</th>
+          <th class="col-status">Status Dokumen</th>
+          <th class="col-status">Status Komisi</th>
+          <th class="col-nilai">Nilai Proyek</th>
+          <th class="col-personel">Personel</th>
+          <th class="col-aksi">Aksi</th>
         </tr>
       </thead>
       <tbody>
@@ -508,7 +523,11 @@ document.addEventListener('DOMContentLoaded', function () {
               {{ $project->status_komisi ?? 'Belum Disetujui' }}
             </td>
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
-            <td>{{ $project->projectPersonel->pluck('nama')->join(', ') ?: '-' }}</td>
+            <td>
+              {{ $project->projectPersonel->map(function($p) {
+                  return $p->user ? $p->user->name : '(User tidak ditemukan)';
+              })->join(', ') ?: '-' }}
+            </td>
             <td>
               <!-- Tombol Detail -->
               <a href="{{ route('staff.project.show', $project->id) }}" 
