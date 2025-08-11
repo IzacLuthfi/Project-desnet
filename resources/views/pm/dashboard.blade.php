@@ -359,7 +359,25 @@ document.addEventListener('DOMContentLoaded', function () {
       font-weight: bold;
       color: #4f46e5;
     }
-    </style>
+
+    .table-fixed {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .table-fixed th,
+    .table-fixed td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .col-no { width: 40px; }
+    .col-judul { width: 180px; }
+    .col-status { width: 140px; }
+    .col-nilai { width: 120px; }
+    .col-personel { width: 200px; }
+    .col-aksi { width: 170px; }
+  </style>
 </head>
 <body>
 
