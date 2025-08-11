@@ -359,25 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
       font-weight: bold;
       color: #4f46e5;
     }
-
-    .table-fixed {
-      table-layout: fixed;
-      width: 100%;
-    }
-    .table-fixed th,
-    .table-fixed td {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      vertical-align: middle;
-    }
-    .col-no { width: 40px; }
-    .col-judul { width: 180px; }
-    .col-status { width: 140px; }
-    .col-nilai { width: 120px; }
-    .col-personel { width: 200px; }
-    .col-aksi { width: 170px; }
-  </style>
+    </style>
 </head>
 <body>
 
@@ -622,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div class="d-flex justify-content-between py-2">
           <strong>Password</strong>
-          <span id="accountPassword">*******</span>
+          <span id="accountPassword">*</span>
         </div>
       </div>
       <div class="modal-footer justify-content-center border-0">
@@ -692,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
             document.getElementById("accountEmail").innerText = "{{ Auth::user()->email }}";
             document.getElementById("accountRole").innerText = "{{ Auth::user()->role }}";
-            document.getElementById("accountPassword").innerText = "********";
+            document.getElementById("accountPassword").innerText = "";
             modalAccount.show();
         });
     }
@@ -812,7 +794,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
       if (!projectIdToDelete) return;
 
-      fetch(`/projects/${projectIdToDelete}`, {
+      fetch(/projects/${projectIdToDelete}, {
         method: 'DELETE',
         headers: {
           'X-CSRF-TOKEN': '{{ csrf_token() }}',
