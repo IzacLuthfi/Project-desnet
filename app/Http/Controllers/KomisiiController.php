@@ -1,36 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\PM;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Komisi; // pastikan ini mengarah ke model Komisi yang sudah diubah tabelnya
+use Illuminate\Support\Facades\Auth;
 
-class KomisiPMController extends Controller
+class KomisiiController extends Controller
 {
     public function index()
     {
-        // Ambil semua data project (bisa disesuaikan dengan user login jika perlu)
-        $projects = Project::all();
+        $projects = Project::with([
+            'projectPersonel.user',
+            'komisi.projectPersonel.user'
+        ])->get();
 
-        // Hitung statistik dokumen
-        $totalDokumen = $projects->count();
-        $dokumenRevisi = $projects->where('status_dokumen', 'Revisi')->count();
-        $dokumenSelesai = $projects->where('status_dokumen', 'Sudah Diajukan')->count();
-
-        $stats = [
-            'total' => $totalDokumen,
-            'revisi' => $dokumenRevisi,
-            'selesai' => $dokumenSelesai,
-        ];
-
-        // Komisi dummy (kamu bisa ganti sesuai logika komisi aslinya)
-        $komisi = [
-            'bulan' => 76000000,
-            'tahun' => 1546000000,
-        ];
-
-        return view('pm.komisi', compact('projects', 'stats', 'komisi'));
+        return view('pm.komisi', compact('projects'));
     }
 
     public function store(Request $request)
@@ -56,6 +42,13 @@ class KomisiPMController extends Controller
 
         return redirect()->back()->with('success', 'Komisi berhasil disimpan.');
     }
-
     
+    public function show($project_id)
+    {
+        $project = Project::with([
+            'komisi.projectPersonel.user'
+        ])->findOrFail($project_id);
+
+        return view('pm.komisi_detail', compact('project'));
+    }
 }

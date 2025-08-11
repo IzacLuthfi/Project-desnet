@@ -10,12 +10,13 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up()
-{
-    Schema::table('project_personels', function (Blueprint $table) {
-        $table->unsignedBigInteger('user_id')->after('project_id');
-        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-    });
-}
+    {
+        Schema::table('project_personels', function (Blueprint $table) {
+            if (!Schema::hasColumn('project_personels', 'user_id')) {
+                $table->unsignedBigInteger('user_id')->after('project_id');
+            }
+        });
+    }
 
     /**
      * Reverse the migrations.

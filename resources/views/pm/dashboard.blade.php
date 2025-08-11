@@ -371,7 +371,6 @@ document.addEventListener('DOMContentLoaded', function () {
       white-space: nowrap;
       vertical-align: middle;
     }
-
     .col-no { width: 40px; }
     .col-judul { width: 180px; }
     .col-status { width: 140px; }
@@ -527,7 +526,6 @@ document.addEventListener('DOMContentLoaded', function () {
               {{ $project->status_komisi ?? 'Belum Disetujui' }}
             </td>
             <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
-
             <td>
               {{ $project->projectPersonel->map(function($p) {
                   return $p->user ? $p->user->name : '(User tidak ditemukan)';
