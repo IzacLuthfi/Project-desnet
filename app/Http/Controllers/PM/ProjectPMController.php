@@ -5,15 +5,19 @@ namespace App\Http\Controllers\PM;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectPMController extends Controller
 {
     public function index()
     {
-        $projects = Project::with('projectPersonel')->get();
+        $projects = Project::with('projectPersonel')
+            ->where('pm_id', Auth::id()) // filter hanya proyek untuk PM login
+            ->get();
 
         return view('pm.project', compact('projects'));
     }
+
     public function storeDocument(Request $request, Project $project)
     {
         $validated = $request->validate([
@@ -32,6 +36,4 @@ class ProjectPMController extends Controller
 
         return redirect()->back()->with('success', 'Dokumen berhasil ditambahkan');
     }
-    // app/Http/Controllers/ProjectController.php
-
 }
