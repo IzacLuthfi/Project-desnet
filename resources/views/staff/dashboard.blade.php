@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <form id="formTambahProject">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -624,48 +626,103 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 </div>
 
-<!-- Modal Edit Akun -->
+{{-- Modal Edit User --}}
 <div class="modal fade" id="modalEditUser" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit Akun Saya</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div id="errorEditUser" class="text-danger mb-2"></div>
-        <div class="mb-3">
-          <label>Nama</label>
-          <input type="text" class="form-control" id="editName">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorEditUser" class="alert alert-danger d-none"></div>
+                <form id="formEditUser">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" id="editUserId" name="id">
+                    
+                    <div class="mb-3">
+                        <label>Nama</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Role</label>
+                        <select class="form-select" id="editRole" name="role" required>
+                            <option value="admin">Admin</option>
+                            <option value="hod">Head of Department</option>
+                            <option value="pm">Project Manager</option>
+                            <option value="staff">Staff</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password Lama</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="editOldPassword" name="old_password">
+                            <button type="button" class="btn btn-outline-secondary" id="toggleEditOldPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password Baru</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="editPassword" name="password">
+                            <button type="button" class="btn btn-outline-secondary" id="toggleEditPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Konfirmasi Password Baru</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation">
+                            <button type="button" class="btn btn-outline-secondary" id="toggleEditPasswordConfirmation">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
+                </form>
+            </div>
         </div>
-        <div class="mb-3">
-          <label>Email</label>
-          <input type="email" class="form-control" id="editEmail">
-        </div>
-        <div class="mb-3">
-  <label>Role</label>
-  <input type="text" class="form-control" id="editRole" readonly>
-</div>
-        <div class="mb-3">
-          <label>Password Lama</label>
-          <input type="password" class="form-control" id="editOldPassword">
-        </div>
-        <div class="mb-3">
-          <label>Password Baru</label>
-          <input type="password" class="form-control" id="editPassword">
-        </div>
-        <div class="mb-3">
-          <label>Konfirmasi Password</label>
-          <input type="password" class="form-control" id="editPasswordConfirmation">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
-      </div>
     </div>
-  </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function togglePassword(buttonId, inputId) {
+        const btn = document.getElementById(buttonId);
+        const input = document.getElementById(inputId);
+        btn.addEventListener('click', function () {
+            const icon = this.querySelector("i");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("bi-eye", "bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("bi-eye-slash", "bi-eye");
+            }
+        });
+    }
+
+    togglePassword("toggleEditOldPassword", "editOldPassword");
+    togglePassword("toggleEditPassword", "editPassword");
+    togglePassword("toggleEditPasswordConfirmation", "editPasswordConfirmation");
+});
+</script>
+@endpush
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
