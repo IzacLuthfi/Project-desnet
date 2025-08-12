@@ -131,6 +131,8 @@ Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::get('/project', [HodProjectController::class, 'index'])->name('hod.project');
     Route::get('/komisi', [HodKomisiController::class, 'index'])->name('hod.komisi');
     Route::get('/project/{id}', [HodProjectController::class, 'show'])->name('hod.project.show');
+    Route::post('/komisi/{id}/verifikasi', [HodKomisiController::class, 'verifikasiAjax'])->name('hod.komisi.verifikasi');
+    Route::post('/komisi/{id}/batalkan', [HodKomisiController::class, 'batalkanVerifikasiAjax'])->name('hod.komisi.batalkan');
 });
 // routes/web.php
 Route::post('/komisi/store', [KomisiiController::class, 'store'])->name('komisi.store');
