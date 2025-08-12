@@ -557,7 +557,8 @@ document.addEventListener('DOMContentLoaded', function () {
                       </h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="{{ route('project.documents.store', $project->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('pm.project.documents.store', $project) }}" method="POST" enctype="multipart/form-data">
+
                       @csrf
                       <div class="modal-body">
                         <div class="mb-3">
