@@ -34,7 +34,7 @@
                     </td>
                     <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
                     <td>
-                        <a href="{{ route('projects.show', $project->id) }}" class="btn btn-detail">Detail</a>
+                        <a href="{{ route('komisi.show', $project->id) }}" class="btn btn-detail">Detail</a>
                     </td>
                 </tr>
             @empty
