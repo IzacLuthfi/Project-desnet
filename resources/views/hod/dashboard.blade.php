@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <form id="formTambahProject">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -568,31 +569,53 @@ document.addEventListener('DOMContentLoaded', function () {
       </div>
       <div class="modal-body">
         <div id="errorEditUser" class="text-danger mb-2"></div>
+        
         <div class="mb-3">
           <label>Nama</label>
           <input type="text" class="form-control" id="editName">
         </div>
+        
         <div class="mb-3">
           <label>Email</label>
           <input type="email" class="form-control" id="editEmail">
         </div>
+        
         <div class="mb-3">
-  <label>Role</label>
-  <input type="text" class="form-control" id="editRole" readonly>
-</div>
+          <label>Role</label>
+          <input type="text" class="form-control" id="editRole" readonly>
+        </div>
+
         <div class="mb-3">
           <label>Password Lama</label>
-          <input type="password" class="form-control" id="editOldPassword">
+          <div class="input-group">
+            <input type="password" class="form-control" id="editOldPassword">
+            <button type="button" class="btn btn-outline-secondary" id="toggleEditOldPassword">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
+
         <div class="mb-3">
           <label>Password Baru</label>
-          <input type="password" class="form-control" id="editPassword">
+          <div class="input-group">
+            <input type="password" class="form-control" id="editPassword">
+            <button type="button" class="btn btn-outline-secondary" id="toggleEditPassword">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
+
         <div class="mb-3">
           <label>Konfirmasi Password</label>
-          <input type="password" class="form-control" id="editPasswordConfirmation">
+          <div class="input-group">
+            <input type="password" class="form-control" id="editPasswordConfirmation">
+            <button type="button" class="btn btn-outline-secondary" id="toggleEditPasswordConfirmation">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
       </div>
+
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
@@ -600,6 +623,29 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function togglePassword(buttonId, inputId) {
+        const btn = document.getElementById(buttonId);
+        const input = document.getElementById(inputId);
+        btn.addEventListener('click', function () {
+            const icon = this.querySelector("i");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("bi-eye", "bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("bi-eye-slash", "bi-eye");
+            }
+        });
+    }
+
+    togglePassword("toggleEditOldPassword", "editOldPassword");
+    togglePassword("toggleEditPassword", "editPassword");
+    togglePassword("toggleEditPasswordConfirmation", "editPasswordConfirmation");
+});
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

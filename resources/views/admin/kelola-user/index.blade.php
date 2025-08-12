@@ -79,34 +79,44 @@
     </div>
 </div>
 
-{{-- Modal Tambah User --}}
-<div class="modal fade" id="modalTambahUser" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content p-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="fw-bold mb-0">Tambah User</h5>
-                <small class="fw-bold text-muted">Masukkan Data</small>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <hr>
-            <form id="formTambahUser">
+            {{-- Modal Tambah User --}}
+            <div class="modal fade" id="modalTambahUser" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold mb-0">Tambah User</h5>
+                            <small class="fw-bold text-muted">Masukkan Data</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <hr>
+                    <form id="formTambahUser" autocomplete="off">
                 @csrf
                 <div class="mb-3">
                     <label>Nama User</label>
-                    <input type="text" class="form-control" name="name" required>
+                    <input type="text" class="form-control" name="name" required autocomplete="off">
                 </div>
                 <div class="mb-3">
                     <label>Email User</label>
-                    <input type="email" class="form-control" name="email" required>
+                    <input type="email" class="form-control" name="email" required autocomplete="off">
                 </div>
-                <div class="mb-3">
-                    <label>Password User</label>
-                    <input type="password" class="form-control" name="password" required>
+                <div class="mb-3 position-relative">
+                <label>Password User</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" name="password" required autocomplete="new-password" id="password">
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                        <i class="bi bi-eye"></i>
+                    </button>
                 </div>
-                <div class="mb-3">
-                    <label>Masukkan Ulang Password</label>
-                    <input type="password" class="form-control" name="password_confirmation" required>
+            </div>
+            <div class="mb-3 position-relative">
+                <label>Masukkan Ulang Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" id="password_confirmation">
+                    <button type="button" class="btn btn-outline-secondary" id="togglePasswordConfirm">
+                        <i class="bi bi-eye"></i>
+                    </button>
                 </div>
+            </div>
                 <div class="mb-3">
                     <label>Role</label>
                     <select class="form-select" name="role" required>
@@ -126,6 +136,31 @@
         </div>
     </div>
 </div>
+<script>
+document.getElementById("togglePassword").addEventListener("click", function () {
+    const passwordField = document.getElementById("password");
+    const icon = this.querySelector("i");
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        icon.classList.replace("bi-eye", "bi-eye-slash");
+    } else {
+        passwordField.type = "password";
+        icon.classList.replace("bi-eye-slash", "bi-eye");
+    }
+});
+
+document.getElementById("togglePasswordConfirm").addEventListener("click", function () {
+    const passwordField = document.getElementById("password_confirmation");
+    const icon = this.querySelector("i");
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        icon.classList.replace("bi-eye", "bi-eye-slash");
+    } else {
+        passwordField.type = "password";
+        icon.classList.replace("bi-eye-slash", "bi-eye");
+    }
+});
+</script>
 
 {{-- Modal Edit User --}}
 <div class="modal fade" id="modalEditUser" tabindex="-1">
@@ -141,14 +176,17 @@
                     @csrf
                     @method('PUT')
                     <input type="hidden" id="editUserId" name="id">
+                    
                     <div class="mb-3">
                         <label>Nama</label>
                         <input type="text" class="form-control" id="editName" name="name" required>
                     </div>
+
                     <div class="mb-3">
                         <label>Email</label>
                         <input type="email" class="form-control" id="editEmail" name="email" required>
                     </div>
+
                     <div class="mb-3">
                         <label>Role</label>
                         <select class="form-select" id="editRole" name="role" required>
@@ -158,25 +196,69 @@
                             <option value="staff">Staff</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label>Password Lama</label>
-                        <input type="password" class="form-control" id="editOldPassword" name="old_password">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="editOldPassword" name="old_password">
+                            <button type="button" class="btn btn-outline-secondary" id="toggleEditOldPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                     </div>
+
                     <div class="mb-3">
                         <label>Password Baru</label>
-                        <input type="password" class="form-control" id="editPassword" name="password">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="editPassword" name="password">
+                            <button type="button" class="btn btn-outline-secondary" id="toggleEditPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                     </div>
+
                     <div class="mb-3">
                         <label>Konfirmasi Password Baru</label>
-                        <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation">
+                            <button type="button" class="btn btn-outline-secondary" id="toggleEditPasswordConfirmation">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                     </div>
+
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
+                    <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function togglePassword(buttonId, inputId) {
+        const btn = document.getElementById(buttonId);
+        const input = document.getElementById(inputId);
+        btn.addEventListener('click', function () {
+            const icon = this.querySelector("i");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("bi-eye", "bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("bi-eye-slash", "bi-eye");
+            }
+        });
+    }
+
+    togglePassword("toggleEditOldPassword", "editOldPassword");
+    togglePassword("toggleEditPassword", "editPassword");
+    togglePassword("toggleEditPasswordConfirmation", "editPasswordConfirmation");
+});
+</script>
+@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
