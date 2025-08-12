@@ -12,4 +12,12 @@ class KomisiController extends Controller
         return view('admin.komisi.index' , compact('projects')); // arahkan ke resources/views/admin/komisi/index.blade.php
 
     }
+    public function show($project_id)
+    {
+        $project = Project::with([
+            'komisi.projectPersonel.user'
+        ])->findOrFail($project_id);
+
+        return view('admin.komisi_detail', compact('project'));
+    }
 }
