@@ -93,8 +93,10 @@ Route::middleware(['auth', PreventBackHistory::class])->group(function () {
     Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
     Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
     Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
-    Route::post('/pm/projects/{project}/documents', [ProjectDocumentController::class, 'store'])->name('project.documents.store');
-    Route::post('/staff/projects/{project}/documents', [DocumentStaffController::class, 'store'])->name('project.documents.store');
+    Route::post('/pm/projects/{project}/documents', [ProjectDocumentController::class, 'store'])
+        ->name('pm.project.documents.store');
+    Route::post('/staff/projects/{project}/documents', [DocumentStaffController::class, 'store'])
+        ->name('staff.project.documents.store');
     Route::get('/project/{id}', [ProjectStaffController::class, 'show'])->name('staff.project.show');
 
     // Profil
