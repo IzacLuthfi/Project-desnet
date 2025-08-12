@@ -35,7 +35,7 @@
           </td>
           <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
           <td>
-            <a href="{{ route('komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
+            <a href="{{ route('pm.komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
             <button 
               class="btn btn-sm btn-warning btn-input-komisi" 
               data-project="{{ $project->id }}"

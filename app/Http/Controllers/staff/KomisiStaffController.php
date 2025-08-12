@@ -32,4 +32,13 @@ class KomisiStaffController extends Controller
 
         return view('staff.komisi', compact('projects', 'stats', 'komisi'));
     }
+
+    public function show($project_id)
+    {
+        $project = Project::with([
+            'komisi.projectPersonel.user'
+        ])->findOrFail($project_id);
+
+        return view('staff.komisi_detail', compact('project'));
+    }
 }

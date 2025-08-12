@@ -14,4 +14,12 @@ class KomisiController extends Controller
 
         return view('hod.komisi', compact('projects'));
     }
+    public function show($project_id)
+    {
+        $project = Project::with([
+            'komisi.projectPersonel.user'
+        ])->findOrFail($project_id);
+
+        return view('hod.komisi_detail', compact('project'));
+    }
 }

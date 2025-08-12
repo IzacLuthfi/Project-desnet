@@ -57,5 +57,4 @@ class KomisiPMController extends Controller
         return redirect()->back()->with('success', 'Komisi berhasil disimpan.');
     }
 
-    
 }

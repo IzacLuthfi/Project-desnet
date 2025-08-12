@@ -33,7 +33,7 @@
           </td>
           <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
           <td>
-            <a href="#" class="btn btn-sm btn-success">Detail</a>
+            <a href="{{ route('hod.komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
             <a href="#" class="btn btn-sm btn-warning">Verifikasi</a>
           </td>
         </tr>
