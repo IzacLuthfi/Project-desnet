@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <nav class="nav flex-column mb-auto">
       <a href="{{ route('hod.dashboard') }}" class="nav-link {{ Request::is('hod/dashboard') ? 'active' : '' }}">Beranda</a>
       <a href="{{ route('hod.project') }}" class="nav-link {{ Request::is('hod/project') ? 'active' : '' }}">Project</a>
-      <a href="#" class="nav-link">Komisi</a>
+      <a href="{{ route('hod.komisi') }}" class="nav-link {{ Request::is('hod/komisi') ? 'active' : '' }}">Komisi</a>
     </nav>
 
     <div class="mt-auto p-3">

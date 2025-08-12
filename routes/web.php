@@ -131,11 +131,13 @@ Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::get('/project', [HodProjectController::class, 'index'])->name('hod.project');
     Route::get('/komisi', [HodKomisiController::class, 'index'])->name('hod.komisi');
     Route::get('/project/{id}', [HodProjectController::class, 'show'])->name('hod.project.show');
+    Route::post('/komisi/{id}/verifikasi', [HodKomisiController::class, 'verifikasiAjax'])->name('hod.komisi.verifikasi');
+    Route::post('/komisi/{id}/batalkan', [HodKomisiController::class, 'batalkanVerifikasiAjax'])->name('hod.komisi.batalkan');
 });
 // routes/web.php
-Route::get('/projects/{id}/commission', [ProjectCommissionController::class, 'edit'])->name('pm.komisi.edit');
-Route::put('/projects/{id}/commission', [ProjectCommissionController::class, 'update'])->name('pm.komisi.update');
 Route::post('/komisi/store', [KomisiiController::class, 'store'])->name('komisi.store');
-Route::get('/komisi', [KomisiiController::class, 'index'])->name('komisi.index');
-Route::get('/komisi/{project_id}', [KomisiiController::class, 'show'])->name('komisi.show');
-
+Route::get('/komisi', [KomisiiController::class, 'index'])->name('pm.komisi');
+Route::get('/pm/komisi/{project_id}', [KomisiiController::class, 'show'])->name('pm.komisi.show');
+Route::get('/staff/komisi/{project_id}', [KomisiStaffController::class, 'show'])->name('staff.komisi.show');
+Route::get('/admin/komisi/{project_id}', [KomisiController::class, 'show'])->name('admin.komisi.show');
+Route::get('/hod/komisi/{project_id}', [HodKomisiController::class, 'show'])->name('hod.komisi.show');
