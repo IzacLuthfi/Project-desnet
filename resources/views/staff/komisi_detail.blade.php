@@ -1,4 +1,4 @@
-@extends('layouts.pm')
+@extends('layouts.staff')
 
 @section('content')
 <div class="container">
@@ -25,6 +25,6 @@
         </tbody>
     </table>
 
-    <a href="{{ route('pm.komisi') }}" class="btn btn-secondary">Kembali</a>
+    <a href="{{ route('staff.komisi') }}" class="btn btn-secondary">Kembali</a>
 </div>
 @endsection
