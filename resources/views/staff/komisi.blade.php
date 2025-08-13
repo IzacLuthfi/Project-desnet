@@ -5,9 +5,10 @@
 @section('content')
   <!-- Tombol Filter -->
   <div class="mb-3">
-    <a href="#" class="btn btn-primary me-2">Perbulan</a>
-    <a href="#" class="btn btn-outline-primary">Pertahun</a>
+      <a href="{{ route('staff.komisi.total.bulanan') }}" class="btn btn-warning">Lihat Total Komisi Per Bulan</a>  
+      <a href="{{ route('staff.komisi.total') }}" class="btn btn-primary">Lihat Total Komisi</a>
   </div>
+
   <h4 class="fw-bold mb-4">Komisi Bulanan</h4>
     <!-- Tabel Komisi -->
   <div class="table-responsive">
