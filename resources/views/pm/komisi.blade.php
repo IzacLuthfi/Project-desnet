@@ -60,54 +60,49 @@
     </table>
   </div>
 
-  <!-- Modal Input Komisi -->
-  <div class="modal fade" id="modalKomisi" tabindex="-1" aria-labelledby="modalKomisiLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <form action="{{ route('komisi.store') }}" method="POST">
-          @csrf
-          <input type="hidden" name="project_id" id="project_id">
+<!-- Modal Input Komisi -->
+<div class="modal fade" id="modalKomisi" tabindex="-1" aria-labelledby="modalKomisiLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form action="{{ route('komisi.store') }}" method="POST">
+        @csrf
+        <input type="hidden" name="project_id" id="project_id">
 
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalKomisiLabel">Input Komisi</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="modalKomisiLabel">Input Komisi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Info Proyek -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Judul Proyek:</label>
+            <div id="judul_proyek" class="fw-bold"></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nilai Proyek:</label>
+            <div id="nilai_proyek" class="fw-bold text-dark"></div>
           </div>
 
-          <div class="modal-body">
-            <div class="mb-3">
-              <label>Judul Proyek</label>
-              <input type="text" id="judul_proyek" class="form-control" readonly>
-            </div>
-            <div class="mb-3">
-              <label>Nilai Proyek</label>
-              <input type="text" id="nilai_proyek" class="form-control" readonly>
-            </div>
-            <div class="mb-3">
-              <label>Nilai Margin</label>
-              <input type="number" step="0.01" name="margin" class="form-control" required>
-            </div>
-
-            <h6>Komisi Personel</h6>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Nama</th>
-                  <th>Persentase (%)</th>
-                </tr>
-              </thead>
-              <tbody id="list_personel"></tbody>
-            </table>
+          <!-- Input Margin -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Input Nilai Margin:</label>
+            <input type="number" step="0.01" name="margin" class="form-control" required>
           </div>
 
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          </div>
-        </form>
-      </div>
+          <!-- Komisi Personel -->
+          <h6 class="fw-bold mb-3">Komisi Personel</h6>
+          <div id="list_personel"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
     </div>
   </div>
-
+</div>
 @endsection
 
 @push('scripts')
@@ -121,20 +116,28 @@ document.addEventListener('DOMContentLoaded', function () {
             let personel = JSON.parse(this.dataset.personel);
 
             document.getElementById('project_id').value = projectId;
-            document.getElementById('judul_proyek').value = judul;
-            document.getElementById('nilai_proyek').value = parseFloat(nilai).toLocaleString();
+            document.getElementById('judul_proyek').textContent = judul;
+            document.getElementById('nilai_proyek').textContent = parseFloat(nilai).toLocaleString('id-ID');
 
-            let tbody = document.getElementById('list_personel');
-            tbody.innerHTML = '';
+            let container = document.getElementById('list_personel');
+            container.innerHTML = '';
 
-            personel.forEach(p => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${p.nama}</td>
-                        <td>
-                            <input type="number" name="komisi[${p.id}]" step="0.01" class="form-control" required>
-                        </td>
-                    </tr>
+            personel.forEach((p, index) => {
+                let labelNama = `Personel ${index + 1}`;
+                container.innerHTML += `
+                  <div class="row align-items-center mb-3">
+                    <div class="col-md-4">
+                      <label class="form-label mb-0">${labelNama}</label>
+                      <input type="text" class="form-control" value="${p.nama}" readonly>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label mb-0">Komisi:</label>
+                      <div class="input-group">
+                        <input type="number" name="komisi[${p.id}]" step="0.01" class="form-control" required>
+                        <span class="input-group-text">%</span>
+                      </div>
+                    </div>
+                  </div>
                 `;
             });
 
@@ -144,3 +147,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
+

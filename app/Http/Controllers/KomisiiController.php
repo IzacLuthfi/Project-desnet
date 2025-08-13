@@ -14,8 +14,8 @@ class KomisiiController extends Controller
         $projects = Project::with([
             'projectPersonel.user',
             'komisi.projectPersonel.user'
-        ])->get();
-
+        ])  ->where('pm_id', Auth::id())
+            ->get();
         return view('pm.komisi', compact('projects'));
     }
 
