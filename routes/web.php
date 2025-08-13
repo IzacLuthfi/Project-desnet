@@ -149,14 +149,26 @@ Route::get('/hod/komisi/{project_id}', [HodKomisiController::class, 'show'])->na
 
 //======= notifikasi ======
 Route::get('/notifications', function () {
-    return Notification::where('user_id', auth()->id())
+    return Notification::where('user_id', Auth::id())
         ->where('is_read', false)
         ->latest()
         ->get();
 })->middleware('auth');
 
 Route::post('/notifications/mark-all-read', function () {
-    Notification::where('user_id', auth()->id())->update(['is_read' => true]);
+    Notification::where('user_id', Auth::id())->update(['is_read' => true]);
     return response()->json(['status' => 'success']);
 })->middleware('auth');
 Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+Route::get('/pm/notifications', function () {
+    return \App\Models\Notification::where('user_id', Auth::id())
+        ->where('is_read', false)
+        ->latest()
+        ->get();
+})->middleware('auth');
+
+Route::post('/pm/notifications/mark-all-read', function () {
+    \App\Models\Notification::where('user_id', Auth::id())
+        ->update(['is_read' => true]);
+    return response()->json(['status' => 'success']);
+})->middleware('auth');
