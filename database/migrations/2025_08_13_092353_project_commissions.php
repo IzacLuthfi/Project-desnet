@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('project_personel_id');
+            $table->unsignedBigInteger('user_id');
             $table->decimal('margin', 15, 2)->default(0);
             $table->decimal('persentase', 5, 2)->default(0);
             $table->decimal('nilai_komisi', 15, 2)->default(0);

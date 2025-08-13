@@ -103,7 +103,6 @@
                     0
                 </span>
             </a>
-
             <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
                 <li class="p-2 border-bottom fw-bold">Notifikasi</li>
                 <div id="notificationList">

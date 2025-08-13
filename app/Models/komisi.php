@@ -14,6 +14,7 @@ class Komisi extends Model
     protected $fillable = [
         'project_id',
         'project_personel_id',
+        'user_id',
         'margin',
         'persentase',
         'nilai_komisi'
@@ -23,4 +24,10 @@ class Komisi extends Model
     {
         return $this->belongsTo(ProjectPersonel::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(ProjectPersonel::class, 'user_id');
+    }
+
 }

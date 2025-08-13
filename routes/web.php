@@ -8,7 +8,6 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\HodController;
-use App\Http\Controllers\KomisiiController;
 use App\Http\Controllers\PM\PMController;
 use App\Http\Controllers\PM\KomisiPMController;
 use App\Http\Controllers\PM\ProjectPMController;
@@ -140,12 +139,20 @@ Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::post('/komisi/{id}/batalkan', [HodKomisiController::class, 'batalkanVerifikasiAjax'])->name('hod.komisi.batalkan');
 });
 // routes/web.php
-Route::post('/komisi/store', [KomisiiController::class, 'store'])->name('komisi.store');
-Route::get('/komisi', [KomisiiController::class, 'index'])->name('pm.komisi');
-Route::get('/pm/komisi/{project_id}', [KomisiiController::class, 'show'])->name('pm.komisi.show');
+Route::post('/komisi/store', [KomisiPMController::class, 'store'])->name('komisi.store');
+Route::get('/komisi', [KomisiPMController::class, 'index'])->name('pm.komisi');
+Route::get('/pm/komisi/{project_id}', [KomisiPMController::class, 'show'])->name('pm.komisi.show');
 Route::get('/staff/komisi/{project_id}', [KomisiStaffController::class, 'show'])->name('staff.komisi.show');
 Route::get('/admin/komisi/{project_id}', [KomisiController::class, 'show'])->name('admin.komisi.show');
 Route::get('/hod/komisi/{project_id}', [HodKomisiController::class, 'show'])->name('hod.komisi.show');
+Route::get('/pm/komisi-total', [KomisiPMController::class, 'totalPerPersonel'])->name('pm.komisi.total');
+Route::get('/staff/komisi-total', [KomisiStaffController::class, 'totalPerPersonel'])->name('staff.komisi.total');
+Route::get('/hod/komisi-total', [HodKomisiController::class, 'totalPerPersonel'])->name('hod.komisi.total');
+Route::get('/admin/komisi-total', [KomisiController::class, 'totalPerPersonel'])->name('admin.komisi.total');
+Route::get('/pm/komisi-total-bulanan', [KomisiPMController::class, 'totalPerPersonelBulananTable'])->name('pm.komisi.total.bulanan');
+Route::get('/staff/komisi-total-bulanan', [KomisiStaffController::class, 'totalPerPersonelBulananTable'])->name('staff.komisi.total.bulanan');
+Route::get('/hod/komisi-total-bulanan', [HodKomisiController::class, 'totalPerPersonelBulananTable'])->name('hod.komisi.total.bulanan');
+Route::get('/admin/komisi-total-bulanan', [KomisiController::class, 'totalPerPersonelBulananTable'])->name('admin.komisi.total.bulanan');
 
 //======= notifikasi ======
 Route::get('/notifications', function () {
