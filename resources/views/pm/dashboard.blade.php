@@ -6,245 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-
   <!-- Bootstrap, Font & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <form id="formTambahProject">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-  <!-- Personel Dynamic JS -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      let personelCount = 3;
-
-      document.getElementById('addPersonelBtn').addEventListener('click', function () {
-        const container = document.getElementById('personelContainer');
-        const index = personelCount++;
-        
-        const row = document.createElement('div');
-        row.className = 'row g-2 mb-3 personel-row';
-        row.innerHTML = `
-          <div class="col-md-6">
-            <label class="form-label">Personel ${index + 1}</label>
-            <input type="text" name="personel[${index}][nama]" class="form-control rounded-3">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Sebagai:</label>
-            <select name="personel[${index}][role]" class="form-select rounded-3">
-              <option value="">Pilih peran</option>
-              <option>Analis</option>
-              <option>Programer web</option>
-              <option>Programer mobile</option>
-              <option>Tester</option>
-              <option>Desainer</option>
-              <option>Front-end</option>
-            </select>
-          </div>
-        `;
-        container.appendChild(row);
-      });
-    });
-  </script>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    let personelCount = 3;
-
-    document.getElementById('addPersonelBtn').addEventListener('click', function () {
-      // Tambah personel secara dinamis
-    });
-  });
-</script>
-
-<script>
-  document.getElementById('addPersonelBtn').addEventListener('click', function () {
-    // Tambah personel (duplikat dari atas)
-  });
-
-  // AJAX simpan project juga di sini
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  let personelCount = 3;
-
-  // HANYA INI SAJA: tombol tambah personel
-  document.getElementById('addPersonelBtn').addEventListener('click', function () {
-    const container = document.getElementById('personelContainer');
-    const index = personelCount++;
-
-    const row = document.createElement('div');
-    row.className = 'row g-2 mb-3 personel-row';
-    row.innerHTML = `
-      <div class="col-md-6">
-        <label class="form-label">Personel ${index + 1}</label>
-        <input type="text" name="personel[${index}][nama]" class="form-control" placeholder="Nama Personel">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Sebagai:</label>
-        <select name="personel[${index}][role]" class="form-select">
-          <option value="">Pilih peran</option>
-          <option>Analis</option>
-          <option>Programer web</option>
-          <option>Programer mobile</option>
-          <option>Tester</option>
-          <option>Desainer</option>
-          <option>Front-end</option>
-        </select>
-      </div>
-    `;
-    container.appendChild(row);
-  });
-
-    // Simpan proyek via AJAX
-  document.getElementById('formTambahProject').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const notif = document.getElementById('notifAjax');
-    const btn = document.getElementById('btnSimpanProject');
-
-    btn.disabled = true;
-    fetch("{{ url('/projects/ajax-store') }}", {
-      method: "POST",
-      headers: {
-        "X-CSRF-TOKEN": '{{ csrf_token() }}'
-      },
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      btn.disabled = false;
-      if (data.success) {
-        notif.classList.remove('d-none', 'alert-danger');
-        notif.classList.add('alert-success');
-        notif.innerText = data.message;
-
-        // Tambahkan baris ke tabel
-        const table = document.getElementById('tabelWorkOrder').querySelector('tbody');
-        const index = table.querySelectorAll('tr').length + 1;
-        const personelList = data.project.project_personel.map(p => p.nama).join(', ');
-        const row = `
-  <tr>
-    <td>${index}</td>
-    <td>${data.project.judul}</td>
-    <td><span class="status-dot dot-warning"></span> Belum Diajukan</td>
-    <td><span class="status-dot dot-warning"></span> Belum Disetujui</td>
-    <td>${parseInt(data.project.nilai).toLocaleString('id-ID')}</td>
-    <td>${personelList || '-'}</td>
-    <td>
-      <a href="/projects/${data.project.id}" class="btn btn-sm btn-info text-white">Detail</a>
-      <a href="/projects/${data.project.id}/edit" class="btn btn-sm btn-warning text-white">Edit</a>
-      <form action="/projects/${data.project.id}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus?')">
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="_method" value="DELETE">
-        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-      </form>
-    </td>
-  </tr>`;
-        table.insertAdjacentHTML('beforeend', row);
-
-        // Reset form & tutup modal
-        form.reset();
-        document.getElementById('modalTambahProject').querySelector('.btn-close').click();
-      } else {
-        notif.classList.remove('d-none', 'alert-success');
-        notif.classList.add('alert-danger');
-        notif.innerText = data.message || 'Gagal menyimpan proyek.';
-      }
-    })
-    .catch(err => {
-      notif.classList.remove('d-none', 'alert-success');
-      notif.classList.add('alert-danger');
-      notif.innerText = 'Kesalahan server. Silakan coba lagi.';
-      btn.disabled = false;
-    });
-  });
-});
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    let personelCount = 3;
-
-    // Tambah Personel
-    document.getElementById('addPersonelBtn').addEventListener('click', function () {
-      const container = document.getElementById('personelContainer');
-      const index = personelCount++;
-
-      const row = document.createElement('div');
-      row.className = 'row g-2 mb-3 personel-row';
-      row.innerHTML = `
-        <div class="col-md-6">
-          <label class="form-label">Personel ${index + 1}</label>
-          <input type="text" name="personel[${index}][nama]" class="form-control" placeholder="Nama Personel">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Sebagai:</label>
-          <select name="personel[${index}][role]" class="form-select">
-            <option value="">Pilih peran</option>
-            <option>Analis</option>
-            <option>Programer web</option>
-            <option>Programer mobile</option>
-            <option>Tester</option>
-            <option>Desainer</option>
-            <option>Front-end</option>
-          </select>
-        </div>
-      `;
-      container.appendChild(row);
-    });
-
-    // RESET form saat klik Batal
-    document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
-      btn.addEventListener('click', function () {
-        const form = document.getElementById('formTambahProject');
-        form.reset();
-
-        // Hapus semua personel dinamis
-        const container = document.getElementById('personelContainer');
-        container.innerHTML = '';
-
-        // Tambahkan kembali default 3 personel
-        personelCount = 3;
-        for (let i = 0; i < 3; i++) {
-          const row = document.createElement('div');
-          row.className = 'row g-2 mb-3 personel-row';
-          row.innerHTML = `
-            <div class="col-md-6">
-              <label class="form-label">Personel ${i + 1}</label>
-              <input type="text" name="personel[${i}][nama]" class="form-control" placeholder="Nama Personel">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Sebagai:</label>
-              <select name="personel[${i}][role]" class="form-select">
-                <option value="">Pilih peran</option>
-                <option>Analis</option>
-                <option>Programer web</option>
-                <option>Programer mobile</option>
-                <option>Tester</option>
-                <option>Desainer</option>
-                <option>Front-end</option>
-              </select>
-            </div>
-          `;
-          container.appendChild(row);
-        }
-
-        // Sembunyikan notifikasi
-        const notif = document.getElementById('notifAjax');
-        notif.classList.add('d-none');
-        notif.innerText = '';
-      });
-    });
-  });
-</script>
-
+  <!-- Tambahkan Pusher & Laravel Echo -->
+  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
 
   <!-- Style -->
   <style>
@@ -294,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
     }
 
     .main-content {
@@ -324,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function () {
       border-radius: 6px;
       font-size: 14px;
     }
-
 
     .btn-info { background-color: #11df11; }
     .btn-warning { background-color: #5051f9; }
@@ -378,6 +149,77 @@ document.addEventListener('DOMContentLoaded', function () {
     .col-nilai { width: 120px; }
     .col-personel { width: 200px; }
     .col-aksi { width: 170px; }
+
+    /* Notification Styles */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 380px;
+      max-height: 500px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: none;
+      z-index: 1000;
+      margin-top: 10px;
+    }
+
+    .notification-dropdown.show {
+      display: block;
+    }
+
+    .notification-header {
+      padding: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notification-item {
+      padding: 16px;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .notification-item:hover {
+      background-color: #f9fafb;
+    }
+
+    .notification-item.unread {
+      background-color: #eff6ff;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ef4444;
+      color: white;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .notification-empty {
+      padding: 40px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .notification-icon {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-body {
+      max-height: 400px;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -387,8 +229,8 @@ document.addEventListener('DOMContentLoaded', function () {
   <div class="text-center mb-3">
     <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
     <div class="role-label" id="openAccountModal" style="cursor:pointer;">
-  <i class="bi bi-person-fill"></i> {{ Auth::user()->role }}
-</div>
+      <i class="bi bi-person-fill"></i> {{ Auth::user()->role }}
+    </div>
   </div>
 
   <nav class="nav flex-column mb-auto">
@@ -396,7 +238,6 @@ document.addEventListener('DOMContentLoaded', function () {
     <a href="{{ route('pm.project') }}" class="nav-link {{ Request::is('pm/project') ? 'active' : '' }}">Project</a>
     <a href="{{ route('pm.komisi') }}" class="nav-link {{ Request::is('pm/komisi') ? 'active' : '' }}">Komisi</a>
   </nav>
-
 
   <!-- Logout di paling bawah -->
   <div class="mt-auto p-3">
@@ -407,332 +248,375 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 
-<!-- Topbar -->
-<div class="topbar">
-  <div><h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6></div>
-  <div class="d-flex align-items-center gap-3">
-    <i class="bi bi-bell"></i>
-  </div>
+<div class="topbar d-flex justify-content-between align-items-center">
+    <h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6>
+    <li class="nav-item dropdown list-unstyled m-0">
+            <a id="pmNotificationDropdown" class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown">
+        <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
+        <span id="pmNotificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+            0
+        </span>
+    </a>
+        <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 320px; max-height: 400px; overflow-y: auto;">
+        <li class="p-2 border-bottom fw-bold">Notifikasi</li>
+        <div id="pmNotificationList">
+            <li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>
+        </div>
+        <li class="text-center border-top p-2">
+            <button id="markAllPMRead" class="btn btn-sm btn-outline-primary rounded-pill">
+                <i class="bi bi-check2-all"></i> Tandai Semua Dibaca
+            </button>
+        </li>
+    </ul>
+        
+    </li>
 </div>
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const badge = document.getElementById('pmNotificationBadge');
+    const list = document.getElementById('pmNotificationList');
+
+    // Load notifikasi awal
+    function loadNotifications() {
+        fetch('/pm/notifications')
+            .then(res => res.json())
+            .then(data => {
+                if (data.length > 0) {
+                    badge.textContent = data.length;
+                    badge.classList.remove('d-none');
+                    list.innerHTML = '';
+                    data.forEach(notif => {
+                        list.innerHTML += `
+                            <li class="p-3 border-bottom">
+                                <div class="fw-bold text-primary mb-1">Work Order Baru</div>
+                                <div class="small text-muted">${notif.message}</div>
+                            </li>
+                        `;
+                    });
+                } else {
+                    badge.classList.add('d-none');
+                    list.innerHTML = '<li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>';
+                }
+            });
+    }
+    loadNotifications();
+
+    // Pusher listener
+    var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
+        cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+        authEndpoint: '/broadcasting/auth',
+        auth: { headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }
+    });
+
+    var channel = pusher.subscribe('private-pm-notifications.{{ auth()->id() }}');
+    channel.bind('new-pm-notification', function(data) {
+        badge.classList.remove('d-none');
+        badge.textContent = parseInt(badge.textContent) + 1;
+
+        const newNotif = `
+            <li class="p-3 border-bottom">
+                <div class="fw-bold text-primary mb-1">Work Order Baru</div>
+                <div class="small text-muted">${data.message}</div>
+            </li>
+        `;
+        list.innerHTML = newNotif + list.innerHTML;
+    });
+
+    // Tombol tandai semua dibaca
+    document.getElementById('markAllPMRead').addEventListener('click', function(e) {
+        e.preventDefault();
+        fetch('/pm/notifications/mark-all-read', { 
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        }).then(() => {
+            badge.classList.add('d-none');
+            list.innerHTML = '<li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>';
+        });
+    });
+});
+</script>
+
 
 <!-- Main Content -->
 <div class="main-content">
-<!-- Modal Tambah Proyek -->
-<div class="modal fade" id="modalTambahProject" tabindex="-1" aria-labelledby="modalTambahProjectLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content rounded-4 shadow">
-      <div class="modal-header border-bottom">
-        <h5 class="modal-title fw-bold">Tambah Data Project</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form action="{{ route('projects.store') }}" method="POST" id="formTambahProject">
-        @csrf
-        <div id="notifAjax" class="alert d-none" role="alert"></div>
-        <div class="modal-body">
-
-          <!-- Proyek -->
-          <div class="mb-4">
-            <h6 class="fw-semibold">Proyek</h6>
-
-            <div class="mb-3">
-              <label class="form-label">Judul Proyek</label>
-              <input type="text" name="judul" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Nilai Proyek</label>
-              <input type="number" name="nilai" class="form-control" required>
-            </div>
-          </div>
-
-          <!-- Personel -->
-          <div class="mb-3">
-            <h6 class="fw-semibold">Personel</h6>
-
-            <div class="mb-3">
-              <label class="form-label">Project Manager</label>
-              <input type="text" name="pm" class="form-control" required>
-            </div>
-
-            <div id="personelContainer">
-              @for ($i = 0; $i < 3; $i++)
-              <div class="row g-2 mb-3 personel-row">
-                <div class="col-md-6">
-                  <label class="form-label">Personel {{ $i + 1 }}</label>
-                  <input type="text" name="personel[{{ $i }}][nama]" class="form-control" placeholder="Nama Personel">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Sebagai:</label>
-                  <select name="personel[{{ $i }}][role]" class="form-select">
-                    <option value="">Pilih peran</option>
-                    <option>Analis</option>
-                    <option>Programer web</option>
-                    <option>Programer mobile</option>
-                    <option>Tester</option>
-                    <option>Desainer</option>
-                    <option>Front-end</option>
-                  </select>
-                </div>
-              </div>
-              @endfor
-            </div>
-
-            <!-- Tombol Tambah Personel -->
-            <button type="button" class="btn btn-sm btn-primary mt-2 rounded-pill px-3" id="addPersonelBtn">
-              <i class="bi bi-plus-circle me-1"></i> Tambah Personel
-            </button>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="modal-footer border-top-0">
-          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary px-4" id="btnSimpanProject">Simpan</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Tabel Work Order -->
-<div class="card-box mb-4">
-  <h6 class="fw-bold mb-3">Work Order</h6>
-  <div class="table-responsive">
-    <table class="table table-bordered align-middle" id="tabelWorkOrder">
-      <thead class="table-light">
-        <tr>
-          <th class="col-no">No</th>
-          <th class="col-judul">Judul Proyek</th>
-          <th class="col-status">Status Dokumen</th>
-          <th class="col-status">Status Komisi</th>
-          <th class="col-nilai">Nilai Proyek</th>
-          <th class="col-personel">Personel</th>
-          <th class="col-aksi">Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        @php $projects = $projects ?? collect(); @endphp
-        @forelse ($projects as $project)
+  <!-- Modal Tambah Proyek (PM tidak perlu ini, hapus saja) -->
+  
+  <!-- Tabel Work Order -->
+  <div class="card-box mb-4">
+    <h6 class="fw-bold mb-3">Work Order</h6>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle" id="tabelWorkOrder">
+        <thead class="table-light">
           <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>{{ $project->judul }}</td>
-            <td>
-              <span class="status-dot {{ $project->status_dokumen === 'Sudah Diajukan' ? 'dot-success' : 'dot-warning' }}"></span>
-              {{ $project->status_dokumen ?? 'Belum Diajukan' }}
-            </td>
-            <td>
-              <span class="status-dot {{ $project->status_komisi === 'Disetujui' ? 'dot-success' : 'dot-warning' }}"></span>
-              {{ $project->status_komisi ?? 'Belum Disetujui' }}
-            </td>
-            <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
-            <td>
-              {{ $project->projectPersonel->map(function($p) {
-                  return $p->user ? $p->user->name : '(User tidak ditemukan)';
-              })->join(', ') ?: '-' }}
-            </td>
-            <td>
-              <!-- Tombol Detail -->
-              <a href="{{ route('projects.show', $project->id) }}" 
-                class="btn btn-sm btn-success text-white" 
-                style="background-color: #11df11;">
-                Detail
-              </a>
+            <th class="col-no">No</th>
+            <th class="col-judul">Judul Proyek</th>
+            <th class="col-status">Status Dokumen</th>
+            <th class="col-status">Status Komisi</th>
+            <th class="col-nilai">Nilai Proyek</th>
+            <th class="col-personel">Personel</th>
+            <th class="col-aksi">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          @php $projects = $projects ?? collect(); @endphp
+          @forelse ($projects as $project)
+            <tr>
+              <td>{{ $loop->iteration }}</td>
+              <td>{{ $project->judul }}</td>
+              <td>
+                <span class="status-dot {{ $project->status_dokumen === 'Sudah Diajukan' ? 'dot-success' : 'dot-warning' }}"></span>
+                {{ $project->status_dokumen ?? 'Belum Diajukan' }}
+              </td>
+              <td>
+                <span class="status-dot {{ $project->status_komisi === 'Disetujui' ? 'dot-success' : 'dot-warning' }}"></span>
+                {{ $project->status_komisi ?? 'Belum Disetujui' }}
+              </td>
+              <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
+              <td>
+                {{ $project->projectPersonel->map(function($p) {
+                    return $p->user ? $p->user->name : '(User tidak ditemukan)';
+                })->join(', ') ?: '-' }}
+              </td>
+              <td>
+                <!-- Tombol Detail -->
+                <a href="{{ route('projects.show', $project->id) }}" 
+                  class="btn btn-sm btn-success text-white" 
+                  style="background-color: #11df11;">
+                  Detail
+                </a>
 
-              <!-- Tombol Tambah dengan modal -->
-              <button class="btn btn-sm btn-primary text-white" 
-                style="background-color: #5051f9;" 
-                data-bs-toggle="modal" 
-                data-bs-target="#modalTambah{{ $project->id }}">
-                Tambah
-              </button>
+                <!-- Tombol Tambah dengan modal -->
+                <button class="btn btn-sm btn-primary text-white" 
+                  style="background-color: #5051f9;" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#modalTambah{{ $project->id }}">
+                  Tambah
+                </button>
 
-              <!-- Modal Tambah Dokumen -->
-              <div class="modal fade" id="modalTambah{{ $project->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $project->id }}" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="modalLabel{{ $project->id }}">
-                        Input Dokumen Proyek: {{ $project->judul }}
-                      </h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Modal Tambah Dokumen -->
+                <div class="modal fade" id="modalTambah{{ $project->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $project->id }}" aria-hidden="true">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel{{ $project->id }}">
+                          Input Dokumen Proyek: {{ $project->judul }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="{{ route('pm.project.documents.store', $project) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label for="jenis_dokumen" class="form-label">Jenis Dokumen</label>
+                            <select name="jenis_dokumen" class="form-select" required>
+                              <option value="" disabled selected>-- Pilih Jenis Dokumen --</option>
+                              <option value="User Acceptance Testing (UAT)">User Acceptance Testing (UAT)</option>
+                              <option value="Berita Acara Serah Terima (BAST)">Berita Acara Serah Terima (BAST)</option>
+                            </select>
+                          </div>
+                          <div class="mb-3">
+                            <label for="dokumen" class="form-label">Upload Dokumen</label>
+                            <input type="file" name="dokumen" class="form-control" required>
+                          </div>
+                          <div class="mb-3">
+                            <label for="keterangan" class="form-label">Keterangan (opsional)</label>
+                            <textarea name="keterangan" class="form-control" rows="3"></textarea>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                          <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                      </form>
                     </div>
-                    <form action="{{ route('pm.project.documents.store', $project) }}" method="POST" enctype="multipart/form-data">
-
-                      @csrf
-                      <div class="modal-body">
-                        <div class="mb-3">
-                          <label for="jenis_dokumen" class="form-label">Jenis Dokumen</label>
-                          <select name="jenis_dokumen" class="form-select" required>
-                            <option value="" disabled selected>-- Pilih Jenis Dokumen --</option>
-                            <option value="User Acceptance Testing (UAT)">User Acceptance Testing (UAT)</option>
-                            <option value="Berita Acara Serah Terima (BAST)">Berita Acara Serah Terima (BAST)</option>
-                          </select>
-                        </div>
-                        <div class="mb-3">
-                          <label for="dokumen" class="form-label">Upload Dokumen</label>
-                          <input type="file" name="dokumen" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                          <label for="keterangan" class="form-label">Keterangan (opsional)</label>
-                          <textarea name="keterangan" class="form-control" rows="3"></textarea>
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                      </div>
-                    </form>
                   </div>
                 </div>
-              </div>
-            </td>
-          </tr>
-        @empty
-          <tr>
-            <td colspan="6" class="text-center text-muted">Tidak ada proyek.</td>
-          </tr>
-        @endforelse
-      </tbody>
-    </table>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="7" class="text-center text-muted">Tidak ada proyek.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 
   <!-- Modal Akun -->
-<div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4" style="border-radius:40px;">
-      <div class="modal-header justify-content-center border-0">
-        <h5 class="modal-title px-4 py-2 rounded" style="background-color: #044280; color: white;">
-          <i class="bi bi-person-fill"></i> Akun Saya
-        </h5>
-        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+  <div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-4" style="border-radius:40px;">
+        <div class="modal-header justify-content-center border-0">
+          <h5 class="modal-title px-4 py-2 rounded" style="background-color: #044280; color: white;">
+            <i class="bi bi-person-fill"></i> Akun Saya
+          </h5>
+          <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex justify-content-between py-2">
+            <strong>Nama</strong>
+            <span id="accountName">{{ Auth::user()->name }}</span>
+          </div>
+          <div class="d-flex justify-content-between py-2">
+            <strong>Email</strong>
+            <span id="accountEmail">{{ Auth::user()->email }}</span>
+          </div>
+          <div class="d-flex justify-content-between py-2">
+            <strong>Role</strong>
+            <span id="accountRole">{{ Auth::user()->role }}</span>
+          </div>
+          <div class="d-flex justify-content-between py-2">
+            <strong>Password</strong>
+            <span id="accountPassword">*</span>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center border-0">
+          <button class="btn btn-warning" id="btnEditAkun">Edit Akun</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <div class="d-flex justify-content-between py-2">
-          <strong>Nama</strong>
-          <span id="accountName">{{ Auth::user()->name }}</span>
+    </div>
+  </div>
+
+  {{-- Modal Edit User --}}
+  <div class="modal fade" id="modalEditUser" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title">Edit User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="d-flex justify-content-between py-2">
-          <strong>Email</strong>
-          <span id="accountEmail">{{ Auth::user()->email }}</span>
-        </div>
-        <div class="d-flex justify-content-between py-2">
-          <strong>Role</strong>
-          <span id="accountRole">{{ Auth::user()->role }}</span>
-        </div>
-        <div class="d-flex justify-content-between py-2">
-          <strong>Password</strong>
-          <span id="accountPassword">*</span>
+        <div class="modal-body">
+          <div id="errorEditUser" class="alert alert-danger d-none"></div>
+          <form id="formEditUser">
+            @csrf
+            @method('PUT')
+            <input type="hidden" id="editUserId" name="id">
+            
+            <div class="mb-3">
+              <label>Nama</label>
+              <input type="text" class="form-control" id="editName" name="name" required>
+            </div>
+
+            <div class="mb-3">
+              <label>Email</label>
+              <input type="email" class="form-control" id="editEmail" name="email" required>
+            </div>
+
+            <div class="mb-3">
+              <label>Role</label>
+              <select class="form-select" id="editRole" name="role" required>
+                <option value="admin">Admin</option>
+                <option value="hod">Head of Department</option>
+                <option value="pm">Project Manager</option>
+                <option value="staff">Staff</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label>Password Lama</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="editOldPassword" name="old_password">
+                <button type="button" class="btn btn-outline-secondary" id="toggleEditOldPassword">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label>Password Baru</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="editPassword" name="password">
+                <button type="button" class="btn btn-outline-secondary" id="toggleEditPassword">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label>Konfirmasi Password Baru</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation">
+                <button type="button" class="btn btn-outline-secondary" id="toggleEditPasswordConfirmation">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
+          </form>
         </div>
       </div>
-      <div class="modal-footer justify-content-center border-0">
-        <button class="btn btn-warning" id="btnEditAkun">Edit Akun</button>
+    </div>
+  </div>
+
+  <!-- Modal Logout -->
+  <div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-4">
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="fw-bold mt-3">Apakah Anda yakin ingin keluar?</h5>
+        <p class="text-muted">Tindakan ini akan mengeluarkan anda dari aplikasi</p>
+
+        <form method="POST" action="{{ route('logout') }}">
+          @csrf
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-dark" id="btnConfirmLogout">Yakin</button>
+          </div>
+        </form>
       </div>
+    </div>
+  </div>
+
+  <!-- Statistik Dokumen -->
+  <div class="card-box mb-4">
+    <h6 class="fw-bold mb-3">Dokumen</h6>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">{{ $stats['total'] ?? 0 }}</div></div></div>
+      <div class="col-md-4"><div class="doc-box border-warning"><i class="bi bi-folder-symlink-fill text-warning"></i><div class="title">Dokumen Revisi</div><div class="number">{{ $stats['revisi'] ?? 0 }}</div></div></div>
+      <div class="col-md-4"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">{{ $stats['selesai'] ?? 0 }}</div></div></div>
+    </div>
+  </div>
+
+  <!-- Statistik Komisi -->
+  <div class="card-box mb-4">
+    <h6 class="fw-bold mb-3">Komisi</h6>
+    <div class="row g-3">
+      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Bulan ini</div><div class="amount">Rp. {{ number_format($komisi['bulan'] ?? 0, 0, ',', '.') }}</div></div></div>
+      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Tahun ini</div><div class="amount">Rp. {{ number_format($komisi['tahun'] ?? 0, 0, ',', '.') }}</div></div></div>
     </div>
   </div>
 </div>
 
-{{-- Modal Edit User --}}
-<div class="modal fade" id="modalEditUser" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title">Edit User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="errorEditUser" class="alert alert-danger d-none"></div>
-                <form id="formEditUser">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" id="editUserId" name="id">
-                    
-                    <div class="mb-3">
-                        <label>Nama</label>
-                        <input type="text" class="form-control" id="editName" name="name" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Email</label>
-                        <input type="email" class="form-control" id="editEmail" name="email" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Role</label>
-                        <select class="form-select" id="editRole" name="role" required>
-                            <option value="admin">Admin</option>
-                            <option value="hod">Head of Department</option>
-                            <option value="pm">Project Manager</option>
-                            <option value="staff">Staff</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Password Lama</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="editOldPassword" name="old_password">
-                            <button type="button" class="btn btn-outline-secondary" id="toggleEditOldPassword">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Password Baru</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="editPassword" name="password">
-                            <button type="button" class="btn btn-outline-secondary" id="toggleEditPassword">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Konfirmasi Password Baru</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="editPasswordConfirmation" name="password_confirmation">
-                            <button type="button" class="btn btn-outline-secondary" id="toggleEditPasswordConfirmation">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-@push('scripts')
+<!-- Scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Toggle Password Functions
     function togglePassword(buttonId, inputId) {
         const btn = document.getElementById(buttonId);
         const input = document.getElementById(inputId);
-        btn.addEventListener('click', function () {
-            const icon = this.querySelector("i");
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.replace("bi-eye", "bi-eye-slash");
-            } else {
-                input.type = "password";
-                icon.classList.replace("bi-eye-slash", "bi-eye");
-            }
-        });
+        if (btn && input) {
+            btn.addEventListener('click', function () {
+                const icon = this.querySelector("i");
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.classList.replace("bi-eye", "bi-eye-slash");
+                } else {
+                    input.type = "password";
+                    icon.classList.replace("bi-eye-slash", "bi-eye");
+                }
+            });
+        }
     }
 
     togglePassword("toggleEditOldPassword", "editOldPassword");
     togglePassword("toggleEditPassword", "editPassword");
     togglePassword("toggleEditPasswordConfirmation", "editPasswordConfirmation");
-});
-</script>
-@endpush
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Ambil elemen modal dan tombol
+    // Account Modal Management
     const modalAccountEl = document.getElementById('accountModal');
     const modalEditUserEl = document.getElementById('modalEditUser');
     const modalAccount = new bootstrap.Modal(modalAccountEl);
@@ -741,7 +625,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnOpenAccount = document.getElementById("openAccountModal");
     const btnEditAkun = document.getElementById("btnEditAkun");
 
-    // Buka modal akun
     if (btnOpenAccount) {
         btnOpenAccount.addEventListener("click", function () {
             document.getElementById("accountName").innerText = "{{ Auth::user()->name }}";
@@ -752,23 +635,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Klik edit akun dari modal akun
     if (btnEditAkun) {
         btnEditAkun.addEventListener("click", function (e) {
             e.preventDefault();
-
-            // Isi form edit dengan data user
             document.getElementById('editName').value = "{{ Auth::user()->name }}";
             document.getElementById('editEmail').value = "{{ Auth::user()->email }}";
-            document.getElementById('editRole').value = "{{ Auth::user()->role }}"; // ← ini penting!
-
+            document.getElementById('editRole').value = "{{ Auth::user()->role }}";
             document.getElementById('editOldPassword').value = '';
             document.getElementById('editPassword').value = '';
             document.getElementById('editPasswordConfirmation').value = '';
-
             document.querySelector('#modalEditUser .modal-title').innerText = 'Edit Akun Saya';
 
-            // Tutup modal akun, baru buka modal edit
             modalAccount.hide();
             modalAccountEl.addEventListener('hidden.bs.modal', function openEdit() {
                 modalEditUser.show();
@@ -777,207 +654,276 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Tombol simpan di modal edit
+    // Save Edit Profile
     const btnSaveEdit = document.getElementById('btnSaveEdit');
+    if (btnSaveEdit) {
+        btnSaveEdit.addEventListener('click', function (e) {
+            e.preventDefault();
 
-    if (!btnSaveEdit) return;
+            const name = document.getElementById('editName').value;
+            const email = document.getElementById('editEmail').value;
+            const role = document.getElementById('editRole').value;
+            const oldPassword = document.getElementById('editOldPassword').value;
+            const newPassword = document.getElementById('editPassword').value;
+            const passwordConfirm = document.getElementById('editPasswordConfirmation').value;
 
-    btnSaveEdit.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        const name = document.getElementById('editName').value;
-        const email = document.getElementById('editEmail').value;
-        const role = document.getElementById('editRole').value;
-        const oldPassword = document.getElementById('editOldPassword').value;
-        const newPassword = document.getElementById('editPassword').value;
-        const passwordConfirm = document.getElementById('editPasswordConfirmation').value;
-        const errorBox = document.getElementById('errorEditUser');
-
-        fetch('/profile', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                name: name,
-                email: email,
-                role: role,
-                old_password: oldPassword,
-                password: newPassword,
-                password_confirmation: passwordConfirm
+            fetch('/profile', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    role: role,
+                    old_password: oldPassword,
+                    password: newPassword,
+                    password_confirmation: passwordConfirm
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                errorBox.textContent = '';
-
-                // Tutup modal edit
-                bootstrap.Modal.getInstance(document.getElementById('modalEditUser')).hide();
-
-                // Tampilkan notifikasi berhasil
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: data.message,
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    location.reload(); // reload setelah user klik OK
-                });
-            } else {
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalEditUser')).hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: data.message || 'Terjadi kesalahan.',
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Gagal',
-                    text: data.message || 'Terjadi kesalahan.',
+                    title: 'Error',
+                    text: 'Terjadi kesalahan sistem.',
                 });
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Terjadi kesalahan sistem.',
             });
         });
-    });
-});
-</script>
+    }
 
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const hapusButtons = document.querySelectorAll('.btn-hapus');
-    const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
-    let projectIdToDelete = null;
-    let rowToDelete = null;
-
-    // Tangkap klik tombol hapus
-    hapusButtons.forEach(button => {
-      button.addEventListener('click', function () {
-        projectIdToDelete = this.dataset.id;
-        rowToDelete = this.closest('tr');
-        modalHapus.show();
-      });
-    });
-
-    // Ketika tombol "Hapus" dalam modal diklik
-    document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
-      if (!projectIdToDelete) return;
-
-      fetch(/projects/${projectIdToDelete}, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}',
-          'Accept': 'application/json'
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          // Hapus baris dari tabel tanpa reload
-          rowToDelete.remove();
-          modalHapus.hide();
-        } else {
-          alert('Gagal menghapus data. Coba lagi.');
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        alert('Terjadi kesalahan!');
-      });
-    });
-  });
-</script>
-
-  <!-- Modal Logout -->
-<div class="modal fade" id="modalLogout" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4">
-      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
-      <h5 class="fw-bold mt-3">Apakah Anda yakin ingin keluar?</h5>
-      <p class="text-muted">Tindakan ini akan mengeluarkan anda dari aplikasi</p>
-
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <div class="d-flex justify-content-center gap-2 mt-3">
-          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Batal</button>
-          <button type="button" class="btn btn-dark" id="btnConfirmLogout">Yakin</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const logoutButton = document.getElementById('btnLogout');
-  const logoutModal = new bootstrap.Modal(document.getElementById('modalLogout'));
-  const confirmLogoutBtn = document.getElementById('btnConfirmLogout');
-
-  // Buka modal saat klik tombol logout di sidebar
-  logoutButton.addEventListener('click', function (e) {
-    e.preventDefault();
-    logoutModal.show();
-  });
-
-  // Logout saat klik tombol "Yakin"
-  confirmLogoutBtn.addEventListener('click', function (e) {
-    e.preventDefault();
-
-    fetch('{{ route('logout') }}', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'Accept': 'application/json'
-      }
-    }).then(res => {
-      if (res.ok) {
-        window.location.href = '/login';
-      } else {
-        alert('Gagal logout!');
-      }
-    }).catch(err => {
-      console.error(err);
-      alert('Kesalahan sistem saat logout.');
-    });
-  });
-});
-</script>
-
- <script>
-  document.addEventListener('DOMContentLoaded', function () {
+    // Logout Management
     const logoutButton = document.getElementById('btnLogout');
     const logoutModal = new bootstrap.Modal(document.getElementById('modalLogout'));
+    const confirmLogoutBtn = document.getElementById('btnConfirmLogout');
 
-    logoutButton.addEventListener('click', function (e) {
-      e.preventDefault();
-      logoutModal.show();
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            logoutModal.show();
+        });
+    }
+
+    if (confirmLogoutBtn) {
+        confirmLogoutBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            fetch('{{ route('logout') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            }).then(res => {
+                if (res.ok) {
+                    window.location.href = '/login';
+                } else {
+                    alert('Gagal logout!');
+                }
+            }).catch(err => {
+                console.error(err);
+                alert('Kesalahan sistem saat logout.');
+            });
+        });
+    }
+
+    // Notification System
+    const notificationIcon = document.getElementById('notificationIcon');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const notificationList = document.getElementById('notificationList');
+    const markAllReadBtn = document.getElementById('markAllRead');
+
+    // Load notifications on page load
+    loadNotifications();
+
+    // Toggle notification dropdown
+    notificationIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle('show');
+        if (notificationDropdown.classList.contains('show')) {
+            loadNotifications();
+        }
     });
-  });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!notificationDropdown.contains(e.target) && !notificationIcon.contains(e.target)) {
+            notificationDropdown.classList.remove('show');
+        }
+    });
+
+    // Mark all as read
+    markAllReadBtn.addEventListener('click', function() {
+        fetch('/notifications/mark-all-read', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadNotifications();
+                updateNotificationBadge(0);
+            }
+        });
+    });
+
+    // Load notifications function
+    function loadNotifications() {
+        fetch('/notifications/unread')
+            .then(response => response.json())
+            .then(data => {
+                updateNotificationBadge(data.count);
+                renderNotifications(data.notifications);
+            })
+            .catch(err => {
+                console.error('Error loading notifications:', err);
+            });
+    }
+
+    // Update notification badge
+    function updateNotificationBadge(count) {
+        if (count > 0) {
+            notificationBadge.textContent = count > 99 ? '99+' : count;
+            notificationBadge.style.display = 'block';
+        } else {
+            notificationBadge.style.display = 'none';
+        }
+    }
+
+    // Render notifications
+    function renderNotifications(notifications) {
+        if (notifications.length === 0) {
+            notificationList.innerHTML = `
+                <div class="notification-empty">
+                    <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>
+                    <p class="mb-0">Tidak ada notifikasi</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        notifications.forEach(notification => {
+            const data = notification.data;
+            const createdAt = new Date(notification.created_at).toLocaleString('id-ID');
+            
+            html += `
+                <div class="notification-item unread" data-id="${notification.id}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <p class="mb-1 fw-semibold">${data.message}</p>
+                            <small class="text-muted">${createdAt}</small>
+                        </div>
+                        <button class="btn btn-sm btn-light mark-read-btn" data-id="${notification.id}">
+                            <i class="bi bi-check2"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        notificationList.innerHTML = html;
+
+        // Add event listeners to mark as read buttons
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                markAsRead(this.dataset.id);
+            });
+        });
+
+        // Add click event to notification items
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const notifId = this.dataset.id;
+                markAsRead(notifId);
+            });
+        });
+    }
+
+    // Mark notification as read
+    function markAsRead(notificationId) {
+        fetch(`/notifications/${notificationId}/read`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadNotifications();
+            }
+        });
+    }
+
+    // Setup Laravel Echo for real-time notifications (optional - jika menggunakan Pusher)
+    @if(config('broadcasting.default') === 'pusher')
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: '{{ config('broadcasting.connections.pusher.key') }}',
+        cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}',
+        forceTLS: true
+    });
+
+    // Listen for real-time notifications
+    window.Echo.private(`user.{{ Auth::id() }}`)
+        .notification((notification) => {
+            // Show browser notification if permitted
+            if (Notification.permission === 'granted') {
+                new Notification('Work Order Baru', {
+                    body: notification.message,
+                    icon: '/images/desnet-logo.png'
+                });
+            }
+
+            // Reload notifications
+            loadNotifications();
+
+            // Show toast notification
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'info',
+                title: 'Notifikasi Baru',
+                text: notification.message,
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true
+            });
+        });
+
+    // Request browser notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+    @endif
+});
 </script>
- 
 
-  <!-- Statistik Dokumen -->
-  <div class="card-box mb-4">
-    <h6 class="fw-bold mb-3">Dokumen</h6>
-    <div class="row g-3">
-      <div class="col-md-4"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">47</div></div></div>
-      <div class="col-md-4"><div class="doc-box border-warning"><i class="bi bi-folder-symlink-fill text-warning"></i><div class="title">Dokumen Revisi</div><div class="number">15</div></div></div>
-      <div class="col-md-4"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">32</div></div></div>
-    </div>
-  </div>
-
-  <!-- Statistik Komisi -->
-  <div class="card-box mb-4">
-    <h6 class="fw-bold mb-3">Komisi</h6>
-    <div class="row g-3">
-      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Bulan ini</div><div class="amount">Rp. 76.000.000,00</div></div></div>
-      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Tahun ini</div><div class="amount">Rp. 1.546.000.000,00</div></div></div>
-    </div>
-  </div>
-
-</div>
 </body>
 </html>

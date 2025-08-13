@@ -23,6 +23,9 @@ use App\Http\Controllers\Admin\AdminProjectController;
 use App\Http\Controllers\Hod\ProjectController as HodProjectController;
 use App\Http\Controllers\Hod\KomisiController as HodKomisiController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\NotificationController;
+use App\Models\Notification;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -151,3 +154,28 @@ Route::get('/staff/komisi-total-bulanan', [KomisiStaffController::class, 'totalP
 Route::get('/hod/komisi-total-bulanan', [HodKomisiController::class, 'totalPerPersonelBulananTable'])->name('hod.komisi.total.bulanan');
 Route::get('/admin/komisi-total-bulanan', [KomisiController::class, 'totalPerPersonelBulananTable'])->name('admin.komisi.total.bulanan');
 
+//======= notifikasi ======
+Route::get('/notifications', function () {
+    return Notification::where('user_id', Auth::id())
+        ->where('is_read', false)
+        ->latest()
+        ->get();
+})->middleware('auth');
+
+Route::post('/notifications/mark-all-read', function () {
+    Notification::where('user_id', Auth::id())->update(['is_read' => true]);
+    return response()->json(['status' => 'success']);
+})->middleware('auth');
+Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+Route::get('/pm/notifications', function () {
+    return \App\Models\Notification::where('user_id', Auth::id())
+        ->where('is_read', false)
+        ->latest()
+        ->get();
+})->middleware('auth');
+
+Route::post('/pm/notifications/mark-all-read', function () {
+    \App\Models\Notification::where('user_id', Auth::id())
+        ->update(['is_read' => true]);
+    return response()->json(['status' => 'success']);
+})->middleware('auth');

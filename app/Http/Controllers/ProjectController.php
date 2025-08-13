@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\ProjectPersonel;
 use App\Models\User;
+use App\Models\Notification;
+use App\Events\NewPMNotification;
 
 class ProjectController extends Controller
 {
@@ -46,6 +48,16 @@ class ProjectController extends Controller
                 'role' => $p['role'],
             ]);
         }
+
+        // 🔹 Buat notifikasi untuk PM
+        $notif = Notification::create([
+            'user_id' => $request->pm_id,
+            'message' => 'Work Order baru ditugaskan: ' . $project->judul,
+            'is_read' => false,
+        ]);
+
+        // 🔹 Trigger event jika pakai real-time
+        event(new NewPMNotification($request->pm_id, $notif->message));
 
         $project->load('projectPersonel');
 
@@ -103,6 +115,13 @@ class ProjectController extends Controller
                 ]);
             }
         }
+        $notif = Notification::create([
+            'user_id' => $request->pm_id,
+            'message' => 'Work Order baru ditugaskan: ' . $project->judul,
+            'is_read' => false,
+        ]);
+
+        event(new NewPMNotification($request->pm_id, $notif->message));
 
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil disimpan.');
     }

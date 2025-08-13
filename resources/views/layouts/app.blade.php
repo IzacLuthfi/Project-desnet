@@ -93,12 +93,29 @@
   </div>
 
   <!-- Topbar -->
-  <div class="topbar">
+<div class="topbar">
     <div><h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6></div>
     <div class="d-flex align-items-center gap-3">
-      <i class="bi bi-bell"></i>
+        <li class="nav-item dropdown list-unstyled m-0">
+            <a id="notificationDropdown" class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
+                <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                    0
+                </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                <li class="p-2 border-bottom fw-bold">Notifikasi</li>
+                <div id="notificationList">
+                    <li class="p-2 text-muted">Tidak ada notifikasi baru</li>
+                </div>
+                <li class="text-center border-top">
+                    <a href="#" id="markAllRead" class="small text-primary">Tandai semua dibaca</a>
+                </li>
+            </ul>
+        </li>
     </div>
-  </div>
+</div>
+
 
   <!-- Main Content -->
   <div class="main-content">
