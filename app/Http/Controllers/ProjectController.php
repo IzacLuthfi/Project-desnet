@@ -134,8 +134,23 @@ class ProjectController extends Controller
 
     public function edit($id)
     {
-        $project = Project::with('projectPersonel')->findOrFail($id);
-        return view('project.edit', compact('project'));
+    $project = Project::with('projectPersonel')->findOrFail($id);
+
+    // ambil semua project kecuali yang sedang di-edit
+    $projects = Project::with('projectPersonel')
+        ->where('id', '!=', $id)
+        ->get();
+
+    // Ambil semua user dengan role Project Manager
+    $projectManagers = User::where('role', 'pm')->get();
+
+    // Ambil semua staff untuk pilihan personel
+    $staffs = User::where('role', 'Staff')->get();
+
+    return view(
+    'admin.projects.edit',
+    compact('project', 'projects', 'projectManagers', 'staffs')
+);
     }
 
     public function update(Request $request, $id)
@@ -144,7 +159,7 @@ class ProjectController extends Controller
             'judul' => 'required|string|max:255',
             'nilai' => 'required|numeric',
             'pm_id' => 'required|exists:users,id',
-            'status' => 'required|string',
+            
             'personel.*.user_id' => 'nullable|exists:users,id',
             'personel.*.role' => 'nullable|string',
         ]);
@@ -155,7 +170,7 @@ class ProjectController extends Controller
             'judul' => $request->judul,
             'nilai' => $request->nilai,
             'pm_id' => $request->pm_id,
-            'status_dokumen' => $request->status,
+
         ]);
 
         // Hapus personel lama
@@ -173,6 +188,6 @@ class ProjectController extends Controller
             }
         }
 
-        return redirect()->route('projects.index')->with('success', 'Proyek berhasil diperbarui.');
+        return redirect()->route('admin.dashboard')->with('success', 'Proyek berhasil diperbarui.');
     }
 }

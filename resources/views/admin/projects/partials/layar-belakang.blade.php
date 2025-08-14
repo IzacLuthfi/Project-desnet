@@ -378,56 +378,6 @@ document.getElementById('formTambahProject').addEventListener('submit', function
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar d-flex flex-column" style="height: 100vh;">
-  <div class="text-center mb-3">
-    <img src="{{ asset('images/desnet-logo.png') }}" alt="Logo" class="img-fluid mb-2">
-    <div class="role-label" id="openAccountModal" style="cursor:pointer;">
-  <i class="bi bi-person-fill"></i> {{ Auth::user()->role }}
-</div>
-  </div>
-
-  <nav class="nav flex-column mb-auto">
-    <a href="{{ route('dashboard') }}" class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">Beranda</a>
-    <a href="{{ route('kelola-user.index') }}" class="nav-link {{ Request::is('kelola-user*') ? 'active' : '' }}">Kelola User</a>
-    <a href="{{ route('komisi.index') }}" class="nav-link {{ Request::is('komisi*') ? 'active' : '' }}">Komisi</a>
-  </nav>
-
-  <!-- Logout di paling bawah -->
-  <div class="mt-auto p-3">
-    <a href="#" id="btnLogout" class="btn btn-sm btn-dark w-100 d-flex align-items-center justify-content-center">
-      <i class="bi bi-box-arrow-right me-1"></i> Logout
-    </a>
-  </div>
-</div>
-
-
-<!-- Topbar -->
-<div class="topbar d-flex justify-content-between align-items-center">
-    <h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6>
-    <li class="nav-item dropdown list-unstyled m-0">
-        <a id="notificationDropdown" class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
-            <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                0
-            </span>
-        </a>
-
-            <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationDropdown" 
-          style="width: 320px; max-height: 400px; overflow-y: auto;">
-          <li class="p-2 border-bottom fw-bold">Notifikasi</li>
-          <div id="notificationList">
-              <li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>
-          </div>
-          <li class="text-center border-top p-2">
-              <button id="markAllRead" class="btn btn-sm btn-outline-primary rounded-pill">
-                  <i class="bi bi-check2-all"></i> Tandai Semua Dibaca
-              </button>
-          </li>
-      </ul>
-    </li>
-</div>
-
 <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {

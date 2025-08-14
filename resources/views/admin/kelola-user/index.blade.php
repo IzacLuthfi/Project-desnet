@@ -2,6 +2,7 @@
 @extends('layouts.app')
 
 @section('title', 'Kelola User')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 @section('content')
 <div class="card-box mb-4">
@@ -27,7 +28,7 @@
             <tbody id="userTableBody">
                 @foreach ($users as $key => $user)
                 <tr data-id="{{ $user->id }}">
-                    <td>{{ $key + 1 }}</td>
+                    <td>{{ $users->firstItem() + $key }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>###</td>
@@ -62,6 +63,40 @@
         <em>Data tidak ditemukan.</em>
     </div>
 </div>
+
+<div class="d-flex justify-content-center mt-3">
+    {{-- Tombol Prev --}}
+    @if ($users->onFirstPage())
+        <button class="btn btn-secondary rounded-circle me-2" style="width:40px; height:40px;" disabled>
+            <i class="bi bi-chevron-left"></i>
+        </button>
+    @else
+        <a href="{{ $users->previousPageUrl() }}" class="btn btn-dark rounded-circle me-2" style="width:40px; height:40px;">
+            <i class="bi bi-chevron-left text-white"></i>
+        </a>
+    @endif
+
+    {{-- Nomor Halaman --}}
+    @foreach ($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+        @if ($page == $users->currentPage())
+            <span class="btn btn-primary rounded-circle me-2" style="width:40px; height:40px;">{{ $page }}</span>
+        @else
+            <a href="{{ $url }}" class="btn btn-outline-dark rounded-circle me-2" style="width:40px; height:40px;">{{ $page }}</a>
+        @endif
+    @endforeach
+
+    {{-- Tombol Next --}}
+    @if ($users->hasMorePages())
+        <a href="{{ $users->nextPageUrl() }}" class="btn btn-dark rounded-circle me-2" style="width:40px; height:40px;">
+            <i class="bi bi-chevron-right text-white"></i>
+        </a>
+    @else
+        <button class="btn btn-secondary rounded-circle me-2" style="width:40px; height:40px;" disabled>
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    @endif
+</div>
+
 @endsection
 
 {{-- Modal Konfirmasi Hapus --}}
