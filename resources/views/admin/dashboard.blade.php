@@ -165,7 +165,7 @@ document.getElementById('formTambahProject').addEventListener('submit', function
       const tableBody = document.querySelector('#tabelWorkOrder tbody');
       const index = tableBody.querySelectorAll('tr').length + 1;
       const personelList = Array.isArray(data.project.project_personel)
-        ? data.project.project_personel.map(p => p.nama).join(', ')
+        ? data.project.project_personel.map(p => p.user ? p.user.name : '(User tidak ditemukan)').join(', ')
         : '-';
 
       const row = document.createElement('tr');
@@ -177,8 +177,8 @@ document.getElementById('formTambahProject').addEventListener('submit', function
         <td>${parseInt(data.project.nilai).toLocaleString('id-ID')}</td>
         <td>${personelList || '-'}</td>
         <td>
-          <a href="/projects/${data.project.id}" class="btn btn-sm btn-info text-white">Detail</a>
-          <a href="/projects/${data.project.id}/edit" class="btn btn-sm btn-warning text-white">Edit</a>
+          <a href="/projects/${data.project.id}" class="btn btn-sm btn-info ">Detail</a>
+          <a href="/projects/${data.project.id}/edit" class="btn btn-sm btn-warning">Edit</a>
           <button class="btn btn-sm btn-danger btn-hapus" data-id="${data.project.id}" data-judul="${data.project.judul}">Hapus</button>
         </td>
       `;

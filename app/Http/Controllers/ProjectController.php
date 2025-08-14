@@ -78,7 +78,7 @@ class ProjectController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Proyek berhasil disimpan.',
-            'project' => $project->load('projectPersonel'),
+            'project' => $project->load('projectPersonel.user'),
         ]);
     }
 
@@ -122,7 +122,7 @@ class ProjectController extends Controller
         }
 
         // Pastikan relasi terload
-        $project->load('projectPersonel');
+        $project->load('projectPersonel.user');
 
         // Notifikasi PM
         $notifPM = Notification::create([
@@ -157,23 +157,23 @@ class ProjectController extends Controller
 
     public function edit($id)
     {
-    $project = Project::with('projectPersonel')->findOrFail($id);
+        $project = Project::with('projectPersonel')->findOrFail($id);
 
-    // ambil semua project kecuali yang sedang di-edit
-    $projects = Project::with('projectPersonel')
-        ->where('id', '!=', $id)
-        ->get();
+        // ambil semua project kecuali yang sedang di-edit
+        $projects = Project::with('projectPersonel')
+            ->where('id', '!=', $id)
+            ->get();
 
-    // Ambil semua user dengan role Project Manager
-    $projectManagers = User::where('role', 'pm')->get();
+        // Ambil semua user dengan role Project Manager
+        $projectManagers = User::where('role', 'pm')->get();
 
-    // Ambil semua staff untuk pilihan personel
-    $staffs = User::where('role', 'Staff')->get();
+        // Ambil semua staff untuk pilihan personel
+        $staffs = User::where('role', 'Staff')->get();
 
-    return view(
-    'admin.projects.edit',
-    compact('project', 'projects', 'projectManagers', 'staffs')
-);
+        return view(
+            'admin.projects.edit',
+            compact('project', 'projects', 'projectManagers', 'staffs')
+        );
     }
 
     public function update(Request $request, $id)
@@ -182,7 +182,7 @@ class ProjectController extends Controller
             'judul' => 'required|string|max:255',
             'nilai' => 'required|numeric',
             'pm_id' => 'required|exists:users,id',
-            
+
             'personel.*.user_id' => 'nullable|exists:users,id',
             'personel.*.role' => 'nullable|string',
         ]);
