@@ -390,12 +390,97 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 
 <!-- Topbar -->
-<div class="topbar">
-  <div><h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6></div>
-  <div class="d-flex align-items-center gap-3">
-    <i class="bi bi-bell"></i>
-  </div>
+<div class="topbar d-flex justify-content-between align-items-center">
+    <h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6>
+    <li class="nav-item dropdown list-unstyled m-0">
+        <a id="notificationDropdown" class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
+            <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                0
+            </span>
+        </a>
+
+            <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationDropdown" 
+          style="width: 320px; max-height: 400px; overflow-y: auto;">
+          <li class="p-2 border-bottom fw-bold">Notifikasi</li>
+          <div id="notificationList">
+              <li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>
+          </div>
+          <li class="text-center border-top p-2">
+              <button id="markAllRead" class="btn btn-sm btn-outline-primary rounded-pill">
+                  <i class="bi bi-check2-all"></i> Tandai Semua Dibaca
+              </button>
+          </li>
+      </ul>
+    </li>
 </div>
+
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const badge = document.getElementById('notificationBadge');
+    const list = document.getElementById('notificationList');
+
+    function loadNotifications() {
+        fetch('/notifications')
+            .then(res => res.json())
+            .then(data => {
+                if (data.notifications.length > 0) {
+                    badge.textContent = data.unread;
+                    badge.classList.toggle('d-none', data.unread === 0);
+                    list.innerHTML = '';
+                    data.notifications.forEach(notif => {
+                        list.innerHTML += `
+                            <li class="p-3 border-bottom">
+                                <div class="fw-bold text-primary mb-1">Komisi Baru Telah Ditambahkan</div>
+                                <div class="small text-muted">${notif.message}</div>
+                            </li>
+                        `;
+                    });
+                } else {
+                    badge.classList.add('d-none');
+                    list.innerHTML = '<li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>';
+                }
+            });
+    }
+
+    loadNotifications();
+
+    var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
+        cluster: '{{ env('PUSHER_APP_CLUSTER') }}'
+    });
+
+    var channel = pusher.subscribe('hod-notifications');
+    channel.bind('new-notification', function(data) {
+        badge.classList.remove('d-none');
+        badge.textContent = parseInt(badge.textContent) + 1;
+
+        const newNotif = `
+            <li class="p-3 border-bottom">
+                <div class="fw-bold text-primary mb-1">Komisi Baru Telah Ditambahkan</div>
+                <div class="small text-muted">${data.message}</div>
+            </li>
+        `;
+        list.innerHTML = newNotif + list.innerHTML;
+    });
+
+    document.getElementById('markAllRead').addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('/notifications/mark-all-read', { 
+            method: 'POST', 
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(() => {
+            badge.classList.add('d-none');
+            list.innerHTML = '<li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>';
+        });
+    });
+});
+</script>
+
 
 <!-- Main Content -->
 <div class="main-content">

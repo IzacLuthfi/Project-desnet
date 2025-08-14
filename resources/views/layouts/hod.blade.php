@@ -94,8 +94,7 @@
   <!-- Topbar -->
   <div class="topbar">
     <div><h6 class="mb-0 fw-bold">Manajemen Arsip Dokumen dan Komisi</h6></div>
-    <div class="d-flex align-items-center gap-3">
-      <i class="bi bi-bell"></i>
+
     </div>
   </div>
 
