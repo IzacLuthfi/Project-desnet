@@ -179,3 +179,5 @@ Route::post('/pm/notifications/mark-all-read', function () {
         ->update(['is_read' => true]);
     return response()->json(['status' => 'success']);
 })->middleware('auth');
+Route::get('/notifications', [NotificationController::class, 'index'])->middleware('auth');
+Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->middleware('auth');
