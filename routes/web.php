@@ -67,6 +67,10 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('projects', ProjectController::class);
+});
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 // ============ REDIRECT DASHBOARD PER ROLE ============
 Route::get('/dashboard', function () {
