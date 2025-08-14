@@ -187,3 +187,4 @@ Route::middleware('auth')->group(function () {
     // Tandai semua notifikasi Staff sebagai sudah dibaca
     Route::post('/staff/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
 });
+
