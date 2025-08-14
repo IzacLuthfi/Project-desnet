@@ -32,5 +32,11 @@ class NotificationController extends Controller
 
         return response()->json(['success' => true]);
     }
+    public function staffIndex()
+    {
+        return Notification::where('user_id', Auth::id())
+            ->latest()
+            ->take(10)
+            ->get();
+    }
 }
-

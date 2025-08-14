@@ -167,6 +167,7 @@ Route::post('/notifications/mark-all-read', function () {
     return response()->json(['status' => 'success']);
 })->middleware('auth');
 Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+
 Route::get('/pm/notifications', function () {
     return \App\Models\Notification::where('user_id', Auth::id())
         ->where('is_read', false)
@@ -179,3 +180,10 @@ Route::post('/pm/notifications/mark-all-read', function () {
         ->update(['is_read' => true]);
     return response()->json(['status' => 'success']);
 })->middleware('auth');
+Route::middleware('auth')->group(function () {
+    // Ambil notifikasi Staff
+    Route::get('/staff/notifications', [NotificationController::class, 'staffIndex']);
+
+    // Tandai semua notifikasi Staff sebagai sudah dibaca
+    Route::post('/staff/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+});

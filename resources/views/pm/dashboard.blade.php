@@ -340,7 +340,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Main Content -->
 <div class="main-content">
-  <!-- Modal Tambah Proyek (PM tidak perlu ini, hapus saja) -->
   
   <!-- Tabel Work Order -->
   <div class="card-box mb-4">
