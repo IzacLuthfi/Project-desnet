@@ -42,6 +42,7 @@ class ProjectController extends Controller
             'status_komisi' => 'Belum Disetujui',
         ]);
 
+        // Simpan personel
         foreach ($request->personel as $p) {
             $project->projectPersonel()->create([
                 'user_id' => $p['user_id'],
@@ -49,26 +50,37 @@ class ProjectController extends Controller
             ]);
         }
 
-        // 🔹 Buat notifikasi untuk PM
-        $notif = Notification::create([
+        // Pastikan relasi personel sudah terload
+        $project->load('projectPersonel');
+
+        // 🔹 Notifikasi untuk PM
+        $notifPM = Notification::create([
             'user_id' => $request->pm_id,
             'message' => 'Work Order baru ditugaskan: ' . $project->judul,
             'is_read' => false,
         ]);
+        event(new NewPMNotification($request->pm_id, $notifPM->message));
 
-        // 🔹 Trigger event jika pakai real-time
-        event(new NewPMNotification($request->pm_id, $notif->message));
+        // 🔹 Notifikasi untuk semua personel di proyek (kecuali PM)
+        $staffs = $project->projectPersonel->pluck('user_id')->filter(function ($id) use ($request) {
+            return $id != $request->pm_id;
+        });
 
-        $project->load('projectPersonel');
+        foreach ($staffs as $staffId) {
+            $notifStaff = Notification::create([
+                'user_id' => $staffId,
+                'message' => 'Work Order baru ditugaskan: ' . $project->judul,
+                'is_read' => false,
+            ]);
+            event(new \App\Events\NewStaffNotification($staffId, $notifStaff->message));
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Proyek berhasil disimpan.',
-            'project' => $project,
+            'project' => $project->load('projectPersonel'),
         ]);
     }
-
-
 
     public function dashboard()
     {
@@ -87,21 +99,14 @@ class ProjectController extends Controller
         return view('project.create', compact('projectManagers', 'staffs'));
     }
 
+    // ================== FIX STORE (Bukan AJAX) ==================
     public function store(Request $request)
     {
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'nilai' => 'required|numeric',
-            'pm_id' => 'required|exists:users,id',
-            'personel.*.user_id' => 'required|exists:users,id',
-            'personel.*.role' => 'required|string',
-        ]);
-
         $project = Project::create([
             'judul' => $request->judul,
             'nilai' => $request->nilai,
             'pm_id' => $request->pm_id,
-            'status' => $request->status ?? 'Belum dimulai',
+            'status' => 'Belum dimulai',
             'status_dokumen' => 'Belum Diajukan',
             'status_komisi' => 'Belum Disetujui',
         ]);
@@ -115,13 +120,31 @@ class ProjectController extends Controller
                 ]);
             }
         }
-        $notif = Notification::create([
+
+        // Pastikan relasi terload
+        $project->load('projectPersonel');
+
+        // Notifikasi PM
+        $notifPM = Notification::create([
             'user_id' => $request->pm_id,
             'message' => 'Work Order baru ditugaskan: ' . $project->judul,
             'is_read' => false,
         ]);
+        event(new NewPMNotification($request->pm_id, $notifPM->message));
 
-        event(new NewPMNotification($request->pm_id, $notif->message));
+        // Notifikasi untuk semua personel (kecuali PM)
+        $staffs = $project->projectPersonel->pluck('user_id')->filter(function ($id) use ($request) {
+            return $id != $request->pm_id;
+        });
+
+        foreach ($staffs as $staffId) {
+            $notifStaff = Notification::create([
+                'user_id' => $staffId,
+                'message' => 'Work Order baru ditugaskan: ' . $project->judul,
+                'is_read' => false,
+            ]);
+            event(new \App\Events\NewStaffNotification($staffId, $notifStaff->message));
+        }
 
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil disimpan.');
     }
