@@ -24,7 +24,7 @@
             @endforeach
         </tbody>
     </table>
-
+    
     <a href="{{ route('komisi.index') }}" class="btn btn-secondary">Kembali</a>
 </div>
 @endsection

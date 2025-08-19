@@ -27,6 +27,13 @@
             <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalKeterangan{{ $doc->id }}">
               Keterangan
             </button>
+              <button 
+                  class="btn btn-sm btn-danger btn-hapus-dokumen" 
+                  data-id="{{ $doc->id }}">
+                  Hapus
+              </button>
+                <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="btn btn-sm btn-success">Unduh</a>
+          </td>
 
             <!-- Modal -->
             <div class="modal fade" id="modalKeterangan{{ $doc->id }}" tabindex="-1" aria-labelledby="labelKeterangan{{ $doc->id }}" aria-hidden="true">
@@ -46,7 +53,7 @@
               </div>
             </div>
 
-            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="btn btn-sm btn-success">Unduh</a>
+          
           </td>
         </tr>
       @empty
@@ -56,5 +63,43 @@
       @endforelse
     </tbody>
   </table>
+  <a href="{{ route('dashboard') }}" class="btn btn-secondary">Kembali</a>
 </div>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const hapusButtons = document.querySelectorAll('.btn-hapus-dokumen');
+    let documentIdToDelete = null;
+    let rowToDelete = null;
+
+    hapusButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            documentIdToDelete = this.dataset.id;
+            rowToDelete = this.closest('tr');
+
+            if (confirm("Yakin ingin menghapus dokumen ini?")) {
+                fetch(`/documents/${documentIdToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        rowToDelete.remove();
+                    } else {
+                        alert('Gagal menghapus dokumen. Coba lagi.');
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Terjadi kesalahan!');
+                });
+            }
+        });
+    });
+});
+</script>
+@endpush

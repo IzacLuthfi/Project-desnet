@@ -120,6 +120,9 @@ Route::get('/pm/project', [ProjectPMController::class, 'index'])->name('pm.proje
 
 
 // web.php
+Route::delete('/documents/{id}', [ProjectDocumentController::class, 'destroy'])->name('documents.destroy');
+Route::delete('/documents/{id}', [App\Http\Controllers\Admin\AdminProjectController::class, 'destroyDocument'])
+    ->name('documents.destroy');
 
 // ============ ROUTE LOGIN / REGISTER DLL ============
 
