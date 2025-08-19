@@ -31,5 +31,8 @@ class Project extends Model
   {
     return $this->hasMany(\App\Models\ProjectCommission::class, 'project_id');
   }
-
+  public function pm()
+  {
+    return $this->belongsTo(User::class, 'pm_id');
+  }
 }

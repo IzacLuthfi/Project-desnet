@@ -16,7 +16,7 @@
         <tbody>
             @foreach($project->komisi as $komisi)
                 <tr>
-                    <td>{{ $komisi->projectPersonel->user->name ?? '-' }}</td>
+                    <td>{{ $komisi->user->name ?? $komisi->projectPersonel->user->name ?? '-' }}</td>
                     <td>Rp {{ number_format($komisi->margin, 2, ',', '.') }}</td>
                     <td>{{ $komisi->persentase }}%</td>
                     <td>Rp {{ number_format($komisi->nilai_komisi, 2, ',', '.') }}</td>
