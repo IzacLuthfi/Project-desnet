@@ -71,10 +71,16 @@ public function index()
         return response()->json(['message' => 'User berhasil dihapus'], 200);
     }
     
-    public function search(Request $request)
+   public function search(Request $request)
 {
     $query = $request->get('q');
-    $users = User::where('name', 'like', "%{$query}%")->get();
+
+    $users = User::when($query, function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                })
+                ->orderBy('id', 'asc')
+                ->paginate(10);
+
     return response()->json($users);
 }
 
