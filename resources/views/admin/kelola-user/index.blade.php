@@ -64,7 +64,7 @@
     </div>
 </div>
 
-<div class="d-flex justify-content-center mt-3">
+<div class="pagination-footer d-flex justify-content-center">
     {{-- Tombol Prev --}}
     @if ($users->onFirstPage())
         <button class="btn btn-secondary rounded-circle me-2" style="width:40px; height:40px;" disabled>
@@ -96,6 +96,19 @@
         </button>
     @endif
 </div>
+
+<style>
+.pagination-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: transparent; /* transparan penuh */
+    padding: 10px 0;
+    box-shadow: none; /* opsional: hilangkan shadow */
+    z-index: 1000;
+}
+</style>
 
 @endsection
 
@@ -359,18 +372,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Live Search
     document.getElementById('searchUser').addEventListener('keyup', function () {
-        const query = this.value;
-        fetch(`{{ route('kelola-user.search') }}?q=${query}`)
+    const query = this.value;
+    fetch(`{{ route('kelola-user.search') }}?q=${query}`)
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById('userTableBody');
             tbody.innerHTML = '';
 
-            if (data.length === 0) {
+            if (data.data.length === 0) {
                 document.getElementById('noDataMessage').classList.remove('d-none');
             } else {
                 document.getElementById('noDataMessage').classList.add('d-none');
-                data.forEach((user, index) => {
+
+                data.data.forEach((user, index) => {
                     let badgeClass = 'bg-secondary';
                     if (user.role === 'admin') badgeClass = 'bg-danger';
                     else if (user.role === 'hod') badgeClass = 'bg-success';
@@ -379,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const row = document.createElement('tr');
                     row.setAttribute('data-id', user.id);
                     row.innerHTML = `
-                        <td>${index + 1}</td>
+                        <td>${data.from + index}</td>
                         <td>${user.name}</td>
                         <td>${user.email}</td>
                         <td>###</td>
@@ -398,7 +412,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
         .catch(err => console.error(err));
-    });
+});
+
 
     // Edit user
     const modalEditUser = new bootstrap.Modal(document.getElementById('modalEditUser'));
