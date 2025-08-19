@@ -13,4 +13,18 @@ class AdminProjectController extends Controller
         $project = Project::with('projectDocuments')->findOrFail($id);
         return view('admin.project-detail', compact('project'));
     }
+    public function destroyDocument($id)
+    {
+        $document = \App\Models\ProjectDocument::findOrFail($id);
+
+        // cek kalau file ada di public/documents/
+        $filePath = public_path($document->file_path);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
+        $document->delete();
+
+        return response()->json(['success' => true]);
+    }
 }
