@@ -17,8 +17,7 @@
                 $komisiPerPersonel = [];
 
                 foreach ($komisiSemuaProject as $komisi) {
-                    $nama = $komisi->projectPersonel->user->name ?? '-';
-
+                    $nama = $komisi->user?->name ?? $komisi->projectPersonel?->user?->name ?? '-';
                     if (!isset($komisiPerPersonel[$nama])) {
                         $komisiPerPersonel[$nama] = [
                             'total_margin' => 0,
