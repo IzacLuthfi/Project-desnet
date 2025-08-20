@@ -75,14 +75,15 @@ public function index()
 {
     $query = $request->get('q');
 
-    $users = User::when($query, function ($q) use ($query) {
-                    $q->where('name', 'like', "%{$query}%");
-                })
-                ->orderBy('id', 'asc')
-                ->paginate(10);
+    $users = User::where('name', 'LIKE', "%{$query}%")
+        ->orWhere('email', 'LIKE', "%{$query}%")
+        ->get(); // ⚡ pakai get() bukan paginate()
 
-    return response()->json($users);
+    return response()->json([
+        'data' => $users
+    ]);
 }
+
 
 
     // Proses update user

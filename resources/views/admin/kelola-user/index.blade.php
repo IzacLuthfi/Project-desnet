@@ -26,6 +26,7 @@
                 </tr>
             </thead>
             <tbody id="userTableBody">
+                
                 @foreach ($users as $key => $user)
                 <tr data-id="{{ $user->id }}">
                     <td>{{ $users->firstItem() + $key }}</td>
@@ -275,13 +276,17 @@ document.getElementById("togglePasswordConfirm").addEventListener("click", funct
                         </div>
                     </div>
 
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button class="btn btn-primary" id="btnSaveEdit">Simpan Perubahan</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    const firstItem = {{ $users->firstItem() }};
+</script>
 
 @push('scripts')
 <script>
@@ -357,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </td>
                 `;
                 tbody.appendChild(newRow);
+                reindexTable();
                 modalTambahUser.hide();
                 formTambahUser.reset();
             } else if (res.status === 422) {
@@ -372,17 +378,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Live Search
     document.getElementById('searchUser').addEventListener('keyup', function () {
-    const query = this.value;
+    const query = this.value.trim();
+    const tbody = document.getElementById('userTableBody');
+    const noDataMessage = document.getElementById('noDataMessage');
+
+    if (query === '') {
+        // reload ulang table default (misalnya panggil route index pakai AJAX atau refresh page)
+        location.reload();
+        return;
+    }
+
     fetch(`{{ route('kelola-user.search') }}?q=${query}`)
         .then(res => res.json())
         .then(data => {
-            const tbody = document.getElementById('userTableBody');
+
             tbody.innerHTML = '';
 
             if (data.data.length === 0) {
-                document.getElementById('noDataMessage').classList.remove('d-none');
+                noDataMessage.classList.remove('d-none');
             } else {
-                document.getElementById('noDataMessage').classList.add('d-none');
+                noDataMessage.classList.add('d-none');
 
                 data.data.forEach((user, index) => {
                     let badgeClass = 'bg-secondary';
@@ -393,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const row = document.createElement('tr');
                     row.setAttribute('data-id', user.id);
                     row.innerHTML = `
-                        <td>${data.from + index}</td>
+                        <td>${index + 1}</td> 
                         <td>${user.name}</td>
                         <td>${user.email}</td>
                         <td>###</td>
@@ -415,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+
     // Edit user
     const modalEditUser = new bootstrap.Modal(document.getElementById('modalEditUser'));
     const formEditUser = document.getElementById('formEditUser');
@@ -432,6 +448,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editName').value = name;
         document.getElementById('editEmail').value = email;
         document.getElementById('editRole').value = role.toLowerCase();
+        document.getElementById('editOldPassword').value = '';
+document.getElementById('editPassword').value = '';
+document.getElementById('editPasswordConfirmation').value = '';
 
         modalEditUser.show();
     }
@@ -483,6 +502,18 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(() => Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error'));
     });
 
+    // pagnition hide
+    
+
+
+    // Fungsi untuk reindex nomor urut
+function reindexTable() {
+    const rows = document.querySelectorAll('#userTableBody tr');
+    rows.forEach((row, index) => {
+        row.children[0].textContent = firstItem + index;
+    });
+}
+
     // Hapus user
     document.addEventListener('click', function (e) {
         if (e.target.closest('.btn-hapus')) {
@@ -504,6 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(res => {
                         if (res.ok) {
                             document.querySelector(`tr[data-id="${idToDelete}"]`).remove();
+                            reindexTable();
                             Swal.fire('Dihapus!', 'Data user berhasil dihapus.', 'success');
                         } else {
                             Swal.fire('Error', 'Gagal menghapus data.', 'error');
