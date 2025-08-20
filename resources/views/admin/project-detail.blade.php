@@ -51,9 +51,7 @@
                   </div>
                 </div>
               </div>
-            </div>
-
-          
+            </div>  
           </td>
         </tr>
       @empty
@@ -63,43 +61,77 @@
       @endforelse
     </tbody>
   </table>
-  <a href="{{ route('dashboard') }}" class="btn btn-secondary">Kembali</a>
-</div>
-@endsection
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const hapusButtons = document.querySelectorAll('.btn-hapus-dokumen');
-    let documentIdToDelete = null;
-    let rowToDelete = null;
+        <!-- Modal Konfirmasi Hapus -->
+      <div class="modal fade" id="modalKonfirmasiHapus" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content text-center p-4">
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            <h5 class="fw-bold mt-3">Apakah Anda yakin ingin menghapus data ini?</h5>
+            <p class="text-muted">Tindakan ini akan menghapus data secara permanen.</p>
+           <div class="modal-footer justify-content-center">
+              <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
+                Batal
+              </button>
+              <button type="button" class="btn btn-dark" id="btnKonfirmasiHapus">
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a href="{{ route('dashboard') }}" class="btn btn-secondary">Kembali</a>
+    </div>
+    @endsection
+    @push('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const hapusButtons = document.querySelectorAll('.btn-hapus-dokumen');
+        const modalHapus = new bootstrap.Modal(document.getElementById('modalKonfirmasiHapus'));
+        let documentIdToDelete = null;
+        let rowToDelete = null;
 
-    hapusButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            documentIdToDelete = this.dataset.id;
-            rowToDelete = this.closest('tr');
+        hapusButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                documentIdToDelete = this.dataset.id;
+                rowToDelete = this.closest('tr');
+                modalHapus.show();
+            });
+        });
 
-            if (confirm("Yakin ingin menghapus dokumen ini?")) {
-                fetch(`/documents/${documentIdToDelete}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        rowToDelete.remove();
-                    } else {
-                        alert('Gagal menghapus dokumen. Coba lagi.');
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                    alert('Terjadi kesalahan!');
-                });
-            }
+        document.getElementById('btnKonfirmasiHapus').addEventListener('click', function () {
+            if (!documentIdToDelete) return;
+
+            fetch(`/documents/${documentIdToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    rowToDelete.remove();
+
+                    // 🔥 Reindex nomor urut
+                    const rows = document.querySelectorAll("table tbody tr");
+                    rows.forEach((row, index) => {
+                        const nomorCell = row.querySelector("td:first-child");
+                        if (nomorCell) {
+                            nomorCell.textContent = index + 1;
+                        }
+                    });
+
+                    modalHapus.hide();
+                } else {
+                    alert('Gagal menghapus dokumen. Coba lagi.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Terjadi kesalahan!');
+            });
         });
     });
-});
-</script>
-@endpush
+    </script>
+    @endpush
+
