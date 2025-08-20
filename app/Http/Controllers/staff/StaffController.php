@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
-    public function dashboard()
+    public function index()
     {
         // Ambil semua project beserta personelnya
         $projects = Project::with('projectPersonel')
@@ -17,17 +18,7 @@ class StaffController extends Controller
                 $query->where('user_id', Auth::id());
             })
             ->get();
-        // Kirim ke view
-        return view('staff.dashboard', compact('projects'));
-    }
-    public function index()
-    {
-        // Ambil project hanya milik PM yang sedang login
-        $projects = Project::with('projectPersonel')
-            ->whereHas('projectPersonel', function ($query) {
-                $query->where('user_id', Auth::id());
-            })
-            ->get();
+
         // Hitung statistik dokumen berdasarkan project milik PM tersebut
         $totalDokumen = $projects->count();
         $dokumenRevisi = $projects->where('status_dokumen', 'Revisi')->count();
@@ -39,10 +30,21 @@ class StaffController extends Controller
             'selesai' => $dokumenSelesai,
         ];
 
-        // Komisi dummy (ganti sesuai logika aslinya)
+        // Hitung komisi bulan ini (tanpa filter status_komisi)
+        $totalKomisiBulanIni = DB::table('project_commissions')
+            ->join('projects', 'project_commissions.project_id', '=', 'projects.id')
+            ->whereMonth('project_commissions.created_at', now()->month)
+            ->whereYear('project_commissions.created_at', now()->year)
+            ->sum('project_commissions.nilai_komisi');
+
+        // Hitung total semua komisi
+        $totalKomisiKeseluruhan = DB::table('project_commissions')
+            ->join('projects', 'project_commissions.project_id', '=', 'projects.id')
+            ->sum('project_commissions.nilai_komisi');
+
         $komisi = [
-            'bulan' => 76000000,
-            'tahun' => 1546000000,
+            'bulan' => $totalKomisiBulanIni,
+            'total' => $totalKomisiKeseluruhan,
         ];
 
         return view('staff.dashboard', compact('projects', 'stats', 'komisi'));
