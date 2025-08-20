@@ -1,6 +1,6 @@
 @extends('layouts.pm')
 
-@section('title', 'Komisi pm')
+@section('title', 'Komisi PM')
 
 @section('content')
   <!-- Tombol Filter -->
@@ -41,10 +41,11 @@
               data-project="{{ $project->id }}"
               data-judul="{{ $project->judul }}"
               data-nilai="{{ $project->nilai }}"
+              data-pm='@json(["id" => $project->pm_id, "nama" => $project->pm?->name ?? "(PM tidak ditemukan)"])'
               data-personel='@json($project->projectPersonel->map(function($p) {
                   return [
-                      'id' => $p->id,
-                      'nama' => $p->user->name ?? '(User tidak ditemukan)'
+                      "id" => $p->id,
+                      "nama" => $p->user->name ?? "(User tidak ditemukan)"
                   ];
               }))'>
               Input Komisi
@@ -90,6 +91,10 @@
             <input type="number" step="0.01" name="margin" class="form-control" required>
           </div>
 
+          <!-- Komisi PM -->
+          <h6 class="fw-bold mb-3">Komisi PM</h6>
+          <div id="list_pm"></div>
+
           <!-- Komisi Personel -->
           <h6 class="fw-bold mb-3">Komisi Personel</h6>
           <div id="list_personel"></div>
@@ -113,12 +118,32 @@ document.addEventListener('DOMContentLoaded', function () {
             let projectId = this.dataset.project;
             let judul = this.dataset.judul;
             let nilai = this.dataset.nilai;
+            let pm = JSON.parse(this.dataset.pm);
             let personel = JSON.parse(this.dataset.personel);
 
             document.getElementById('project_id').value = projectId;
             document.getElementById('judul_proyek').textContent = judul;
             document.getElementById('nilai_proyek').textContent = parseFloat(nilai).toLocaleString('id-ID');
 
+            // === Render PM ===
+            let containerPm = document.getElementById('list_pm');
+            containerPm.innerHTML = `
+              <div class="row align-items-center mb-3">
+                <div class="col-md-4">
+                  <label class="form-label mb-0">Project Manager</label>
+                  <input type="text" class="form-control" value="${pm.nama}" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label mb-0">Komisi:</label>
+                  <div class="input-group">
+                    <input type="number" name="komisi_pm[${pm.id}]" step="0.01" class="form-control" required>
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            // === Render Personel ===
             let container = document.getElementById('list_personel');
             container.innerHTML = '';
 
@@ -147,4 +172,3 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
-

@@ -15,13 +15,13 @@ class KomisiStaffController extends Controller
         $projects = Project::with([
             'projectPersonel.user',
             'komisi.projectPersonel.user'
-        ])  ->whereHas('projectPersonel', function ($query) {
-                $query->where('user_id', Auth::id());
-            })
+        ])->whereHas('projectPersonel', function ($query) {
+            $query->where('user_id', Auth::id());
+        })
             ->get();
         return view('staff.komisi', compact('projects'));
     }
-    
+
     public function show($project_id)
     {
         $project = Project::with([
@@ -33,16 +33,23 @@ class KomisiStaffController extends Controller
 
     public function totalPerPersonel()
     {
-        // Ambil semua data komisi + relasi personel & user
-        $komisiSemuaProject = Komisi::with('projectPersonel.user')->get();
+        // Ambil hanya komisi yang terkait dengan staff login
+        $komisiSemuaProject = Komisi::with('projectPersonel.user')
+            ->whereHas('projectPersonel', function ($q) {
+                $q->where('user_id', Auth::id());
+            })
+            ->get();
 
-        // Kirim ke view
         return view('staff.komisi_total', compact('komisiSemuaProject'));
     }
 
     public function totalPerPersonelBulananTable()
     {
-        $komisiSemuaProject = \App\Models\Komisi::with('projectPersonel.user')->get();
+        $komisiSemuaProject = Komisi::with('projectPersonel.user')
+            ->whereHas('projectPersonel', function ($q) {
+                $q->where('user_id', Auth::id());
+            })
+            ->get();
 
         // Siapkan struktur data
         $personelData = [];
@@ -55,7 +62,7 @@ class KomisiStaffController extends Controller
                 $personelData[$nama] = array_fill(1, 12, 0); // Januari-Desember
             }
 
-            $personelData[$nama][$bulan] += $komisi->nilai_komisi;
+            $personelData[$nama][$bulan] += $komisi->nilai_komisi ?? 0;
         }
 
         return view('staff.komisi_total_bulanan', compact('personelData'));

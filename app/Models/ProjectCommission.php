@@ -11,6 +11,7 @@ class ProjectCommission extends Model
     protected $fillable = [
         'project_id',
         'project_personel_id',
+        'user_id',
         'margin',
         'persentase',
         'nilai_komisi'
@@ -24,5 +25,9 @@ class ProjectCommission extends Model
     public function projectPersonel()
     {
         return $this->belongsTo(ProjectPersonel::class, 'project_personel_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
