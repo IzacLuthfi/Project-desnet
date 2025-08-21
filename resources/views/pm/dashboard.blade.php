@@ -575,7 +575,6 @@ document.addEventListener('DOMContentLoaded', function () {
     <h6 class="fw-bold mb-3">Dokumen</h6>
     <div class="row g-3">
       <div class="col-md-4"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">{{ $stats['total'] ?? 0 }}</div></div></div>
-      <div class="col-md-4"><div class="doc-box border-warning"><i class="bi bi-folder-symlink-fill text-warning"></i><div class="title">Dokumen Revisi</div><div class="number">{{ $stats['revisi'] ?? 0 }}</div></div></div>
       <div class="col-md-4"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">{{ $stats['selesai'] ?? 0 }}</div></div></div>
     </div>
   </div>
@@ -585,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <h6 class="fw-bold mb-3">Komisi</h6>
     <div class="row g-3">
       <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Bulan ini</div><div class="amount">Rp. {{ number_format($komisi['bulan'] ?? 0, 0, ',', '.') }}</div></div></div>
-      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Tahun ini</div><div class="amount">Rp. {{ number_format($komisi['tahun'] ?? 0, 0, ',', '.') }}</div></div></div>
+      <div class="col-md-6"><div class="komisi-box border-primary"><div class="title"><i class="bi bi-receipt"></i> Komisi Tahun ini</div><div class="amount">Rp. {{ number_format($komisi['total'] ?? 0, 0, ',', '.') }}</div></div></div>
     </div>
   </div>
 </div>
