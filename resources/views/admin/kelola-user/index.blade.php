@@ -68,12 +68,15 @@
 <div class="pagination-footer d-flex justify-content-center">
     {{-- Tombol Prev --}}
     @if ($users->onFirstPage())
-        <button class="btn btn-secondary rounded-circle me-2" style="width:40px; height:40px;" disabled>
+        <button class="btn btn-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" 
+                style="width:40px; height:40px;" disabled>
             <i class="bi bi-chevron-left"></i>
         </button>
     @else
-        <a href="{{ $users->previousPageUrl() }}" class="btn btn-dark rounded-circle me-2" style="width:40px; height:40px;">
-            <i class="bi bi-chevron-left text-white"></i>
+        <a href="{{ $users->previousPageUrl() }}" 
+            class="btn btn-dark rounded-circle me-2 d-flex align-items-center justify-content-center" 
+            style="width:40px; height:40px;">
+                <i class="bi bi-chevron-left"></i>
         </a>
     @endif
 
@@ -88,14 +91,18 @@
 
     {{-- Tombol Next --}}
     @if ($users->hasMorePages())
-        <a href="{{ $users->nextPageUrl() }}" class="btn btn-dark rounded-circle me-2" style="width:40px; height:40px;">
-            <i class="bi bi-chevron-right text-white"></i>
+        <a href="{{ $users->nextPageUrl() }}" 
+        class="btn btn-dark rounded-circle me-2 d-flex align-items-center justify-content-center" 
+        style="width:40px; height:40px;">
+            <i class="bi bi-chevron-right"></i>
         </a>
     @else
-        <button class="btn btn-secondary rounded-circle me-2" style="width:40px; height:40px;" disabled>
+        <button class="btn btn-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" 
+                style="width:40px; height:40px;" disabled>
             <i class="bi bi-chevron-right"></i>
         </button>
     @endif
+
 </div>
 
 <style>
