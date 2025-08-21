@@ -5,7 +5,9 @@ namespace App\Http\Controllers\PM;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Komisi;
 use App\Models\ProjectCommission;
+use Illuminate\Support\Facades\DB;
 use App\Models\User; // untuk ambil user HOD
 use App\Models\Notification; // untuk simpan notifikasi
 use Illuminate\Support\Facades\Auth;
@@ -84,6 +86,57 @@ class KomisiPMController extends Controller
         }
 
         return redirect()->back()->with('success', 'Komisi berhasil disimpan dan notifikasi telah dikirim ke HOD.');
+    }
+
+    public function destroy($id)
+    {
+        $komisi = Komisi::findOrFail($id);
+        $komisi->delete();
+
+        return redirect()->back()->with('success', 'Komisi berhasil dihapus.');
+    }
+
+    public function update(Request $request, $projectId)
+    {
+        DB::transaction(function () use ($request, $projectId) {
+            // PM
+            $pmArray = $request->input('komisi_pm', []);                 // [user_id => persen]
+            $pmId    = array_key_first($pmArray);
+            $pmPct   = $pmArray[$pmId] ?? 0;
+            $pmRowId = $request->input('komisi_pm_id');                  // id lama (boleh null)
+
+            ProjectCommission::updateOrCreate(
+                $pmRowId ? ['id' => $pmRowId] : ['project_id' => $projectId, 'user_id' => $pmId],
+                [
+                    'project_id'  => $projectId,
+                    'user_id'     => $pmId,
+                    'persentase'  => $pmPct,
+                    'margin'      => $request->margin ?? 0,
+                    'nilai_komisi' => ($request->margin ?? 0) * ($pmPct / 100),
+                ]
+            );
+
+            // Personel
+            $persen = $request->input('komisi', []);                     // [project_personel_id => persen]
+            $ids    = $request->input('komisi_id', []);                  // [project_personel_id => commission_id]
+
+            foreach ($persen as $ppId => $pct) {
+                $rowId = $ids[$ppId] ?? null;
+
+                ProjectCommission::updateOrCreate(
+                    $rowId ? ['id' => $rowId] : ['project_id' => $projectId, 'project_personel_id' => $ppId],
+                    [
+                        'project_id'          => $projectId,
+                        'project_personel_id' => $ppId,
+                        'persentase'          => $pct,
+                        'margin'              => $request->margin ?? 0,
+                        'nilai_komisi'        => ($request->margin ?? 0) * ($pct / 100),
+                    ]
+                );
+            }
+        });
+
+        return back()->with('success', 'Komisi berhasil diperbarui.');
     }
     public function show($project_id)
     {
