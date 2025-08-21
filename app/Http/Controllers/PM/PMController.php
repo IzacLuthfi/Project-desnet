@@ -5,7 +5,9 @@ namespace App\Http\Controllers\PM;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\ProjectCommission;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PMController extends Controller
 {
@@ -16,19 +18,30 @@ class PMController extends Controller
 
         // Hitung statistik dokumen berdasarkan project milik PM tersebut
         $totalDokumen = $projects->count();
-        $dokumenRevisi = $projects->where('status_dokumen', 'Revisi')->count();
         $dokumenSelesai = $projects->where('status_dokumen', 'Sudah Diajukan')->count();
 
         $stats = [
             'total' => $totalDokumen,
-            'revisi' => $dokumenRevisi,
             'selesai' => $dokumenSelesai,
         ];
 
-        // Komisi dummy (ganti sesuai logika aslinya)
+        // Hitung komisi bulan ini (tanpa filter status_komisi)
+        $totalKomisiBulanIni = DB::table('project_commissions')
+            ->join('projects', 'project_commissions.project_id', '=', 'projects.id')
+            ->where('projects.pm_id', Auth::id())
+            ->whereMonth('project_commissions.created_at', now()->month)
+            ->whereYear('project_commissions.created_at', now()->year)
+            ->sum('project_commissions.nilai_komisi');
+
+        // Hitung total semua komisi
+        $totalKomisiKeseluruhan = DB::table('project_commissions')
+            ->join('projects', 'project_commissions.project_id', '=', 'projects.id')
+            ->where('projects.pm_id', Auth::id())
+            ->sum('project_commissions.nilai_komisi');
+
         $komisi = [
-            'bulan' => 76000000,
-            'tahun' => 1546000000,
+            'bulan' => $totalKomisiBulanIni,
+            'total' => $totalKomisiKeseluruhan,
         ];
 
         return view('pm.dashboard', compact('projects', 'stats', 'komisi'));
