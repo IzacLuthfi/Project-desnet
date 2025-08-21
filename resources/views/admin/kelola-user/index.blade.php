@@ -141,7 +141,7 @@
                     <div class="modal-content p-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="fw-bold mb-0">Tambah User</h5>
-                            <small class="fw-bold text-muted">Masukkan Data</small>
+                            
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <hr>
