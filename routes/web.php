@@ -146,6 +146,8 @@ Route::middleware(['auth'])->prefix('hod')->group(function () {
     Route::post('/komisi/{id}/batalkan', [HodKomisiController::class, 'batalkanVerifikasiAjax'])->name('hod.komisi.batalkan');
 });
 // routes/web.php
+Route::delete('/komisi/{id}', [KomisiPMController::class, 'destroy'])->name('komisi.destroy');
+Route::put('/komisi/{project}', [KomisiPMController::class, 'update'])->name('komisi.update');
 Route::post('/komisi/store', [KomisiPMController::class, 'store'])->name('komisi.store');
 Route::get('/komisi', [KomisiPMController::class, 'index'])->name('pm.komisi');
 Route::get('/pm/komisi/{project_id}', [KomisiPMController::class, 'show'])->name('pm.komisi.show');
