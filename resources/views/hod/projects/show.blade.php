@@ -60,5 +60,7 @@
         @endforelse
       </tbody>
     </table>
+        {{-- Tombol Kembali --}}
+  <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
   </div>
 @endsection
