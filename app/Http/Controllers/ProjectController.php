@@ -170,9 +170,17 @@ class ProjectController extends Controller
         // Ambil semua staff untuk pilihan personel
         $staffs = User::where('role', 'Staff')->get();
 
+        // Siapkan array aman untuk dipakai di JavaScript
+    $staffsArray = $staffs->map(function($s) {
+        return [
+            'id' => $s->id,
+            'name' => $s->name,
+        ];
+    });
+
         return view(
             'admin.projects.edit',
-            compact('project', 'projects', 'projectManagers', 'staffs')
+            compact('project', 'projects', 'projectManagers', 'staffs', 'staffsArray')
         );
     }
 
