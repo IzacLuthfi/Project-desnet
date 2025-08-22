@@ -43,6 +43,52 @@ Route::delete('/admin/kelola-user/{id}', [KelolaUserController::class, 'destroy'
 Route::put('/admin/kelola-user/{id}', [KelolaUserController::class, 'update'])->name('kelola-user.update');
 Route::get('/admin/kelola-user/search', [KelolaUserController::class, 'search'])->name('kelola-user.search');
 
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+// ============ HALAMAN UTAMA (WELCOME) ============
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
+
+// ============ LOGIN & REGISTER ============
+// Semua route login/register hanya boleh diakses guest
+Route::middleware(['guest', PreventBackHistory::class])->group(function () {
+    require __DIR__ . '/auth.php';
+});
+
+// ============ REDIRECT DASHBOARD PER ROLE ============
+Route::get('/dashboard', function () {
+    $user = Auth::user();
+
+    switch ($user->role) {   // kalau pakai relasi, ganti ke $user->role->name
+        case 'admin':
+            return redirect()->route('admin.dashboard');
+        case 'pm':
+            return redirect()->route('pm.dashboard');
+        case 'hod':
+            return redirect()->route('hod.dashboard');
+        case 'staff':
+            return redirect()->route('staff.dashboard');
+        default:
+            abort(403, 'Role tidak dikenali.');
+    }
+})->middleware(['auth', 'verified', PreventBackHistory::class])->name('dashboard');
+
+// ============ ROUTE PROTECTED (HARUS LOGIN) ============
+Route::middleware(['auth', PreventBackHistory::class])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/hod/dashboard', [HodController::class, 'dashboard'])->name('hod.dashboard');
+    Route::get('/staff/dashboard', [StaffController::class, 'index'])->name('staff.dashboard');
+    Route::get('/pm/dashboard', [PMController::class, 'index'])->name('pm.dashboard');
+
+    // Profil
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // dst ... semua route project, komisi, notifikasi
+    // biarkan tetap sama, tapi sudah otomatis terproteksi
+});
 
 // ============ HALAMAN UTAMA (WELCOME) ============
 Route::get('/', function () {
@@ -165,17 +211,24 @@ Route::get('/admin/komisi-total-bulanan', [KomisiController::class, 'totalPerPer
 
 //======= notifikasi ======
 Route::get('/notifications', function () {
-    return Notification::where('user_id', Auth::id())
-        ->where('is_read', false)
+    $notifs = \App\Models\Notification::where('user_id', Auth::id())
         ->latest()
+        ->take(10)
         ->get();
+
+    $unread = $notifs->where('is_read', false)->count();
+
+    return response()->json([
+        'notifications' => $notifs,
+        'unread' => $unread
+    ]);
 })->middleware('auth');
 
 Route::post('/notifications/mark-all-read', function () {
     Notification::where('user_id', Auth::id())->update(['is_read' => true]);
     return response()->json(['status' => 'success']);
 })->middleware('auth');
-Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+
 
 Route::get('/pm/notifications', function () {
     return \App\Models\Notification::where('user_id', Auth::id())
