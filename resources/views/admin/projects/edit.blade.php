@@ -3,10 +3,10 @@
 @section('content')
 {{-- ======== Layer Belakang ======== --}}
 <div class="full-width-content">
-    
     @include('admin.projects.partials.layar-belakang')
-
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {{-- ======== Modal Edit (Layer Depan) ======== --}}
 <div class="modal-overlay d-flex justify-content-center align-items-center">
@@ -31,10 +31,11 @@
                         value="{{ old('nilai', $project->nilai) }}">
                 </div>
 
-                <!-- Personel -->
+                {{-- Personel --}}
                 <div class="mb-3">
                     <h6 class="fw-semibold">Personel</h6>
 
+                    {{-- Project Manager --}}
                     <div class="mb-3">
                         <label class="form-label">Project Manager</label>
                         <select name="pm_id" id="edit_pm_id" class="form-select" required>
@@ -48,6 +49,7 @@
                         </select>
                     </div>
 
+                    {{-- Personel list --}}
                     <div id="editPersonelContainer">
                         @php
                             $personels = $project->projectPersonel;
@@ -88,22 +90,24 @@
                         @endfor
                     </div>
 
-                    <!-- Tombol Tambah Personel -->
-                    <button type="button" class="btn btn-sm btn-primary mt-2 rounded-pill px-3" id="addPersonelBtn">
+                    {{-- Tombol Tambah Personel --}}
+                    <button type="button" 
+                            class="btn btn-sm btn-primary mt-2 rounded-pill px-3" 
+                            id="editAddPersonelBtn">
                         <i class="bi bi-plus-circle me-1"></i> Tambah Personel
                     </button>
                 </div>
 
-            </div> {{-- end card-body --}}
-
-            <!-- Footer -->
-            <div class="modal-footer border-top-0">
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary px-4">Batal</a>
-                <button type="submit" class="btn btn-primary px-4" id="btnUpdateProject">Update</button>
-            </div>
-        </form>
+                {{-- Footer --}}
+                <div class="modal-footer border-top-0">
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary px-4">Batal</a>
+                    <button type="submit" class="btn btn-primary px-4" id="btnUpdateProject">Update</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
 
 
 {{-- ======== CSS Modal Overlay & Scroll ======== --}}
@@ -135,21 +139,26 @@
 }
 </style>
 
+@endsection
+
+@push('scripts')
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const addPersonelBtn = document.getElementById("addPersonelBtn");
+    console.log("✅ Script loaded");
+
+    const addBtn = document.getElementById("editAddPersonelBtn");
     const container = document.getElementById("editPersonelContainer");
 
-    addPersonelBtn.addEventListener("click", function () {
-        // Hitung jumlah row yang sudah ada
-        const rowCount = container.querySelectorAll(".personel-row").length;
+    if (addBtn) {
+        addBtn.addEventListener("click", function () {
+            const index = container.querySelectorAll(".personel-row").length;
 
-        // Template HTML baris baru
-        const newRow = `
-            <div class="row g-2 mb-3 personel-row">
+            const newRow = document.createElement("div");
+            newRow.classList.add("row", "g-2", "mb-3", "personel-row");
+            newRow.innerHTML = `
                 <div class="col-md-6">
-                    <label class="form-label">Personel ${rowCount + 1}</label>
-                    <select name="personel[${rowCount}][user_id]" class="form-select">
+                    <label class="form-label">Personel ${index + 1}</label>
+                    <select name="personel[${index}][user_id]" class="form-select">
                         <option value="">-- Pilih Personel --</option>
                         @foreach ($staffs as $staff)
                             <option value="{{ $staff->id }}">{{ $staff->name }}</option>
@@ -158,20 +167,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Sebagai:</label>
-                    <select name="personel[${rowCount}][role]" class="form-select">
+                    <select name="personel[${index}][role]" class="form-select">
                         <option value="">-- Pilih Peran --</option>
-                        @foreach (['Analis', 'Programer web', 'Programer mobile', 'Tester', 'Desainer', 'Front-end'] as $role)
+                        @foreach (['Analis','Programer web','Programer mobile','Tester','Desainer','Front-end'] as $role)
                             <option value="{{ $role }}">{{ $role }}</option>
                         @endforeach
                     </select>
                 </div>
-            </div>
-        `;
-
-        // Tambahkan row ke container
-        container.insertAdjacentHTML("beforeend", newRow);
-    });
+            `;
+            container.appendChild(newRow);
+        });
+    }
 });
 </script>
 
-@endsection
+{{-- SweetAlert Success --}}
+@if(session('success'))
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            showConfirmButton: false,
+            timer: 2000
+        }).then(() => {
+            // setelah alert selesai -> redirect ke dashboard
+            window.location.href = "{{ route('admin.dashboard') }}";
+        });
+    });
+</script>
+@endif
+
+@endpush

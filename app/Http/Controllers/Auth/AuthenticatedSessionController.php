@@ -14,10 +14,14 @@ class AuthenticatedSessionController extends Controller
     /**
      * Tampilkan halaman login.
      */
-    public function create(): View
+    public function create()
     {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
         return view('auth.login');
     }
+
 
     /**
      * Tangani proses login.
@@ -54,13 +58,12 @@ class AuthenticatedSessionController extends Controller
      * Logout user.
      */
     public function destroy(Request $request): RedirectResponse
-{
-    Auth::guard('web')->logout();
+    {
+        Auth::guard('web')->logout();
 
-    $request->session()->invalidate();        // Hapus session
-    $request->session()->regenerateToken();   // Regenerasi CSRF token
+        $request->session()->invalidate();        // Hapus session
+        $request->session()->regenerateToken();   // Regenerasi CSRF token
 
-    return redirect('/');
-}
-
+        return redirect('/');
+    }
 }

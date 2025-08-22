@@ -11,6 +11,7 @@
                 <th>Margin</th>
                 <th>Persentase (%)</th>
                 <th>Nilai Komisi</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -20,6 +21,13 @@
                     <td>Rp {{ number_format($komisi->margin, 2, ',', '.') }}</td>
                     <td>{{ $komisi->persentase }}%</td>
                     <td>Rp {{ number_format($komisi->nilai_komisi, 2, ',', '.') }}</td>
+                    <td>
+                        <form action="{{ route('komisi.destroy', $komisi->id) }}" method="POST" class="form-hapus d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" class="btn btn-sm btn-danger btn-konfirmasi-hapus">Hapus</button>
+                        </form>
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -28,3 +36,32 @@
     <a href="{{ route('pm.komisi') }}" class="btn btn-secondary">Kembali</a>
 </div>
 @endsection
+
+@push('scripts')
+<!-- Tambahkan SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-konfirmasi-hapus').forEach(button => {
+        button.addEventListener('click', function () {
+            let form = this.closest('form');
+
+            Swal.fire({
+                title: 'Yakin hapus komisi ini?',
+                text: "Data yang dihapus tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
+@endpush
