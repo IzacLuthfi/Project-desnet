@@ -400,18 +400,18 @@ document.addEventListener('DOMContentLoaded', function () {
             </span>
         </a>
 
-            <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationDropdown" 
-          style="width: 320px; max-height: 400px; overflow-y: auto;">
-          <li class="p-2 border-bottom fw-bold">Notifikasi</li>
-          <div id="notificationList">
-              <li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>
-          </div>
-          <li class="text-center border-top p-2">
-              <button id="markAllRead" class="btn btn-sm btn-outline-primary rounded-pill">
-                  <i class="bi bi-check2-all"></i> Tandai Semua Dibaca
-              </button>
-          </li>
-      </ul>
+        <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationDropdown" 
+            style="width: 320px; max-height: 400px; overflow-y: auto;">
+            <li class="p-2 border-bottom fw-bold">Notifikasi</li>
+            <div id="notificationList">
+                <li class="p-3 text-muted text-center">Tidak ada notifikasi baru</li>
+            </div>
+            <li class="text-center border-top p-2">
+                <button id="markAllRead" class="btn btn-sm btn-outline-primary rounded-pill">
+                    <i class="bi bi-check2-all"></i> Tandai Semua Dibaca
+                </button>
+            </li>
+        </ul>
     </li>
 </div>
 
@@ -427,7 +427,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 if (data.notifications.length > 0) {
                     badge.textContent = data.unread;
-                    badge.classList.toggle('d-none', data.unread === 0);
+
+                    if (data.unread > 0) {
+                        badge.classList.remove('d-none'); // tampilkan badge
+                    } else {
+                        badge.classList.add('d-none'); // sembunyikan kalau tidak ada
+                    }
+
                     list.innerHTML = '';
                     data.notifications.forEach(notif => {
                         list.innerHTML += `
@@ -446,6 +452,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     loadNotifications();
 
+    // Pusher setup
     var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
         cluster: '{{ env('PUSHER_APP_CLUSTER') }}'
     });
@@ -453,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var channel = pusher.subscribe('hod-notifications');
     channel.bind('new-notification', function(data) {
         badge.classList.remove('d-none');
-        badge.textContent = parseInt(badge.textContent) + 1;
+        badge.textContent = (parseInt(badge.textContent) || 0) + 1;
 
         const newNotif = `
             <li class="p-3 border-bottom">
@@ -464,6 +471,7 @@ document.addEventListener('DOMContentLoaded', function () {
         list.innerHTML = newNotif + list.innerHTML;
     });
 
+    // Tandai semua dibaca
     document.getElementById('markAllRead').addEventListener('click', function (e) {
         e.preventDefault();
         fetch('/notifications/mark-all-read', { 
