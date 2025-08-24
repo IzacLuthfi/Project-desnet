@@ -6,6 +6,8 @@
     @include('admin.projects.partials.layar-belakang')
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 {{-- ======== Modal Edit (Layer Depan) ======== --}}
 <div class="modal-overlay d-flex justify-content-center align-items-center">
     <div class="card shadow-lg modal-card">
@@ -89,11 +91,11 @@
                     </div>
 
                     {{-- Tombol Tambah Personel --}}
-<button type="button" 
-        class="btn btn-sm btn-primary mt-2 rounded-pill px-3" 
-        id="editAddPersonelBtn">
-    <i class="bi bi-plus-circle me-1"></i> Tambah Personel
-</button>
+                    <button type="button" 
+                            class="btn btn-sm btn-primary mt-2 rounded-pill px-3" 
+                            id="editAddPersonelBtn">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Personel
+                    </button>
                 </div>
 
                 {{-- Footer --}}
@@ -144,43 +146,57 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ Script loaded");
 
-    const addBtn = document.getElementById("editAddPersonelBtn"); // pakai ID baru
+    const addBtn = document.getElementById("editAddPersonelBtn");
     const container = document.getElementById("editPersonelContainer");
 
-    if (!addBtn) {
-        console.error("❌ editAddPersonelBtn not found!");
-        return;
+    if (addBtn) {
+        addBtn.addEventListener("click", function () {
+            const index = container.querySelectorAll(".personel-row").length;
+
+            const newRow = document.createElement("div");
+            newRow.classList.add("row", "g-2", "mb-3", "personel-row");
+            newRow.innerHTML = `
+                <div class="col-md-6">
+                    <label class="form-label">Personel ${index + 1}</label>
+                    <select name="personel[${index}][user_id]" class="form-select">
+                        <option value="">-- Pilih Personel --</option>
+                        @foreach ($staffs as $staff)
+                            <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Sebagai:</label>
+                    <select name="personel[${index}][role]" class="form-select">
+                        <option value="">-- Pilih Peran --</option>
+                        @foreach (['Analis','Programer web','Programer mobile','Tester','Desainer','Front-end'] as $role)
+                            <option value="{{ $role }}">{{ $role }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            `;
+            container.appendChild(newRow);
+        });
     }
-
-    addBtn.addEventListener("click", function () {
-        console.log("👉 Tombol Tambah Personel diklik!");
-
-        const index = container.querySelectorAll(".personel-row").length;
-
-        const newRow = document.createElement("div");
-        newRow.classList.add("row", "g-2", "mb-3", "personel-row");
-        newRow.innerHTML = `
-            <div class="col-md-6">
-                <label class="form-label">Personel ${index + 1}</label>
-                <select name="personel[${index}][user_id]" class="form-select">
-                    <option value="">-- Pilih Personel --</option>
-                    @foreach ($staffs as $staff)
-                        <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Sebagai:</label>
-                <select name="personel[${index}][role]" class="form-select">
-                    <option value="">-- Pilih Peran --</option>
-                    @foreach (['Analis','Programer web','Programer mobile','Tester','Desainer','Front-end'] as $role)
-                        <option value="{{ $role }}">{{ $role }}</option>
-                    @endforeach
-                </select>
-            </div>
-        `;
-        container.appendChild(newRow);
-    });
 });
 </script>
+
+{{-- SweetAlert Success --}}
+@if(session('success'))
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            showConfirmButton: false,
+            timer: 2000
+        }).then(() => {
+            // setelah alert selesai -> redirect ke dashboard
+            window.location.href = "{{ route('admin.dashboard') }}";
+        });
+    });
+</script>
+@endif
+
 @endpush

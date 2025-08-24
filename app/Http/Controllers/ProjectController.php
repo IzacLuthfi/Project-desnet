@@ -219,6 +219,6 @@ class ProjectController extends Controller
             }
         }
 
-        return redirect()->route('admin.dashboard')->with('success', 'Proyek berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Proyek berhasil diperbarui.');
     }
 }
