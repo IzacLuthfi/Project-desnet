@@ -10,10 +10,11 @@
   </div>
 
   <h4 class="fw-bold mb-4">Komisi Bulanan</h4>
-    <!-- Tabel Komisi -->
+  
+  <!-- Tabel Komisi -->
   <div class="table-responsive">
     <table class="table table-bordered bg-white">
-      <thead class="table-light">
+      <thead class="table-light text-center"> {{-- header rata tengah --}}
         <tr>
           <th>No</th>
           <th>Judul Proyek</th>
@@ -32,7 +33,9 @@
                 return $p->user ? $p->user->name : '(User tidak ditemukan)';
             })->join(', ') ?: '-' }}
           </td>
-          <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
+          <td class="text-end"> {{-- nilai proyek rata kanan --}}
+            Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
+          </td>
           <td>
             <a href="{{ route('admin.komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
           </td>
