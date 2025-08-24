@@ -586,7 +586,7 @@ document.addEventListener('DOMContentLoaded', function () {
   <h6 class="fw-bold mb-3">Work Order</h6>
   <div class="table-responsive">
     <table class="table table-bordered align-middle" id="tabelWorkOrder">
-      <thead class="table-light">
+      <thead class="table-light text-center"> {{-- header rata tengah --}}
         <tr>
           <th class="col-no">No</th>
           <th class="col-judul">Judul Proyek</th>
@@ -611,7 +611,9 @@ document.addEventListener('DOMContentLoaded', function () {
               <span class="status-dot {{ $project->status_komisi === 'Disetujui' ? 'dot-success' : 'dot-warning' }}"></span>
               {{ $project->status_komisi ?? 'Belum Disetujui' }}
             </td>
-            <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
+            <td class="text-end"> {{-- nilai proyek rata kanan --}}
+              Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
+            </td>
             <td>
               {{ $project->projectPersonel->map(function($p) {
                   return $p->user ? $p->user->name : '(User tidak ditemukan)';
@@ -646,9 +648,9 @@ document.addEventListener('DOMContentLoaded', function () {
                       @csrf
                       <div class="modal-body">
                         <div class="mb-3">
-                        <label for="jenis_dokumen" class="form-label">Jenis Dokumen</label>
-                        <input type="text" name="jenis_dokumen" class="form-control" placeholder="Masukkan Jenis Dokumen" required>
-                      </div>
+                          <label for="jenis_dokumen" class="form-label">Jenis Dokumen</label>
+                          <input type="text" name="jenis_dokumen" class="form-control" placeholder="Masukkan Jenis Dokumen" required>
+                        </div>
                         <div class="mb-3">
                           <label for="dokumen" class="form-label">Upload Dokumen</label>
                           <input type="file" name="dokumen" class="form-control" required>

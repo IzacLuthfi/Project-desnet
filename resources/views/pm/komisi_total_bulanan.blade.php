@@ -26,6 +26,12 @@
         </thead>
         <tbody>
             @php $no = 1; @endphp
+            @php 
+                // Siapkan array total per bulan
+                $totalPerBulan = array_fill(1, 12, 0);
+                $grandTotal = 0;
+            @endphp
+
             @foreach($personelData as $nama => $bulanData)
                 <tr>
                     <td>{{ $no++ }}</td>
@@ -35,15 +41,25 @@
                         @php 
                             $nilai = $bulanData[$i];
                             $subtotal += $nilai;
+                            $totalPerBulan[$i] += $nilai; // tambahkan ke total bulan
                         @endphp
                         <td>{{ $nilai > 0 ? 'Rp ' . number_format($nilai, 0, ',', '.') : '-' }}</td>
                     @endfor
+                    @php $grandTotal += $subtotal; @endphp
                     <td><strong>Rp {{ number_format($subtotal, 0, ',', '.') }}</strong></td>
                 </tr>
             @endforeach
+
+            {{-- Baris total semua personel --}}
+            <tr class="table-secondary fw-bold">
+                <td colspan="2">Total Semua Personel</td>
+                @for($i = 1; $i <= 12; $i++)
+                    <td>Rp {{ number_format($totalPerBulan[$i], 0, ',', '.') }}</td>
+                @endfor
+                <td>Rp {{ number_format($grandTotal, 0, ',', '.') }}</td>
+            </tr>
         </tbody>
     </table>
-
     <a href="{{ route('pm.komisi') }}" class="btn btn-secondary">Kembali</a>
 </div>
 @endsection

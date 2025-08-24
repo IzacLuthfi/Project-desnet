@@ -14,7 +14,7 @@
   <!-- Tabel Komisi -->
   <div class="table-responsive">
     <table class="table table-bordered bg-white">
-      <thead class="table-light">
+      <thead class="table-light text-center">
         <tr>
           <th>No</th>
           <th>Judul Proyek</th>
@@ -33,7 +33,9 @@
                   return $p->user ? $p->user->name : '(User tidak ditemukan)';
               })->join(', ') ?: '-' }}
           </td>
-          <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
+          <td class="text-end"> {{-- nilai proyek rata kanan --}}
+            Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
+          </td>
           <td>
             <a href="{{ route('pm.komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
 
@@ -106,7 +108,7 @@
           <h5 class="modal-title fw-bold" id="modalKomisiLabel">Input Komisi</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-
+        <div id="formAlert" class="alert alert-danger d-none"></div>
         <div class="modal-body">
           <!-- Info Proyek -->
           <div class="mb-3">
@@ -121,7 +123,7 @@
           <!-- Input Margin -->
           <div class="mb-4">
             <label class="form-label fw-semibold">Input Nilai Margin:</label>
-            <input type="number" step="0.01" name="margin" class="form-control" required>
+            <input type="text" name="margin" id="marginInput" class="form-control" required>
           </div>
 
           <!-- Komisi PM -->
@@ -141,6 +143,28 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Error -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title fw-bold" id="errorModalLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2 text-white"></i> Validasi Komisi
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-2 text-dark" id="errorModalBody"></p>
+        <small class="text-muted">Silakan periksa kembali input komisi Anda.</small>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -148,11 +172,13 @@
 document.addEventListener('DOMContentLoaded', function () {
   const form         = document.getElementById('formKomisi');
   const methodInput  = document.getElementById('formMethod');
-
+  const marginInput  = document.getElementById('marginInput'); // margin input
+  const formAlert    = document.getElementById('formAlert');
+  
   function openModal({mode, projectId, judul, nilai, pm, personel}) {
     // Set action & method: create vs edit
     if (mode === 'edit') {
-      form.action     = `/komisi/${projectId}`;     // route('komisi.update', projectId)
+      form.action     = `/komisi/${projectId}`;
       methodInput.value = 'PUT';
     } else {
       form.action     = `{{ route('komisi.store') }}`;
@@ -213,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.btn-open-komisi').forEach(btn => {
     btn.addEventListener('click', function () {
       openModal({
-        mode: this.dataset.mode,                           // "create" | "edit"
+        mode: this.dataset.mode,
         projectId: this.dataset.project,
         judul: this.dataset.judul,
         nilai: this.dataset.nilai,
@@ -221,6 +247,51 @@ document.addEventListener('DOMContentLoaded', function () {
         personel: JSON.parse(this.dataset.personel)
       });
     });
+  });
+
+  function showError(message) {
+    formAlert.textContent = message;
+    formAlert.classList.remove('d-none');
+  }
+
+  function hideError() {
+    formAlert.classList.add('d-none');
+    formAlert.textContent = '';
+  }
+
+  // === Format ribuan untuk input margin ===
+  marginInput.addEventListener('input', function() {
+    let value = this.value.replace(/\./g, '');
+    if (!isNaN(value) && value !== '') {
+      this.value = parseInt(value, 10).toLocaleString('id-ID');
+    } else {
+      this.value = '';
+    }
+  });
+
+  form.addEventListener('submit', function(e) {
+    hideError();
+
+    let totalPersen = 0;
+    form.querySelectorAll('input[name^="komisi_pm"], input[name^="komisi["]').forEach(input => {
+      let val = parseFloat(input.value) || 0;
+      totalPersen += val;
+    });
+
+    if (totalPersen !== 100) {
+      e.preventDefault();
+
+      // isi pesan error ke modal
+      document.getElementById('errorModalBody').textContent =
+        `Total persentase komisi harus 100%. Saat ini tercatat ${totalPersen}%.`;
+
+      // tampilkan modal error
+      new bootstrap.Modal(document.getElementById('errorModal')).show();
+      return false;
+    }
+
+    // bersihkan titik ribuan sebelum submit
+    marginInput.value = marginInput.value.replace(/\./g, '');
   });
 });
 </script>

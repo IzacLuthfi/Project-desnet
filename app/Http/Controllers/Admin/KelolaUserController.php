@@ -11,13 +11,13 @@ class KelolaUserController extends Controller
 {
     // Tampilkan semua user dengan pagination
     // KelolaUserController.php
-public function index()
-{
-    ini_set('memory_limit', '1024M'); // Harus di atas!
+    public function index()
+    {
+        ini_set('memory_limit', '1024M'); // Harus di atas!
 
-    $users = User::select('id', 'name', 'email', 'role', 'is_active')->paginate(10); 
-    return view('admin.kelola-user.index', compact('users'));
-}
+        $users = User::select('id', 'name', 'email', 'role', 'is_active')->paginate(10);
+        return view('admin.kelola-user.index', compact('users'));
+    }
 
 
     // Tampilkan form tambah user
@@ -28,28 +28,39 @@ public function index()
 
     // Simpan user baru
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:6',
-        'role' => 'required|in:admin,hod,pm,staff',
-    ]);
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => [
+                'required',
+                'string',
+                'min:8',                // minimal 8 karakter
+                'regex:/[a-zA-Z]/',     // harus ada huruf
+                'regex:/[0-9]/',        // harus ada angka
+                'confirmed',            // harus sama dengan password_confirmation
+            ],
+            'role' => 'required|in:admin,hod,pm,staff',
+        ], [
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung huruf dan angka.',
+            'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+        ]);
 
-    $user = User::create([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-        'password' => bcrypt($validated['password']),
-        'role' => $validated['role'],
-    ]);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'role' => $validated['role'],
+        ]);
 
-    return response()->json([
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-        'role' => $user->role,
-    ]);
-}
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]);
+    }
 
     // Tampilkan form edit user
     public function edit($id)
@@ -70,57 +81,56 @@ public function index()
         $user->delete();
         return response()->json(['message' => 'User berhasil dihapus'], 200);
     }
-    
-   public function search(Request $request)
-{
-    $query = $request->get('q');
 
-    $users = User::where('name', 'LIKE', "%{$query}%")
-        ->orWhere('email', 'LIKE', "%{$query}%")
-        ->get(); // ⚡ pakai get() bukan paginate()
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
 
-    return response()->json([
-        'data' => $users
-    ]);
-}
+        $users = User::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get(); // ⚡ pakai get() bukan paginate()
+
+        return response()->json([
+            'data' => $users
+        ]);
+    }
 
 
 
     // Proses update user
-public function update(Request $request, $id)
-{
-    $user = User::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
 
-    $rules = [
-        'name' => 'required',
-        'email' => 'required|email|unique:users,email,' . $id,
-        'role' => 'required',
-    ];
+        $rules = [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'role' => 'required',
+        ];
 
-    // Kalau user mau ubah password
-    if ($request->filled('password')) {
-        $rules['old_password'] = 'required';
-        $rules['password'] = 'required|min:6|confirmed'; // pakai password_confirmation
-    }
-
-    $request->validate($rules);
-
-    // Cek old password kalau mau ganti password
-    if ($request->filled('password')) {
-        if (!Hash::check($request->old_password, $user->password)) {
-            return response()->json([
-                'errors' => ['old_password' => ['Password lama salah']]
-            ], 422);
+        // Kalau user mau ubah password
+        if ($request->filled('password')) {
+            $rules['old_password'] = 'required';
+            $rules['password'] = 'required|min:6|confirmed'; // pakai password_confirmation
         }
-        $user->password = Hash::make($request->password);
+
+        $request->validate($rules);
+
+        // Cek old password kalau mau ganti password
+        if ($request->filled('password')) {
+            if (!Hash::check($request->old_password, $user->password)) {
+                return response()->json([
+                    'errors' => ['old_password' => ['Password lama salah']]
+                ], 422);
+            }
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->role = $request->role;
+        $user->save();
+
+        return response()->json($user);
     }
-
-    $user->name = $request->name;
-    $user->email = $request->email;
-    $user->role = $request->role;
-    $user->save();
-
-    return response()->json($user);
-}
-
 }

@@ -135,17 +135,17 @@
     </div>
 </div>
 
-            {{-- Modal Tambah User --}}
-            <div class="modal fade" id="modalTambahUser" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                    <div class="modal-content p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="fw-bold mb-0">Tambah User</h5>
-                            <small class="fw-bold text-muted">Masukkan Data</small>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <hr>
-                    <form id="formTambahUser" autocomplete="off">
+{{-- Modal Tambah User --}}
+<div class="modal fade" id="modalTambahUser" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-bold mb-0">Tambah User</h5>
+                <small class="fw-bold text-muted">Masukkan Data</small>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <hr>
+            <form id="formTambahUser" autocomplete="off">
                 @csrf
                 <div class="mb-3">
                     <label>Nama User</label>
@@ -156,23 +156,23 @@
                     <input type="email" class="form-control" name="email" required autocomplete="off">
                 </div>
                 <div class="mb-3 position-relative">
-                <label>Password User</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" name="password" required autocomplete="new-password" id="password">
-                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <label>Password User <small class="text-muted">(min. 8 karakter, harus ada huruf & angka)</small></label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" name="password" required autocomplete="new-password" id="password">
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="mb-3 position-relative">
-                <label>Masukkan Ulang Password</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" id="password_confirmation">
-                    <button type="button" class="btn btn-outline-secondary" id="togglePasswordConfirm">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                <div class="mb-3 position-relative">
+                    <label>Masukkan Ulang Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" id="password_confirmation">
+                        <button type="button" class="btn btn-outline-secondary" id="togglePasswordConfirm">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
                 <div class="mb-3">
                     <label>Role</label>
                     <select class="form-select" name="role" required>
@@ -183,7 +183,7 @@
                         <option value="staff">Staff</option>
                     </select>
                 </div>
-                <div id="errorTambahUser" class="alert alert-danger d-none"></div>
+
                 <div class="text-end mt-3">
                     <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan</button>
@@ -192,31 +192,68 @@
         </div>
     </div>
 </div>
+
+{{-- 🔹 Modal Peringatan --}}
+<div class="modal fade" id="passwordErrorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i> Peringatan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p id="passwordErrorMessage" class="fw-bold mb-0"></p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">Mengerti</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+// Toggle show/hide password
 document.getElementById("togglePassword").addEventListener("click", function () {
     const passwordField = document.getElementById("password");
     const icon = this.querySelector("i");
-    if (passwordField.type === "password") {
-        passwordField.type = "text";
-        icon.classList.replace("bi-eye", "bi-eye-slash");
-    } else {
-        passwordField.type = "password";
-        icon.classList.replace("bi-eye-slash", "bi-eye");
-    }
+    passwordField.type = passwordField.type === "password" ? "text" : "password";
+    icon.classList.toggle("bi-eye");
+    icon.classList.toggle("bi-eye-slash");
 });
 
 document.getElementById("togglePasswordConfirm").addEventListener("click", function () {
     const passwordField = document.getElementById("password_confirmation");
     const icon = this.querySelector("i");
-    if (passwordField.type === "password") {
-        passwordField.type = "text";
-        icon.classList.replace("bi-eye", "bi-eye-slash");
-    } else {
-        passwordField.type = "password";
-        icon.classList.replace("bi-eye-slash", "bi-eye");
+    passwordField.type = passwordField.type === "password" ? "text" : "password";
+    icon.classList.toggle("bi-eye");
+    icon.classList.toggle("bi-eye-slash");
+});
+
+// 🔹 Validasi Password Ketat + Popup Modal
+document.getElementById("formTambahUser").addEventListener("submit", function (e) {
+    const password = document.getElementById("password").value.trim();
+    const confirmPassword = document.getElementById("password_confirmation").value.trim();
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+        e.preventDefault(); 
+        showPasswordError("Password minimal 8 karakter, harus ada huruf dan angka.");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        showPasswordError("Konfirmasi password tidak sesuai.");
+        return;
     }
 });
-</script>
+
+function showPasswordError(message) {
+    document.getElementById("passwordErrorMessage").textContent = message;
+    new bootstrap.Modal(document.getElementById("passwordErrorModal")).show();
+}
+</script>   
+
 
 {{-- Modal Edit User --}}
 <div class="modal fade" id="modalEditUser" tabindex="-1">
