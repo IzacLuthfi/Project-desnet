@@ -60,6 +60,9 @@
             </tr>
         </tbody>
     </table>
-    <a href="{{ route('pm.komisi') }}" class="btn btn-secondary">Kembali</a>
-</div>
+        <a href="{{ url('/komisi/export-bulanan') }}" class="btn btn-success">
+        Export ke Excel
+    </a>
+        <a href="{{ route('pm.komisi') }}" class="btn btn-secondary">Kembali</a>
+    </div>
 @endsection

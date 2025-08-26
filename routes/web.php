@@ -25,6 +25,8 @@ use App\Http\Controllers\Hod\KomisiController as HodKomisiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
 use App\Models\Notification;
+use App\Exports\KomisiBulananExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 /*
@@ -248,4 +250,9 @@ Route::middleware('auth')->group(function () {
 
     // Tandai semua notifikasi Staff sebagai sudah dibaca
     Route::post('/staff/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+});
+
+//========= export excel =====
+Route::get('/komisi/export-bulanan', function () {
+    return Excel::download(new KomisiBulananExport, 'komisi-bulanan.xlsx');
 });

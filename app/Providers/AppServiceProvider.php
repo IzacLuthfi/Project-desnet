@@ -4,13 +4,22 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class RouteServiceProvider extends ServiceProvider
+class AppServiceProvider extends ServiceProvider
 {
-    public const HOME = '/dashboard';
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
 
-    public function boot()
-{
-    ini_set('memory_limit', '1024M'); // Tambahkan baris ini
-    DB::statement("SET time_zone = '+07:00'");
-}
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        ini_set('memory_limit', '1024M'); // kalau mau tetap dipakai taruh di sini
+        // DB::statement("SET time_zone = '+07:00'"); // ini butuh import DB, kalau perlu
+    }
 }
