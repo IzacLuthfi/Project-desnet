@@ -141,7 +141,7 @@
         <div class="modal-content p-4">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h5 class="fw-bold mb-0">Tambah User</h5>
-                <small class="fw-bold text-muted">Masukkan Data</small>
+                <small class="fw-bold text-muted"></small>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <hr>
@@ -184,6 +184,9 @@
                     </select>
                 </div>
 
+                {{-- Tempat error --}}
+                <div id="errorTambahUser" class="alert alert-danger d-none"></div>
+
                 <div class="text-end mt-3">
                     <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan</button>
@@ -210,49 +213,7 @@
         </div>
     </div>
 </div>
-
-<script>
-// Toggle show/hide password
-document.getElementById("togglePassword").addEventListener("click", function () {
-    const passwordField = document.getElementById("password");
-    const icon = this.querySelector("i");
-    passwordField.type = passwordField.type === "password" ? "text" : "password";
-    icon.classList.toggle("bi-eye");
-    icon.classList.toggle("bi-eye-slash");
-});
-
-document.getElementById("togglePasswordConfirm").addEventListener("click", function () {
-    const passwordField = document.getElementById("password_confirmation");
-    const icon = this.querySelector("i");
-    passwordField.type = passwordField.type === "password" ? "text" : "password";
-    icon.classList.toggle("bi-eye");
-    icon.classList.toggle("bi-eye-slash");
-});
-
-// 🔹 Validasi Password Ketat + Popup Modal
-document.getElementById("formTambahUser").addEventListener("submit", function (e) {
-    const password = document.getElementById("password").value.trim();
-    const confirmPassword = document.getElementById("password_confirmation").value.trim();
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-        e.preventDefault(); 
-        showPasswordError("Password minimal 8 karakter, harus ada huruf dan angka.");
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        e.preventDefault();
-        showPasswordError("Konfirmasi password tidak sesuai.");
-        return;
-    }
-});
-
-function showPasswordError(message) {
-    document.getElementById("passwordErrorMessage").textContent = message;
-    new bootstrap.Modal(document.getElementById("passwordErrorModal")).show();
-}
-</script>   
+   
 
 
 {{-- Modal Edit User --}}
@@ -362,14 +323,55 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const formTambahUser = document.getElementById('formTambahUser');
-    const errorBox = document.getElementById('errorTambahUser');
     const modalTambahUser = new bootstrap.Modal(document.getElementById('modalTambahUser'));
 
-    // Submit tambah user
+    // 👁 Toggle show/hide password
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordField = document.getElementById("password");
+        const icon = this.querySelector("i");
+        passwordField.type = passwordField.type === "password" ? "text" : "password";
+        icon.classList.toggle("bi-eye");
+        icon.classList.toggle("bi-eye-slash");
+    });
+
+    document.getElementById("togglePasswordConfirm").addEventListener("click", function () {
+        const passwordField = document.getElementById("password_confirmation");
+        const icon = this.querySelector("i");
+        passwordField.type = passwordField.type === "password" ? "text" : "password";
+        icon.classList.toggle("bi-eye");
+        icon.classList.toggle("bi-eye-slash");
+    });
+
+    // 🔹 Submit form
     formTambahUser.addEventListener('submit', function(e) {
         e.preventDefault();
-        errorBox.classList.add('d-none');
-        errorBox.innerHTML = '';
+
+        const password = document.getElementById("password").value.trim();
+        const confirmPassword = document.getElementById("password_confirmation").value.trim();
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+        // Validasi password
+        if (!passwordRegex.test(password)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Peringatan',
+                text: 'Password minimal 8 karakter, harus ada huruf dan angka.',
+                confirmButtonText: 'Mengerti'
+            });
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Peringatan',
+                text: 'Konfirmasi password tidak sesuai.',
+                confirmButtonText: 'Mengerti'
+            });
+            return;
+        }
+
+        // Kalau valid → kirim ke server
         const formData = new FormData(formTambahUser);
 
         fetch("{{ route('kelola-user.store') }}", {
@@ -380,6 +382,16 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(async res => {
             if (res.ok) {
                 const data = await res.json();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'User berhasil ditambahkan!',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                // Tambah user ke tabel
                 const tbody = document.getElementById('userTableBody');
                 const newIndex = tbody.querySelectorAll('tr').length + 1;
 
@@ -406,18 +418,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     </td>
                 `;
                 tbody.appendChild(newRow);
+
                 reindexTable();
                 modalTambahUser.hide();
                 formTambahUser.reset();
+
             } else if (res.status === 422) {
                 const err = await res.json();
-                errorBox.innerHTML = Object.values(err.errors).flat().join('<br>');
-                errorBox.classList.remove('d-none');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validasi Gagal',
+                    html: Object.values(err.errors).flat().join('<br>')
+                });
             } else {
-                alert('Terjadi kesalahan server.');
+                Swal.fire('Error', 'Terjadi kesalahan server.', 'error');
             }
         })
-        .catch(() => alert('Terjadi kesalahan jaringan.'));
+        .catch(() => Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error'));
     });
 
     // Live Search
@@ -500,12 +517,40 @@ document.getElementById('editPasswordConfirmation').value = '';
     }
     });
 
-    // Submit edit
+    // 🔹 Submit edit user
     formEditUser.addEventListener('submit', function(e) {
         e.preventDefault();
         errorEditBox.classList.add('d-none');
         errorEditBox.innerHTML = '';
+
         const id = document.getElementById('editUserId').value;
+        const newPassword = document.getElementById('editPassword').value.trim();
+        const confirmPassword = document.getElementById('editPasswordConfirmation').value.trim();
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+        // ✅ Validasi hanya kalau user isi password baru
+        if (newPassword !== "" || confirmPassword !== "") {
+            if (!passwordRegex.test(newPassword)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Peringatan',
+                    text: 'Password baru minimal 8 karakter, harus ada huruf dan angka.',
+                    confirmButtonText: 'Mengerti'
+                });
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Peringatan',
+                    text: 'Konfirmasi password baru tidak sesuai.',
+                    confirmButtonText: 'Mengerti'
+                });
+                return;
+            }
+        }
+
         const formData = new FormData(formEditUser);
 
         fetch(`/admin/kelola-user/${id}`, {
