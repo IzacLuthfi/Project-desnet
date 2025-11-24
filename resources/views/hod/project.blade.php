@@ -37,8 +37,8 @@
   </style>
 
   <div class="table-responsive">
-    <table class="table table-bordered bg-white">
-      <thead class="table-light">
+    <table class="table table-bordered table-border-black bg-white">
+      <thead class="table-light text-center table-shadedd">
         <tr>
           <th class="col-no">No</th>
           <th class="col-judul">Judul Proyek</th>
@@ -52,22 +52,24 @@
         @php $projects = $projects ?? collect(); @endphp
         @forelse ($projects as $project)
           <tr>
-            <td>{{ $loop->iteration }}</td>
+            <td class="text-center">{{ $loop->iteration }}</td>
             <td>{{ $project->judul }}</td>
             <td>
               <span class="status-dot {{ $project->status_dokumen === 'Sudah Diajukan' ? 'dot-success' : 'dot-warning' }}"></span>
               {{ $project->status_dokumen ?? 'Belum Diajukan' }}
             </td>
-            <td>{{ number_format($project->nilai ?? 0, 0, ',', '.') }}</td>
+            <td class="text-end"> {{-- nilai proyek rata kanan --}}
+              Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
+            </td>
             <td>
               {{ $project->projectPersonel->map(function($p) {
                   return $p->user ? $p->user->name : '(User tidak ditemukan)';
               })->join(', ') ?: '-' }}
             </td>
-            <td>
+            <td class="text-center">
             <a href="{{ route('hod.project.show', $project->id) }}" 
                 class="btn btn-sm btn-success text-white" 
-                style="background-color: #11df11;">
+                style="background-color: #22c55e;">
                 Detail
               </a>
             </td>

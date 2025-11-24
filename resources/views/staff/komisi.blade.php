@@ -12,8 +12,8 @@
   <h4 class="fw-bold mb-4">Komisi Bulanan</h4>
     <!-- Tabel Komisi -->
   <div class="table-responsive">
-    <table class="table table-bordered bg-white">
-      <thead class="table-light text-center">
+    <table class="table table-bordered table-border-black bg-white">
+      <thead class="table-light table-shadded text-center">
         <tr>
           <th>No</th>
           <th>Judul Proyek</th>
@@ -25,7 +25,7 @@
       <tbody>
         @forelse ($projects as $project)
         <tr>
-          <td>{{ $loop->iteration }}</td>
+          <td class="text-center">{{ $loop->iteration }}</td>
           <td>{{ $project->judul }}</td>
           <td>
             {{ $project->projectPersonel->map(function($p) {
@@ -35,8 +35,8 @@
           <td class="text-end"> {{-- nilai proyek rata kanan --}}
             Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
           </td>
-          <td>
-            <a href="{{ route('staff.komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
+          <td class="text-center">
+            <a href="{{ route('staff.komisi.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
           </td>
         </tr>
         @empty

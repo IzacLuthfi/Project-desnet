@@ -12,8 +12,8 @@
 
   <!-- Tabel Komisi -->
   <div class="table-responsive">
-    <table class="table table-bordered bg-white">
-      <thead class="table-light text-center">
+    <table class="table table-bordered table-border-black bg-white">
+      <thead class="table-light text-center table-shadded">
         <tr>
           <th>No</th>
           <th>Judul Proyek</th>
@@ -26,7 +26,7 @@
       <tbody>
         @forelse ($projects as $project)
         <tr id="row-{{ $project->id }}">
-          <td>{{ $loop->iteration }}</td>
+          <td class="text-center">{{ $loop->iteration }}</td>
           <td>{{ $project->judul }}</td>
           <td>
             {{ $project->projectPersonel->map(function($p) {
@@ -36,7 +36,7 @@
           <td class="text-end"> {{-- nilai proyek rata kanan --}}
             Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
           </td>
-          <td class="status-cell">
+          <td class="status-cell text-center">
             @if($project->status_komisi == 'Disetujui')
               <span class="badge bg-success">Disetujui</span>
             @else
@@ -44,7 +44,7 @@
             @endif
           </td>
           <td>
-            <a href="{{ route('hod.komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
+            <a href="{{ route('hod.komisi.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
             @if($project->status_komisi == 'Disetujui')
               <button class="btn btn-sm btn-danger btn-batal-verifikasi" data-id="{{ $project->id }}">Batalkan Verifikasi</button>
             @else

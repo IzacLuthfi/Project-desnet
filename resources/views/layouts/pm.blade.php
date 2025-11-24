@@ -60,6 +60,37 @@
       justify-content: space-between;
       align-items: center;
     }
+    
+    .table-shaded td,
+    .table-shaded th {
+        background-color: #ffcc00;
+    }
+
+    .table-shadded td,
+    .table-shadded th {
+        background-color: #2bc6ff;
+    }
+
+    .table-shadedd td,
+    .table-shadedd th {
+        background-color: #22c55e;
+    }
+
+    .table-shaddedd td,
+    .table-shaddedd th {
+        background-color: #0d6efd;
+    }
+
+    .table-border-black,
+    .table-border-black th,
+    .table-border-black td {
+        border: 1px solid #000 !important;
+    }
+    
+    .table-text-white td,
+    .table-text-white th {
+        color: #ffffff; /* putih */
+    }
 
     .main-content {
       margin-left: 240px;

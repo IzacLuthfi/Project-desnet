@@ -4,8 +4,8 @@
 <div class="container">
     <h2>Detail Komisi - {{ $project->nama_project }}</h2>
 
-    <table class="table table-bordered mt-3">
-        <thead>
+    <table class="table table-bordered table-border-black mt-3">
+        <thead class="table-light text-center table-shadded">
             <tr>
                 <th>Nama Personel</th>
                 <th>Margin</th>
@@ -17,9 +17,9 @@
             @foreach($project->komisi as $komisi)
                 <tr>
                     <td>{{ $komisi->user->name ?? $komisi->projectPersonel->user->name ?? '-' }}</td>
-                    <td>Rp {{ number_format($komisi->margin, 2, ',', '.') }}</td>
+                    <td class="text-end">Rp {{ number_format($komisi->margin, 2, ',', '.') }}</td>
                     <td>{{ $komisi->persentase }}%</td>
-                    <td>Rp {{ number_format($komisi->nilai_komisi, 2, ',', '.') }}</td>
+                    <td class="text-end">Rp {{ number_format($komisi->nilai_komisi, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>

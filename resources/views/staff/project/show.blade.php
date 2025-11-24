@@ -6,8 +6,8 @@
   <h4 class="mb-4 fw-bold">Project: {{ $project->judul }}</h4>
 
   <div class="table-responsive">
-    <table class="table table-bordered bg-white">
-      <thead class="table-light">
+    <table class="table table-bordered table-border-black bg-white">
+      <thead class="table-light text-center table-shadedd">
         <tr>
           <th>No</th>
           <th>Jenis Dokumen</th>
@@ -19,11 +19,11 @@
       <tbody>
   @forelse ($project->projectDocuments as $doc)
     <tr>
-      <td>{{ $loop->iteration }}</td>
+      <td class="text-center">{{ $loop->iteration }}</td>
       <td>{{ $doc->jenis_dokumen }}</td>
       <td>{{ $doc->nama_asli ?? basename($doc->file_path) }}</td>
       <td>{{ \Carbon\Carbon::parse($doc->created_at)->translatedFormat('d F Y') }}</td>
-      <td>
+      <td class="text-center">
         <!-- Tombol Keterangan -->
         <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalKeterangan{{ $doc->id }}">
           Keterangan

@@ -4,8 +4,8 @@
 <div class="container">
     <h2>Total Komisi</h2>
 
-    <table class="table table-bordered mt-3">
-        <thead>
+    <table class="table table-bordered table-border-black mt-3">
+        <thead class="text-center table-text-white table-shaddedd">
             <tr>
                 <th>Nama Personel</th>
                 <th>Total Margin</th>
@@ -34,8 +34,8 @@
             @foreach($komisiPerPersonel as $nama => $data)
                 <tr>
                     <td>{{ $nama }}</td>
-                    <td>Rp {{ number_format($data['total_margin'], 2, ',', '.') }}</td>
-                    <td>Rp {{ number_format($data['total_komisi'], 2, ',', '.') }}</td>
+                    <td class="text-end">Rp {{ number_format($data['total_margin'], 2, ',', '.') }}</td>
+                    <td class="text-end">Rp {{ number_format($data['total_komisi'], 2, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>

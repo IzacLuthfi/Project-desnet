@@ -346,6 +346,17 @@ document.addEventListener('DOMContentLoaded', function () {
       color: #4f46e5;
     }
 
+    .table-shadedd td,
+    .table-shadedd th {
+        background-color: #22c55e;
+    }
+
+    .table-border-black,
+    .table-border-black th,
+    .table-border-black td {
+        border: 1px solid #000 !important;
+    }
+
     .table-fixed {
       table-layout: fixed;
       width: 100%;
@@ -573,8 +584,8 @@ document.addEventListener('DOMContentLoaded', function () {
 <div class="card-box mb-4">
   <h6 class="fw-bold mb-3">Work Order</h6>
   <div class="table-responsive">
-    <table class="table table-bordered align-middle" id="tabelWorkOrder">
-      <thead class="table-light text-center">
+    <table class="table table-bordered table-border-black align-middle table-fixed" id="tabelWorkOrder">
+      <thead class="table-light text-center table-shadedd">
         <tr>
           <th class="col-no">No</th>
           <th class="col-judul">Judul Proyek</th>
@@ -588,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function () {
         @php $projects = $projects ?? collect(); @endphp
         @forelse ($projects as $project)
           <tr>
-            <td>{{ $loop->iteration }}</td>
+            <td class="text-center">{{ $loop->iteration }}</td>
             <td>{{ $project->judul }}</td>
             <td>
               <span class="status-dot {{ $project->status_dokumen === 'Sudah Diajukan' ? 'dot-success' : 'dot-warning' }}"></span>
@@ -973,8 +984,8 @@ document.addEventListener('DOMContentLoaded', function () {
   <div class="card-box mb-4">
     <h6 class="fw-bold mb-3">Dokumen</h6>
     <div class="row g-3">
-      <div class="col-md-4"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">{{ $stats['total'] ?? 0 }}</div></div></div>
-      <div class="col-md-4"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">{{ $stats['selesai'] ?? 0 }}</div></div></div>
+      <div class="col-md-6"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">{{ $stats['total'] ?? 0 }}</div></div></div>
+      <div class="col-md-6"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">{{ $stats['selesai'] ?? 0 }}</div></div></div>
     </div>
   </div>
 

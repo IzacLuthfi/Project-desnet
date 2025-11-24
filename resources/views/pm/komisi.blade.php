@@ -13,8 +13,8 @@
 
   <!-- Tabel Komisi -->
   <div class="table-responsive">
-    <table class="table table-bordered bg-white">
-      <thead class="table-light text-center">
+    <table class="table table-bordered table-border-black bg-white">
+      <thead class="table-light table-shadded text-center">
         <tr>
           <th>No</th>
           <th>Judul Proyek</th>
@@ -26,7 +26,7 @@
       <tbody>
         @forelse ($projects as $project)
         <tr>
-          <td>{{ $loop->iteration }}</td>
+          <td class="text-center">{{ $loop->iteration }}</td>
           <td>{{ $project->judul }}</td>
           <td>
               {{ $project->projectPersonel->map(function($p) {
@@ -36,12 +36,11 @@
           <td class="text-end"> {{-- nilai proyek rata kanan --}}
             Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
           </td>
-          <td>
-            <a href="{{ route('pm.komisi.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
+          <td class="text-center">
 
             {{-- Input baru --}}
             <button 
-              class="btn btn-sm btn-warning btn-open-komisi" 
+              class="btn btn-sm btn-success btn-open-komisi" 
               data-mode="create"
               data-project="{{ $project->id }}"
               data-judul="{{ $project->judul }}"
@@ -61,7 +60,7 @@
 
             {{-- Edit komisi yang sudah ada --}}
             <button 
-                class="btn btn-sm btn-info btn-open-komisi"
+                class="btn btn-sm btn-warning btn-open-komisi"
                 data-mode="edit"
                 data-project="{{ $project->id }}"
                 data-judul="{{ $project->judul }}"
@@ -84,6 +83,7 @@
                 ) }}'>
                 Edit
             </button>
+            <a href="{{ route('pm.komisi.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
           </td>
         </tr>
         @empty

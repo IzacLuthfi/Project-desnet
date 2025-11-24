@@ -14,8 +14,8 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-hover align-middle table-bordered bg-white">
-            <thead class="table-light text-center">
+        <table class="table table-hover table-border-black align-middle table-bordered bg-white">
+            <thead class="table-light table-shaded text-center">
                 <tr>
                     <th>No</th>
                     <th>Full Name</th>
@@ -29,11 +29,11 @@
                 
                 @foreach ($users as $key => $user)
                 <tr data-id="{{ $user->id }}">
-                    <td>{{ $users->firstItem() + $key }}</td>
+                    <td class="text-center">{{ $users->firstItem() + $key }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>###</td>
-                    <td>
+                    <td class="text-center">
                         @php
                             switch ($user->role) {
                                 case 'admin': $badgeColor = 'bg-danger'; break;

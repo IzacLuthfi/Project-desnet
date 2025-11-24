@@ -4,8 +4,8 @@
 <div class="container">
     <h2>Total Komisi Perbulan</h2>
 
-    <table class="table table-bordered text-center">
-        <thead>
+    <table class="table table-bordered table-border-black bg-white">
+        <thead class="table-light text-center table-shaded">
             <tr>
                 <th>No</th>
                 <th>Nama Personel</th>
