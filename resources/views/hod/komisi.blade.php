@@ -13,6 +13,14 @@
   <!-- Tabel Komisi -->
   <div class="table-responsive">
     <table class="table table-bordered table-border-black bg-white">
+      <colgroup>
+  <col style="width: 60px;">         <!-- No -->
+  <col style="width: 250px;">        <!-- Judul Proyek -->
+  <col style="width: 220px;">        <!-- Personel (PATEN) -->
+  <col style="width: 130px;">        <!-- Nilai Proyek -->
+  <col style="width: 130px;">        <!-- Status Komisi -->
+  <col style="width: 180px;">        <!-- Aksi -->
+</colgroup>
       <thead class="table-light text-center table-shadded">
         <tr>
           <th>No</th>
@@ -28,7 +36,7 @@
         <tr id="row-{{ $project->id }}">
           <td class="text-center">{{ $loop->iteration }}</td>
           <td>{{ $project->judul }}</td>
-          <td>
+          <td class="personel-col">
             {{ $project->projectPersonel->map(function($p) {
               return $p->user ? $p->user->name : '(User tidak ditemukan)';
             })->join(', ') ?: '-' }}
@@ -60,6 +68,15 @@
       </tbody>
     </table>
   </div>
+
+<style>
+  td.personel-col {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;       /* harus sama dengan colgroup */
+  }
+</style>
 
   <!-- Modal Konfirmasi -->
   <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">

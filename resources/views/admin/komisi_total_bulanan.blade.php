@@ -35,7 +35,7 @@
             @foreach($personelData as $nama => $bulanData)
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $nama }}</td>
+                    <td class="text-start" >{{ $nama }}</td>
                     @php $subtotal = 0; @endphp
                     @for($i = 1; $i <= 12; $i++)
                         @php 

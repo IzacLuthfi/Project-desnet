@@ -177,14 +177,14 @@ document.getElementById('formTambahProject').addEventListener('submit', function
 
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${index}</td>
+        <td class="text-center">${index}</td>
         <td>${data.project.judul}</td>
         <td><span class="status-dot dot-warning"></span> Belum Diajukan</td>
         <td><span class="status-dot dot-warning"></span> Belum Disetujui</td>
-        <td>${parseInt(data.project.nilai).toLocaleString('id-ID')}</td>
+        <td class="text-end">Rp ${(parseInt(data.project.nilai ?? 0)).toLocaleString('id-ID')}</td>
         <td>${personelList || '-'}</td>
-        <td>
-          <a href="/projects/${data.project.id}" class="btn btn-sm btn-info ">Detail</a>
+        <td class="text-center">
+          <a href="/projects/${data.project.id}" class="btn btn-sm btn-success">Detail</a>
           <a href="/projects/${data.project.id}/edit" class="btn btn-sm btn-warning">Edit</a>
           <button class="btn btn-sm btn-danger btn-hapus" data-id="${data.project.id}" data-judul="${data.project.judul}">Hapus</button>
         </td>
@@ -886,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <span class="status-dot {{ $project->status_komisi === 'Disetujui' ? 'dot-success' : 'dot-warning' }}"></span>
               {{ $project->status_komisi ?? 'Belum Disetujui' }}
             </td>
-            <td class="text-end"> {{-- nilai proyek rata kanan --}}
+            <td class="text-end">
               Rp {{ number_format($project->nilai ?? 0, 0, ',', '.') }}
             </td>
             <td>

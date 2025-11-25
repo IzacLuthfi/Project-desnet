@@ -46,11 +46,11 @@
                     </td>
                     <td class="text-center">
                         <a href="#" class="btn btn-warning btn-sm rounded-2 me-1 btn-edit" data-id="{{ $user->id }}">
-    <i class="bi bi-pencil-square"></i> Edit
+    <i class=""></i> Edit
 </a>
 
                         <button class="btn btn-danger btn-sm rounded-2 btn-hapus" data-id="{{ $user->id }}">
-                            <i class="bi bi-trash"></i> Hapus
+                            <i class=""></i> Hapus
                         </button>
                     </td>
                 </tr>
@@ -403,17 +403,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 const newRow = document.createElement('tr');
                 newRow.setAttribute('data-id', data.id);
                 newRow.innerHTML = `
-                    <td>${newIndex}</td>
+                    <td class="text-center">${newIndex}</td>
                     <td>${data.name}</td>
                     <td>${data.email}</td>
                     <td>###</td>
-                    <td><span class="badge ${badgeClass}">${data.role}</span></td>
+                    <td class="text-center"><span class="badge ${badgeClass}">${data.role}</span></td>
                     <td class="text-center">
                         <a href="#" class="btn btn-warning btn-sm rounded-2 me-1 btn-edit">
-                            <i class="bi bi-pencil-square"></i> Edit
+                            <i class=""></i> Edit
                         </a>
                         <button class="btn btn-danger btn-sm rounded-2 btn-hapus" data-id="${data.id}">
-                            <i class="bi bi-trash"></i> Hapus
+                            <i class=""></i> Hapus
                         </button>
                     </td>
                 `;
@@ -469,17 +469,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     const row = document.createElement('tr');
                     row.setAttribute('data-id', user.id);
                     row.innerHTML = `
-                        <td>${index + 1}</td> 
+                        <td class="text-center">${index + 1}</td> 
                         <td>${user.name}</td>
                         <td>${user.email}</td>
                         <td>###</td>
-                        <td><span class="badge ${badgeClass}">${user.role}</span></td>
+                        <td class="text-center"><span class="badge ${badgeClass}">${user.role}</span></td>
                         <td class="text-center">
                             <a href="#" class="btn btn-warning btn-sm rounded-2 me-1 btn-edit" data-id="${user.id}">
-                                <i class="bi bi-pencil-square"></i> Edit
+                                <i class=""></i> Edit
                             </a>
                             <button class="btn btn-danger btn-sm rounded-2 btn-hapus" data-id="${user.id}">
-                                <i class="bi bi-trash"></i> Hapus
+                                <i class=""></i> Hapus
                             </button>
                         </td>
                     `;

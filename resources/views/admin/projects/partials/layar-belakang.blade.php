@@ -333,6 +333,37 @@ document.getElementById('formTambahProject').addEventListener('submit', function
       margin-right: 6px;
     }
 
+    .table-shaded td,
+    .table-shaded th {
+        background-color: #ffcc00;
+    }
+
+    .table-shadded td,
+    .table-shadded th {
+        background-color: #2bc6ff;
+    }
+
+    .table-shadedd td,
+    .table-shadedd th {
+        background-color: #22c55e;
+    }
+
+    .table-shaddedd td,
+    .table-shaddedd th {
+        background-color: #0d6efd;
+    }
+
+    .table-border-black,
+    .table-border-black th,
+    .table-border-black td {
+        border: 1px solid #000 !important;
+    }
+    
+    .table-text-white td,
+    .table-text-white th {
+        color: #ffffff; /* putih */
+    }
+
     .dot-success { background-color: #22c55e; }
     .dot-warning { background-color: #f59e0b; }
 
@@ -791,8 +822,8 @@ document.addEventListener('DOMContentLoaded', function () {
 <div class="card-box mb-4">
   <h6 class="fw-bold mb-3">Work Order</h6>
   <div class="table-responsive">
-    <table class="table table-bordered align-middle table-fixed" id="tabelWorkOrder">
-      <thead class="table-light">
+    <table class="table table-bordered table-border-black align-middle table-fixed" id="tabelWorkOrder">
+      <thead class="table-light text-center table-shaded">
         <tr>
           <th class="col-no">No</th>
           <th class="col-judul">Judul Proyek</th>
@@ -807,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function () {
         @php $projects = $projects ?? collect(); @endphp
         @forelse ($projects as $project)
           <tr>
-            <td>{{ $loop->iteration }}</td>
+            <td class="text-center">{{ $loop->iteration }}</td>
             <td>{{ $project->judul }}</td>
             <td>
               <span class="status-dot {{ $project->status_dokumen === 'Sudah Diajukan' ? 'dot-success' : 'dot-warning' }}"></span>
@@ -823,8 +854,8 @@ document.addEventListener('DOMContentLoaded', function () {
                   return $p->user ? $p->user->name : '(User tidak ditemukan)';
               })->join(', ') ?: '-' }}
             </td>
-            <td>
-              <a href="{{ route('admin.project.show', $project->id) }}" class="btn btn-sm btn-info">Detail</a>
+            <td class="text-center">
+              <a href="{{ route('admin.project.show', $project->id) }}" class="btn btn-sm btn-success">Detail</a>
               <a href="{{ route('admin.projects.edit', $project->id) }}" class="btn btn-sm btn-warning">Edit</a>
 
               <!-- Tombol Hapus dengan data-id -->
@@ -887,8 +918,8 @@ document.addEventListener('DOMContentLoaded', function () {
   <div class="card-box mb-4">
     <h6 class="fw-bold mb-3">Dokumen</h6>
     <div class="row g-3">
-      <div class="col-md-4"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">{{ $stats['total'] ?? 0 }}</div></div></div>
-      <div class="col-md-4"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">{{ $stats['selesai'] ?? 0 }}</div></div></div>
+      <div class="col-md-6"><div class="doc-box border-primary"><i class="bi bi-folder-fill text-primary"></i><div class="title">Total Dokumen</div><div class="number">{{ $stats['total'] ?? 0 }}</div></div></div>
+      <div class="col-md-6"><div class="doc-box border-success"><i class="bi bi-folder-check text-success"></i><div class="title">Dokumen Selesai</div><div class="number">{{ $stats['selesai'] ?? 0 }}</div></div></div>
     </div>
   </div>
 
